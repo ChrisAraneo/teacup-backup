@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/ChrisAraneo/mini-backup/issues"
   },
-  "homepage": "https://github.com/ChrisAraneo/mini-backup#readme"
+  "homepage": "https://github.com/ChrisAraneo/mini-backup#readme",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
 }
