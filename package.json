@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/ChrisAraneo/mini-backup#readme",
   "devDependencies": {
+    "@types/node": "^20.7.0",
     "typescript": "^5.2.2"
   }
 }
