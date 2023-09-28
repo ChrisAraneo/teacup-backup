@@ -52,6 +52,22 @@ export class MiniBackup {
     );
   }
 
+  async writeTextFiles(textFiles: TextFile[]): Promise<void> {
+    return (await Promise.all(
+      textFiles.map((textFile) => {
+        return new Promise((resolve, reject) => {
+          fs.writeFile(textFile.path, textFile.content, (error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(undefined);
+            }
+          });
+        });
+      })
+    )) as unknown as void;
+  }
+
   private async encryptTextFile(
     textFile: TextFile,
     secretKey: string
