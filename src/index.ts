@@ -1,12 +1,15 @@
 import { MiniBackup } from "./mini-backup";
 
 class App {
-  static main(): void {
-    new MiniBackup()
-      .findFiles("spiders-password-db.kdbx", ["D:\\", "E:\\"])
-      .then((results) => {
-        console.log("Results!", results);
-      });
+  static async main(): Promise<void> {
+    const miniBackup = new MiniBackup();
+
+    const roots = ["D:\\", "E:\\"];
+    const files = await miniBackup.findFiles("spiders-password-db.kdbx", roots);
+    const base64s = await miniBackup.readFilesToBase64(files);
+    const encrypted = await miniBackup.encryptTexts(base64s, 'super secret key');
+
+    console.log("Results!", encrypted);
   }
 }
 
