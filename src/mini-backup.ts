@@ -1,6 +1,8 @@
 import CryptoAES from "crypto-js/aes";
 import fileBase64 from "file-base64";
 import find from "find";
+import fs from "fs";
+import { TextFile } from "./types";
 
 export class MiniBackup {
   async findFiles(
@@ -20,30 +22,59 @@ export class MiniBackup {
     return result;
   }
 
-  async readFilesToBase64(files: string[]): Promise<string[]> {
+  async readFilesToBase64(files: string[]): Promise<TextFile[]> {
     return Promise.all(
-      files.map((file: string) => {
+      files.map((path: string) => {
         return new Promise((resolve, reject) => {
-          fileBase64.encode(file, (error, result: string) => {
+          fileBase64.encode(path, (error, result: string) => {
             if (error) {
               reject(error);
             } else {
-              resolve(result);
+              resolve({
+                path,
+                content: result,
+              });
             }
           });
         });
       })
-    ) as Promise<string[]>;
+    ) as Promise<TextFile[]>;
   }
 
-  async encryptTexts(texts: string[], secretKey: string): Promise<string[]> {
+  async encryptTextFiles(
+    textFiles: TextFile[],
+    secretKey: string
+  ): Promise<TextFile[]> {
     return Promise.all(
-      texts.map((text: string) => this.encryptText(text, secretKey))
+      textFiles.map((textFile: TextFile) =>
+        this.encryptTextFile(textFile, secretKey)
+      )
     );
   }
 
-  private async encryptText(text: string, secretKey: string): Promise<string> {
-    return CryptoAES.encrypt(text, secretKey).toString();
+  private async encryptTextFile(
+    textFile: TextFile,
+    secretKey: string
+  ): Promise<TextFile> {
+    return new Promise<TextFile>(async (resolve, reject) => {
+      let encrypted = "";
+
+      try {
+        encrypted = await CryptoAES.encrypt(
+          textFile.content,
+          secretKey
+        ).toString();
+      } catch (error) {
+        reject(error);
+      }
+
+      if (encrypted) {
+        resolve({
+          path: textFile.path,
+          content: encrypted,
+        });
+      }
+    });
   }
 
   private async findFile(
