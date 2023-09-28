@@ -1,4 +1,5 @@
 import find from "find";
+import fileBase64 from "file-base64";
 
 export class MiniBackup {
   async findFiles(
@@ -16,6 +17,22 @@ export class MiniBackup {
     );
 
     return result;
+  }
+
+  async readFilesToBase64(files: string[]): Promise<string[]> {
+    return Promise.all(
+      files.map((file: string) => {
+        return new Promise((resolve, reject) => {
+          fileBase64.encode(file, (error, result: string) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+      })
+    ) as Promise<string[]>;
   }
 
   private async findFile(
