@@ -27,6 +27,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "file-base64": "^1.0.0",
     "find": "^0.3.0"
   }
 }
