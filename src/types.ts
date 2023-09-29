@@ -7,3 +7,8 @@ export type TextFile = {
   path: string;
   content: string;
 };
+
+export type Base64File = {
+  path: string;
+  content: string;
+};
