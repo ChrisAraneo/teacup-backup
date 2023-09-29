@@ -1,3 +1,4 @@
+import { FileProcessor } from "./file-processor";
 import { MiniBackup } from "./mini-backup";
 
 class App {
@@ -6,7 +7,7 @@ class App {
 
     const roots = ["D:\\", "E:\\"];
     const files = await miniBackup.findFiles("spiders-password-db.kdbx", roots);
-    const filesInBase64 = await miniBackup.readFilesToBase64(files);
+    const filesInBase64 = await FileProcessor.readFilesToBase64(files);
     const encrypted = await miniBackup.encryptTextFiles(filesInBase64, 'super secret key');
 
     console.log("Results!", encrypted);

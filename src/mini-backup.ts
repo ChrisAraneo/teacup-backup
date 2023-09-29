@@ -1,8 +1,6 @@
 import CryptoAES from "crypto-js/aes";
-import fileBase64 from "file-base64";
 import find from "find";
-import fs from "fs";
-import { TextFile } from "./types";
+import { Base64File, EncryptedFile } from "./types";
 
 export class MiniBackup {
   async findFiles(
@@ -22,57 +20,22 @@ export class MiniBackup {
     return result;
   }
 
-  async readFilesToBase64(files: string[]): Promise<TextFile[]> {
-    return Promise.all(
-      files.map((path: string) => {
-        return new Promise((resolve, reject) => {
-          fileBase64.encode(path, (error, result: string) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve({
-                path,
-                content: result,
-              });
-            }
-          });
-        });
-      })
-    ) as Promise<TextFile[]>;
-  }
-
   async encryptTextFiles(
-    textFiles: TextFile[],
+    textFiles: Base64File[],
     secretKey: string
-  ): Promise<TextFile[]> {
+  ): Promise<EncryptedFile[]> {
     return Promise.all(
-      textFiles.map((textFile: TextFile) =>
+      textFiles.map((textFile: Base64File) =>
         this.encryptTextFile(textFile, secretKey)
       )
     );
   }
 
-  async writeTextFiles(textFiles: TextFile[]): Promise<void> {
-    return (await Promise.all(
-      textFiles.map((textFile) => {
-        return new Promise((resolve, reject) => {
-          fs.writeFile(textFile.path, textFile.content, (error) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(undefined);
-            }
-          });
-        });
-      })
-    )) as unknown as void;
-  }
-
   private async encryptTextFile(
-    textFile: TextFile,
+    textFile: Base64File,
     secretKey: string
-  ): Promise<TextFile> {
-    return new Promise<TextFile>(async (resolve, reject) => {
+  ): Promise<EncryptedFile> {
+    return new Promise<EncryptedFile>(async (resolve, reject) => {
       let encrypted = "";
 
       try {
