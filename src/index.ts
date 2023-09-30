@@ -4,15 +4,16 @@ class App {
   static async main(): Promise<void> {
     const miniBackup = new MiniBackup();
 
-    const roots = ["D:\\", "E:\\"];
-    const files = await miniBackup.findFiles("spiders-password-db.kdbx", roots);
+    const roots = ["C:\\Users\\chris\\Documents\\"];
+    const files = await miniBackup.findFiles("pliczek.txt", roots);
     const filesInBase64 = await miniBackup.readFilesToBase64(files);
     const encrypted = await miniBackup.encryptBase64Files(
       filesInBase64,
       "super secret key"
     );
+    const writtenFiles = await miniBackup.writeEncryptedFiles(encrypted);
 
-    console.log("Results!", encrypted);
+    console.log("Results!", writtenFiles);
   }
 }
 
