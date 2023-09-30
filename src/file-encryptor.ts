@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import CryptoAES from "crypto-js/aes";
 import { Base64File, EncryptedFile } from "./types";
 
@@ -21,7 +22,9 @@ export class FileEncryptor {
       let encrypted = "";
 
       try {
-        encrypted = CryptoAES.encrypt(file.content, secretKey).toString();
+        encrypted = CryptoAES.encrypt(file.content, secretKey).toString(
+          CryptoJS.format.OpenSSL
+        );
       } catch (error) {
         reject(error);
       }
@@ -56,7 +59,9 @@ export class FileEncryptor {
       let decrypted = "";
 
       try {
-        decrypted = CryptoAES.decrypt(file.content, secretKey).toString();
+        decrypted = CryptoAES.decrypt(file.content, secretKey).toString(
+          CryptoJS.enc.Utf8
+        );
       } catch (error) {
         reject(error);
       }
