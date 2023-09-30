@@ -60,9 +60,7 @@ export class FileProcessor {
 
   static async writeFileFromBase64(file: Base64File): Promise<void> {
     return new Promise((resolve, reject) => {
-      const buffer = Buffer.from(file.content, "base64");
-
-      fs.writeFile(file.path, buffer, (error: unknown) => {
+      fs.writeFile(file.path, file.content, {encoding: 'base64'}, (error: unknown) => {
         if (error) {
           reject(error);
         } else {
