@@ -1,5 +1,5 @@
 import CryptoAES from "crypto-js/aes";
-import find from "find";
+import { FileFinder } from "./file-finder";
 import { Base64File, EncryptedFile } from "./types";
 
 export class MiniBackup {
@@ -7,17 +7,7 @@ export class MiniBackup {
     pattern: string | RegExp,
     roots: string[] = ["C:\\"]
   ): Promise<string[]> {
-    const result: string[] = [];
-
-    const promises = roots.map((root: string) => {
-      return this.findFile(pattern, root);
-    });
-
-    (await Promise.all(promises)).map((items: string[]) =>
-      result.push(...items)
-    );
-
-    return result;
+    return FileFinder.findFiles(pattern, roots);
   }
 
   async encryptTextFiles(
@@ -53,21 +43,6 @@ export class MiniBackup {
           content: encrypted,
         });
       }
-    });
-  }
-
-  private async findFile(
-    pattern: string | RegExp,
-    root: string = "C:\\"
-  ): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      find
-        .file(pattern, root, (result) => {
-          resolve(result);
-        })
-        .error((error) => {
-          reject(error);
-        });
     });
   }
 }
