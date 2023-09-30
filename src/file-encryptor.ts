@@ -36,4 +36,39 @@ export class FileEncryptor {
       }
     });
   }
+
+  static async decryptBase64Files(
+    files: EncryptedFile[],
+    secretKey: string
+  ): Promise<Base64File[]> {
+    return Promise.all(
+      files.map((files: EncryptedFile) =>
+        this.decryptBase64File(files, secretKey)
+      )
+    );
+  }
+
+  static async decryptBase64File(
+    file: EncryptedFile,
+    secretKey: string
+  ): Promise<Base64File> {
+    return new Promise<Base64File>(async (resolve, reject) => {
+      let decrypted = "";
+
+      try {
+        decrypted = CryptoAES.decrypt(file.content, secretKey).toString();
+      } catch (error) {
+        reject(error);
+      }
+
+      if (decrypted) {
+        resolve({
+          path: file.path,
+          content: decrypted,
+        });
+      } else {
+        reject(decrypted);
+      }
+    });
+  }
 }
