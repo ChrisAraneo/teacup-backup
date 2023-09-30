@@ -1,4 +1,4 @@
-import { Base64File } from "./types";
+import { Base64File, EncryptedFile, TextFile } from "./types";
 var fs = require("node:fs");
 
 export class FileProcessor {
@@ -14,6 +14,16 @@ export class FileProcessor {
     await Promise.all(
       filesInBase64.map((file: Base64File) => {
         return this.writeFileFromBase64(file);
+      })
+    );
+  }
+
+  static async writeTextFiles(
+    files: (TextFile | EncryptedFile)[]
+  ): Promise<void> {
+    await Promise.all(
+      files.map((file: TextFile | EncryptedFile) => {
+        return this.writeTextFile(file);
       })
     );
   }
@@ -42,6 +52,18 @@ export class FileProcessor {
       const buffer = Buffer.from(file.content, "base64");
 
       fs.writeFile(file.path, buffer, (error: unknown) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(undefined);
+        }
+      });
+    });
+  }
+
+  private static writeTextFile(file: TextFile | EncryptedFile): Promise<void> {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(file.path, file.content, "utf8", (error: unknown) => {
         if (error) {
           reject(error);
         } else {
