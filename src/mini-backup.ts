@@ -2,6 +2,7 @@ import CryptoAES from "crypto-js/aes";
 import { FileFinder } from "./file-finder";
 import { Base64File, EncryptedFile } from "./types";
 import { FileProcessor } from "./file-processor";
+import { FileEncryptor } from "./file-encryptor";
 
 export class MiniBackup {
   async findFiles(
@@ -15,39 +16,10 @@ export class MiniBackup {
     return FileProcessor.readFilesToBase64(files);
   }
 
-  async encryptTextFiles(
-    textFiles: Base64File[],
+  async encryptBase64Files(
+    files: Base64File[],
     secretKey: string
   ): Promise<EncryptedFile[]> {
-    return Promise.all(
-      textFiles.map((textFile: Base64File) =>
-        this.encryptTextFile(textFile, secretKey)
-      )
-    );
-  }
-
-  private async encryptTextFile(
-    textFile: Base64File,
-    secretKey: string
-  ): Promise<EncryptedFile> {
-    return new Promise<EncryptedFile>(async (resolve, reject) => {
-      let encrypted = "";
-
-      try {
-        encrypted = await CryptoAES.encrypt(
-          textFile.content,
-          secretKey
-        ).toString();
-      } catch (error) {
-        reject(error);
-      }
-
-      if (encrypted) {
-        resolve({
-          path: textFile.path,
-          content: encrypted,
-        });
-      }
-    });
+    return FileEncryptor.encryptBase64Files(files, secretKey);
   }
 }
