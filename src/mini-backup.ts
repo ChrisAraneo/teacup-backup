@@ -1,6 +1,7 @@
 import CryptoAES from "crypto-js/aes";
 import { FileFinder } from "./file-finder";
 import { Base64File, EncryptedFile } from "./types";
+import { FileProcessor } from "./file-processor";
 
 export class MiniBackup {
   async findFiles(
@@ -8,6 +9,10 @@ export class MiniBackup {
     roots: string[] = ["C:\\"]
   ): Promise<string[]> {
     return FileFinder.findFiles(pattern, roots);
+  }
+
+  async readFilesToBase64(files: string[]): Promise<Base64File[]> {
+    return FileProcessor.readFilesToBase64(files);
   }
 
   async encryptTextFiles(
