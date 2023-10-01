@@ -1,7 +1,7 @@
 import path from "path";
 
-export class File {
-  constructor(private path: string, private content: any) {}
+export abstract class File<T> {
+  constructor(private path: string, private content: T) {}
 
   getFilename(): string {
     const basename = path.basename(this.path);
@@ -21,7 +21,7 @@ export class File {
     return parts[1];
   }
 
-  getContent(): any {
+  getContent(): T {
     return this.content;
   }
 
