@@ -30,6 +30,30 @@ export class MiniBackup {
     return filesWithChangedNames;
   }
 
+  async readEncryptedFiles(
+    files: EncryptedFile[],
+    secretKey: string
+  ): Promise<Base64File[]> {
+    const encryptedFiles = await FileProcessor.readTextFiles(
+      files.map((file) => file.path)
+    );
+
+    const decryptedFiles = await FileEncryptor.decryptBase64Files(
+      encryptedFiles,
+      secretKey
+    );
+
+    return this.updateFilePathsToDecrypted(decryptedFiles);
+  }
+
+  async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
+    const filesWithChangedNames = this.updateFilePathsToRestored(files);
+
+    await FileProcessor.writeFilesFromBase64(filesWithChangedNames);
+
+    return filesWithChangedNames.map((file) => file.path);
+  }
+
   private updateFilePathsToEncrypted(files: Base64File[]) {
     return files.map((file) => {
       const parts = file.path.split(".");
@@ -51,9 +75,36 @@ export class MiniBackup {
       } else {
         return {
           ...file,
-          path: file.path + "_encrypted.txt",
+          path: file.path + "_encrypted_.txt",
         };
       }
+    });
+  }
+
+  private updateFilePathsToDecrypted(files: Base64File[]): Base64File[] {
+    return files.map((file) => ({
+      ...file,
+      path: file.path.replace("_encrypted_", "_decrypted_"),
+      content: file.content,
+    }));
+  }
+
+  private updateFilePathsToRestored(
+    decryptedFiles: Base64File[]
+  ): Base64File[] {
+    return decryptedFiles.map((file) => {
+      const dotIndex = file.path.lastIndexOf(".");
+      const decryptedIndex = file.path.lastIndexOf("_decrypted_");
+      const extensionIndex = decryptedIndex + "_decrypted_".length;
+      const extension = file.path.substring(extensionIndex, dotIndex);
+      const updatedName =
+        file.path.replace("_decrypted_" + extension + ".txt", "") +
+        `_restored_.${extension}`;
+
+      return {
+        path: updatedName,
+        content: file.content,
+      };
     });
   }
 }
