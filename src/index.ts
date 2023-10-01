@@ -5,15 +5,19 @@ class App {
     const miniBackup = new MiniBackup();
 
     const roots = ["C:\\Users\\chris\\Documents\\"];
-    const files = await miniBackup.findFiles("pliczek.txt", roots);
+    const filename = "beztytulu.png";
+    const key = "super secret key";
+    const files = await miniBackup.findFiles(filename, roots);
     const filesInBase64 = await miniBackup.readFilesToBase64(files);
-    const encrypted = await miniBackup.encryptBase64Files(
-      filesInBase64,
-      "super secret key"
-    );
+    const encrypted = await miniBackup.encryptBase64Files(filesInBase64, key);
     const writtenFiles = await miniBackup.writeEncryptedFiles(encrypted);
 
-    console.log("Results!", writtenFiles);
+    setTimeout(async () => {
+      const readFiles = await miniBackup.readEncryptedFiles(writtenFiles, key);
+      const results = await miniBackup.writeRestoredFiles(readFiles);
+
+      console.log("Results!", results);
+    }, 2500);
   }
 }
 
