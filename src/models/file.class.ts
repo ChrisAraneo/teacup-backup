@@ -1,7 +1,7 @@
 import path from "path";
 
 export abstract class File<T> {
-  constructor(private path: string, private content: T) {}
+  constructor(protected path: string, protected content: T) {}
 
   getFilename(): string {
     const basename = path.basename(this.path);
