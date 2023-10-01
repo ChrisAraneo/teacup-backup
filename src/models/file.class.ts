@@ -24,4 +24,14 @@ export class File {
   getContent(): any {
     return this.content;
   }
+
+  setFilename(filename: string, extension: string | null): void {
+    const basename = path.basename(this.path);
+    const basenameIndex = this.path.lastIndexOf(basename);
+
+    this.path =
+      this.path.substring(0, basenameIndex) +
+      filename +
+      (extension ? extension : "");
+  }
 }
