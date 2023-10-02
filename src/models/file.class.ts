@@ -3,6 +3,10 @@ import path from "path";
 export abstract class File<T> {
   constructor(protected path: string, protected content: T) {}
 
+  getPath(): string {
+    return this.path;
+  }
+
   getFilename(): string {
     const basename = path.basename(this.path);
     const parts = basename.split(".");
