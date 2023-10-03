@@ -1,48 +1,42 @@
-import { Base64File, EncryptedFile, TextFile } from "./types";
-var fs = require("node:fs");
+import { Base64File } from "./models/base64-file.class";
+import { TextFile } from "./models/text-file.class";
+
+const fs = require("node:fs");
 
 export class FileProcessor {
-  static async readFilesToBase64(files: string[]): Promise<Base64File[]> {
+  static async readFilesToBase64(paths: string[]): Promise<Base64File[]> {
     return Promise.all(
-      files.map((path: string) => this.readFileToBase64(path))
+      paths.map((path) => this.readFileToBase64(path))
     );
   }
 
-  static async readFileToBase64(file: string): Promise<Base64File> {
+  static async readFileToBase64(path: string): Promise<Base64File> {
     return new Promise((resolve, reject) => {
       fs.readFile(
-        file,
+        path,
         { encoding: "base64" },
         (error: unknown, data: string) => {
           if (error) {
             reject(error);
           } else {
-            resolve({
-              path: file,
-              content: data,
-            });
+            resolve(new Base64File(path, data));
           }
         }
       );
     });
   }
 
-  static async readTextFiles(
-    files: string[]
-  ): Promise<(TextFile | EncryptedFile)[]> {
-    return Promise.all(files.map((path: string) => this.readTextFile(path)));
+  static async readTextFiles(paths: string[]): Promise<TextFile[]> {
+    return Promise.all(paths.map((path: string) => this.readTextFile(path)));
   }
 
-  static async readTextFile(file: string): Promise<TextFile | EncryptedFile> {
+  static async readTextFile(path: string): Promise<TextFile> {
     return new Promise((resolve, reject) => {
-      fs.readFile(file, "utf8", (error: unknown, data: string) => {
+      fs.readFile(path, "utf8", (error: unknown, data: string) => {
         if (error) {
           reject(error);
         } else {
-          resolve({
-            path: file,
-            content: data,
-          });
+          resolve(new TextFile(path, data));
         }
       });
     });
@@ -52,43 +46,46 @@ export class FileProcessor {
     filesInBase64: Base64File[]
   ): Promise<void> {
     await Promise.all(
-      filesInBase64.map((file: Base64File) => {
-        return this.writeFileFromBase64(file);
-      })
+      filesInBase64.map((file) => this.writeFileFromBase64(file))
     );
   }
 
   static async writeFileFromBase64(file: Base64File): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(file.path, file.content, {encoding: 'base64'}, (error: unknown) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(undefined);
+      fs.writeFile(
+        file.getPath(),
+        file.getContent(),
+        { encoding: "base64" },
+        (error: unknown) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(undefined);
+          }
         }
-      });
+      );
     });
   }
 
-  static async writeTextFiles(
-    files: (TextFile | EncryptedFile)[]
-  ): Promise<void> {
-    await Promise.all(
-      files.map((file: TextFile | EncryptedFile) => {
-        return this.writeTextFile(file);
-      })
-    );
+  static async writeTextFiles(files: TextFile[]): Promise<void> {
+    await Promise.all(files.map((file) => this.writeTextFile(file)));
   }
 
-  static async writeTextFile(file: TextFile | EncryptedFile): Promise<void> {
+  static async writeTextFile(file: TextFile): Promise<void> {
+    console.log('writeTextFile!', file.getPath());
     return new Promise((resolve, reject) => {
-      fs.writeFile(file.path, file.content, "utf8", (error: unknown) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(undefined);
+      fs.writeFile(
+        file.getPath(),
+        file.getContent(),
+        "utf8",
+        (error: unknown) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(undefined);
+          }
         }
-      });
+      );
     });
   }
 }

@@ -1,7 +1,9 @@
 import { FileEncryptor } from "./file-encryptor";
 import { FileFinder } from "./file-finder";
 import { FileProcessor } from "./file-processor";
-import { Base64File, EncryptedFile } from "./types";
+import { Base64File } from "./models/base64-file.class";
+import { EncryptedFile } from "./models/encrypted-file.class";
+import { TextFile } from "./models/text-file.class";
 
 export class MiniBackup {
   async findFiles(
@@ -19,92 +21,97 @@ export class MiniBackup {
     files: Base64File[],
     secretKey: string
   ): Promise<EncryptedFile[]> {
-    return FileEncryptor.encryptBase64Files(files, secretKey);
+    return Promise.all(
+      files.map((item) => EncryptedFile.fromBase64File(item, secretKey))
+    );
   }
 
   async writeEncryptedFiles(files: EncryptedFile[]): Promise<EncryptedFile[]> {
-    const filesWithChangedNames = this.updateFilePathsToEncrypted(files);
+    this.updateFilePathsToEncrypted(files);
 
-    await FileProcessor.writeTextFiles(filesWithChangedNames);
+    await Promise.all(files.map((file) => file.writeToFile()));
 
-    return filesWithChangedNames;
+    return files;
   }
 
   async readEncryptedFiles(
-    files: EncryptedFile[],
+    paths: string[],
     secretKey: string
   ): Promise<Base64File[]> {
-    const encryptedFiles = await FileProcessor.readTextFiles(
-      files.map((file) => file.path)
+    const encryptedFiles: EncryptedFile[] = await Promise.all(
+      paths.map((path) => EncryptedFile.fromEncryptedFile(path))
     );
 
-    const decryptedFiles = await FileEncryptor.decryptBase64Files(
+    const decryptedFiles: Base64File[] = FileEncryptor.decryptBase64Files(
       encryptedFiles,
       secretKey
     );
 
-    return this.updateFilePathsToDecrypted(decryptedFiles);
+    this.updateFilePathsToDecrypted(decryptedFiles);
+
+    return decryptedFiles;
   }
 
   async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
-    const filesWithChangedNames = this.updateFilePathsToRestored(files);
+    this.updateFilePathsToRestored(files);
 
-    await FileProcessor.writeFilesFromBase64(filesWithChangedNames);
+    await FileProcessor.writeFilesFromBase64(files);
 
-    return filesWithChangedNames.map((file) => file.path);
+    return files.map((file) => file.getPath());
   }
 
-  private updateFilePathsToEncrypted(files: Base64File[]) {
-    return files.map((file) => {
-      const parts = file.path.split(".");
+  private updateFilePathsToEncrypted(files: TextFile[]): void {
+    files.forEach((file) => {
+      const currentFilename = file.getFilename();
+      const currentExtension = file.getExtension();
 
-      if (parts.length >= 2) {
-        const extension = parts[parts.length - 1];
-        const updatedName = parts[parts.length - 2] + "_encrypted_" + extension;
-
-        let updatedPath = "";
-        for (let i = 0; i < parts.length - 2; ++i) {
-          updatedPath += parts[i];
-        }
-        updatedPath += updatedPath + updatedName + ".txt";
-
-        return {
-          ...file,
-          path: updatedPath,
-        };
-      } else {
-        return {
-          ...file,
-          path: file.path + "_encrypted_.txt",
-        };
-      }
+      file.setFilename(
+        currentFilename + "_encrypted_" + currentExtension,
+        "txt"
+      );
     });
   }
 
-  private updateFilePathsToDecrypted(files: Base64File[]): Base64File[] {
-    return files.map((file) => ({
-      ...file,
-      path: file.path.replace("_encrypted_", "_decrypted_"),
-      content: file.content,
-    }));
+  private updateFilePathsToDecrypted(encryptedFiles: TextFile[]): void {
+    encryptedFiles.forEach((file) => {
+      const currentFilename = file.getFilename();
+      const ecryptedSubstringIndex = currentFilename.lastIndexOf("_encrypted_");
+      const updatedExtension = currentFilename.substring(
+        ecryptedSubstringIndex + "_encrypted_".length
+      );
+      const updatedFilename = currentFilename.replace(
+        "_encrypted_" + updatedExtension,
+        "_decrypted_"
+      );
+
+      console.log(
+        "updateFilePathsToDecrypted",
+        currentFilename,
+        updatedFilename,
+        updatedExtension
+      );
+
+      file.setFilename(updatedFilename, updatedExtension);
+    });
   }
 
-  private updateFilePathsToRestored(
-    decryptedFiles: Base64File[]
-  ): Base64File[] {
-    return decryptedFiles.map((file) => {
-      const dotIndex = file.path.lastIndexOf(".");
-      const decryptedIndex = file.path.lastIndexOf("_decrypted_");
-      const extensionIndex = decryptedIndex + "_decrypted_".length;
-      const extension = file.path.substring(extensionIndex, dotIndex);
-      const updatedName =
-        file.path.replace("_decrypted_" + extension + ".txt", "") +
-        `_restored_.${extension}`;
+  private updateFilePathsToRestored(decryptedFiles: TextFile[]): void {
+    decryptedFiles.forEach((file) => {
+      const currentFilename = file.getFilename();
+      const currentExtension = file.getExtension();
+      const updatedFilename = currentFilename.replace(
+        "_decrypted_",
+        "_restored_"
+      );
 
-      return {
-        path: updatedName,
-        content: file.content,
-      };
+      console.log(
+        "updateFilePathsToRestored",
+        currentFilename,
+        currentExtension,
+        updatedFilename
+      );
+
+      file.setFilename(updatedFilename, currentExtension);
     });
   }
 }

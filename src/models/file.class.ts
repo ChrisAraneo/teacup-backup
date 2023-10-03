@@ -29,13 +29,16 @@ export abstract class File<T> {
     return this.content;
   }
 
-  setFilename(filename: string, extension: string | null): void {
+  setFilename(
+    filename: string,
+    extension: string | null = this.getExtension()
+  ): void {
     const basename = path.basename(this.path);
     const basenameIndex = this.path.lastIndexOf(basename);
 
     this.path =
       this.path.substring(0, basenameIndex) +
       filename +
-      (extension ? extension : "");
+      (extension ? "." + extension : "");
   }
 }

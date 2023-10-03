@@ -1,12 +1,18 @@
 import CryptoJS from "crypto-js";
 import CryptoAES from "crypto-js/aes";
-import { Base64File, EncryptedFile } from "./types";
+import { Base64File } from "./models/base64-file.class";
+import { EncryptedFile } from "./models/encrypted-file.class";
+
+type EncryptionResult = {
+  path: string;
+  content: string;
+};
 
 export class FileEncryptor {
   static async encryptBase64Files(
     files: Base64File[],
     secretKey: string
-  ): Promise<EncryptedFile[]> {
+  ): Promise<EncryptionResult[]> {
     return Promise.all(
       files.map((textFile: Base64File) =>
         this.encryptBase64File(textFile, secretKey)
@@ -14,66 +20,51 @@ export class FileEncryptor {
     );
   }
 
-  static async encryptBase64File(
+  static encryptBase64File(
     file: Base64File,
     secretKey: string
-  ): Promise<EncryptedFile> {
-    return new Promise<EncryptedFile>(async (resolve, reject) => {
-      let encrypted = "";
+  ): EncryptionResult {
+    let encrypted = "";
 
-      try {
-        encrypted = CryptoAES.encrypt(file.content, secretKey).toString(
-          CryptoJS.format.OpenSSL
-        );
-      } catch (error) {
-        reject(error);
-      }
+    try {
+      encrypted = CryptoAES.encrypt(file.getContent(), secretKey).toString(
+        CryptoJS.format.OpenSSL
+      );
+    } catch (error) {
+      throw error;
+    }
 
-      if (encrypted) {
-        resolve({
-          path: file.path,
-          content: encrypted,
-        });
-      } else {
-        reject(encrypted);
-      }
-    });
+    if (encrypted) {
+      return { path: file.getPath(), content: encrypted };
+    } else {
+      throw Error("Encrypted content is empty!");
+    }
   }
 
-  static async decryptBase64Files(
+  static decryptBase64Files(
     files: EncryptedFile[],
     secretKey: string
-  ): Promise<Base64File[]> {
-    return Promise.all(
-      files.map((files: EncryptedFile) =>
-        this.decryptBase64File(files, secretKey)
-      )
+  ): Base64File[] {
+    return files.map((files: EncryptedFile) =>
+      this.decryptBase64File(files, secretKey)
     );
   }
 
-  static async decryptBase64File(
-    file: EncryptedFile,
-    secretKey: string
-  ): Promise<Base64File> {
-    return new Promise<Base64File>(async (resolve, reject) => {
-      let decrypted = "";
+  static decryptBase64File(file: EncryptedFile, secretKey: string): Base64File {
+    let decrypted = "";
 
-      try {
-        decrypted = CryptoAES.decrypt(file.content, secretKey).toString(
-          CryptoJS.enc.Utf8
-        );
-      } catch (error) {
-        reject(error);
-      }
+    try {
+      decrypted = CryptoAES.decrypt(file.getContent(), secretKey).toString(
+        CryptoJS.enc.Utf8
+      );
+    } catch (error) {
+      throw error;
+    }
 
-      if (decrypted) {
-        resolve({
-          path: file.path,
-          content: decrypted,
-        });
-      } else {
-        reject(decrypted);
-      }
-    });
+    if (decrypted) {
+      return new Base64File(file.getPath(), file.getContent());
+    } else {
+      throw Error("Decrypted content is empty!");
+    }
   }
 }
