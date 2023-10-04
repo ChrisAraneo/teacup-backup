@@ -1,9 +1,4 @@
-import { read } from "fs";
-import { FileEncryptor } from "./file-encryptor";
 import { MiniBackup } from "./mini-backup";
-import { EncryptedFile } from "./models/encrypted-file.class";
-import CryptoJS from "crypto-js";
-import CryptoAES from "crypto-js/aes";
 
 class App {
   static async main(): Promise<void> {
