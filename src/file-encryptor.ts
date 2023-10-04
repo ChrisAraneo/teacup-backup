@@ -62,7 +62,7 @@ export class FileEncryptor {
     }
 
     if (decrypted) {
-      return new Base64File(file.getPath(), file.getContent());
+      return new Base64File(file.getPath(), decrypted);
     } else {
       throw Error("Decrypted content is empty!");
     }
