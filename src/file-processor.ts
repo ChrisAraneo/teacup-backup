@@ -1,13 +1,12 @@
 import { Base64File } from "./models/base64-file.class";
+import { JsonFile } from "./models/json-file.class";
 import { TextFile } from "./models/text-file.class";
 
 const fs = require("node:fs");
 
 export class FileProcessor {
   static async readFilesToBase64(paths: string[]): Promise<Base64File[]> {
-    return Promise.all(
-      paths.map((path) => this.readFileToBase64(path))
-    );
+    return Promise.all(paths.map((path) => this.readFileToBase64(path)));
   }
 
   static async readFileToBase64(path: string): Promise<Base64File> {
@@ -42,6 +41,24 @@ export class FileProcessor {
     });
   }
 
+  static async readJsonFiles(paths: string[]): Promise<JsonFile[]> {
+    return Promise.all(paths.map((path: string) => this.readJsonFile(path)));
+  }
+
+  static async readJsonFile(path: string): Promise<JsonFile> {
+    return new Promise((resolve, reject) => {
+      this.readTextFile(path)
+        .then((result) => {
+          resolve(
+            new JsonFile(result.getPath(), JSON.parse(result.getContent()))
+          );
+        })
+        .catch((error: unknown) => {
+          throw error;
+        });
+    });
+  }
+
   static async writeFilesFromBase64(
     filesInBase64: Base64File[]
   ): Promise<void> {
@@ -72,7 +89,6 @@ export class FileProcessor {
   }
 
   static async writeTextFile(file: TextFile): Promise<void> {
-    console.log('writeTextFile!', file.getPath());
     return new Promise((resolve, reject) => {
       fs.writeFile(
         file.getPath(),
