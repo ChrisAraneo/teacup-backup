@@ -1,3 +1,4 @@
+import { ConfigLoader } from "./config-loader";
 import { FileEncryptor } from "./file-encryptor";
 import { FileFinder } from "./file-finder";
 import { FileProcessor } from "./file-processor";
@@ -58,6 +59,10 @@ export class MiniBackup {
     await FileProcessor.writeFilesFromBase64(files);
 
     return files.map((file) => file.getPath());
+  }
+
+  async readConfigFile(): Promise<object> {
+    return ConfigLoader.readConfigFile();
   }
 
   private updateFilePathsToEncrypted(files: TextFile[]): void {
