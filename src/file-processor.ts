@@ -54,7 +54,7 @@ export class FileProcessor {
           );
         })
         .catch((error: unknown) => {
-          throw error;
+          reject(error);
         });
     });
   }
