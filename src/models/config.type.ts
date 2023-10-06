@@ -1,5 +1,6 @@
 export type Config = {
+  roots: string[];
   files: Array<{
-    pattern: string;
+    filename: string;
   }>;
 };
