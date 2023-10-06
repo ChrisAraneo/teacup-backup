@@ -1,0 +1,8 @@
+{
+  "roots": ["C:\\", "D:\\", "E:\\"],
+  "files": [
+    {
+      "filename": "this-is-example-filename.txt"
+    }
+  ]
+}
