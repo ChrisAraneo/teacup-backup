@@ -4,5 +4,7 @@
     {
       "filename": "this-is-example-filename.txt"
     }
-  ]
+  ],
+  "mode": "backup",
+  "backupDirectory": "./backups"
 }

@@ -3,4 +3,6 @@ export type Config = {
   files: Array<{
     filename: string;
   }>;
+  mode: "backup" | "restore";
+  backupDirectory: string;
 };
