@@ -6,7 +6,18 @@ import { Base64File } from "./models/base64-file.class";
 import { EncryptedFile } from "./models/encrypted-file.class";
 import { TextFile } from "./models/text-file.class";
 
+var prompt = require("prompt-sync")({
+  sigint: false,
+});
+
 export class MiniBackup {
+  private secretKey: string = "";
+
+  promptUserSecretKey(): void {
+    console.log("Secret key (password for encryption):");
+    this.secretKey = prompt({ echo: "*" });
+  }
+
   async findFiles(
     pattern: string | RegExp,
     roots: string[] = ["C:\\"]
@@ -18,12 +29,9 @@ export class MiniBackup {
     return FileProcessor.readFilesToBase64(files);
   }
 
-  async encryptBase64Files(
-    files: Base64File[],
-    secretKey: string
-  ): Promise<EncryptedFile[]> {
+  async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
     return Promise.all(
-      files.map((item) => EncryptedFile.fromBase64File(item, secretKey))
+      files.map((item) => EncryptedFile.fromBase64File(item, this.secretKey))
     );
   }
 
@@ -35,17 +43,14 @@ export class MiniBackup {
     return files;
   }
 
-  async readEncryptedFiles(
-    paths: string[],
-    secretKey: string
-  ): Promise<Base64File[]> {
+  async readEncryptedFiles(paths: string[]): Promise<Base64File[]> {
     const encryptedFiles: EncryptedFile[] = await Promise.all(
       paths.map((path) => EncryptedFile.fromEncryptedFile(path))
     );
 
     const decryptedFiles: Base64File[] = FileEncryptor.decryptBase64Files(
       encryptedFiles,
-      secretKey
+      this.secretKey
     );
 
     this.updateFilePathsToDecrypted(decryptedFiles);
