@@ -35,8 +35,11 @@ export class MiniBackup {
     );
   }
 
-  async writeEncryptedFiles(files: EncryptedFile[]): Promise<EncryptedFile[]> {
-    this.updateFilePathsToEncrypted(files);
+  async writeEncryptedFiles(
+    files: EncryptedFile[],
+    backupDirectory: string
+  ): Promise<EncryptedFile[]> {
+    this.updateFilePathsToEncrypted(files, backupDirectory);
 
     await Promise.all(files.map((file) => file.writeToFile()));
 
@@ -70,14 +73,18 @@ export class MiniBackup {
     return ConfigLoader.readConfigFile();
   }
 
-  private updateFilePathsToEncrypted(files: TextFile[]): void {
+  private updateFilePathsToEncrypted(
+    files: TextFile[],
+    backupDirectory: string
+  ): void {
     files.forEach((file) => {
       const currentFilename = file.getFilename();
       const currentExtension = file.getExtension();
 
-      file.setFilename(
-        currentFilename + "_encrypted_" + currentExtension,
-        "txt"
+      file.setPath(
+        `${backupDirectory}/${
+          currentFilename + "_encrypted_" + currentExtension + ".txt"
+        }`
       );
     });
   }
@@ -94,13 +101,6 @@ export class MiniBackup {
         "_decrypted_"
       );
 
-      console.log(
-        "updateFilePathsToDecrypted",
-        currentFilename,
-        updatedFilename,
-        updatedExtension
-      );
-
       file.setFilename(updatedFilename, updatedExtension);
     });
   }
@@ -112,13 +112,6 @@ export class MiniBackup {
       const updatedFilename = currentFilename.replace(
         "_decrypted_",
         "_restored_"
-      );
-
-      console.log(
-        "updateFilePathsToRestored",
-        currentFilename,
-        currentExtension,
-        updatedFilename
       );
 
       file.setFilename(updatedFilename, currentExtension);
