@@ -41,4 +41,8 @@ export abstract class File<T> {
       filename +
       (extension ? "." + extension : "");
   }
+
+  setPath(path: string): void {
+    this.path = path;
+  }
 }
