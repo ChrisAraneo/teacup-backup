@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx tsc && node copy-config-file.js && node dist/index.js --no-warnings",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc && node copy-config-file.js && pkg ./dist/index.js --o ./dist/mini-backup"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
