@@ -5,8 +5,10 @@ import { Config } from "./models/config.type";
 
 class App {
   static async main(): Promise<void> {
+    this.ignoreWarnings();
+
     const miniBackup = new MiniBackup();
-  
+
     miniBackup.promptUserSecretKey();
 
     const config: Config = (await miniBackup.readConfigFile()) as Config;
@@ -35,6 +37,10 @@ class App {
 
   private static getCurrentDirectory(): string {
     return Process.cwd();
+  }
+
+  private static ignoreWarnings(): void {
+    console.warn = () => {};
   }
 }
 
