@@ -1,10 +1,12 @@
 import Path from "path";
+import Process from "process";
 import { FileProcessor } from "./file-processor";
 import { JsonFile } from "./models/json-file.class";
 
 export class ConfigLoader {
   static async readConfigFile(): Promise<object> {
-    const path = Path.normalize(`${__dirname}/config.json`);
+    const currentDirectory = this.getCurrentDirectory();
+    const path = Path.normalize(`${currentDirectory}/config.json`);
     let config: JsonFile | undefined;
 
     try {
@@ -20,5 +22,9 @@ export class ConfigLoader {
     }
 
     return (config as JsonFile)?.getContent();
+  }
+
+  private static getCurrentDirectory(): string {
+    return Process.cwd();
   }
 }
