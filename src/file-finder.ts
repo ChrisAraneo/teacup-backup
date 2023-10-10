@@ -14,6 +14,8 @@ export class FileFinder {
         .error((error) => {
           if (!ignoreErrors) {
             reject(error);
+          } else {
+            resolve([]);
           }
         });
     });
