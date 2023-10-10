@@ -2,6 +2,7 @@ import Path from "path";
 import { CurrentDirectoryProvider } from "./current-directory-provider";
 import { MiniBackup } from "./mini-backup";
 import { Config } from "./models/config.type";
+import fs from "fs";
 
 class App {
   static async main(): Promise<void> {
@@ -17,6 +18,8 @@ class App {
         config.backupDirectory
       }`
     );
+
+    this.createDirectoryIfDoesntExist(backupDirectory);
 
     config.files.forEach(async (file) => {
       const foundFiles = await miniBackup.findFiles(
@@ -39,6 +42,12 @@ class App {
 
   private static ignoreWarnings(): void {
     console.warn = () => {};
+  }
+
+  private static createDirectoryIfDoesntExist(directory: string): void {
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory);
+    }
   }
 }
 
