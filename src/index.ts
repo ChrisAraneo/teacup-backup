@@ -1,5 +1,5 @@
 import Path from "path";
-import Process from "process";
+import { CurrentDirectoryProvider } from "./current-directory-provider";
 import { MiniBackup } from "./mini-backup";
 import { Config } from "./models/config.type";
 
@@ -13,7 +13,9 @@ class App {
 
     const config: Config = (await miniBackup.readConfigFile()) as Config;
     const backupDirectory = Path.normalize(
-      `${this.getCurrentDirectory()}/${config.backupDirectory}`
+      `${CurrentDirectoryProvider.getCurrentDirectory()}/${
+        config.backupDirectory
+      }`
     );
 
     config.files.forEach(async (file) => {
@@ -33,10 +35,6 @@ class App {
         writtenFiles.map((file) => file.getPath())
       );
     });
-  }
-
-  private static getCurrentDirectory(): string {
-    return Process.cwd();
   }
 
   private static ignoreWarnings(): void {

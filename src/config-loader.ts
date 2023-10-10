@@ -1,11 +1,11 @@
 import Path from "path";
-import Process from "process";
+import { CurrentDirectoryProvider } from "./current-directory-provider";
 import { FileProcessor } from "./file-processor";
 import { JsonFile } from "./models/json-file.class";
 
 export class ConfigLoader {
   static async readConfigFile(): Promise<object> {
-    const currentDirectory = this.getCurrentDirectory();
+    const currentDirectory = CurrentDirectoryProvider.getCurrentDirectory();
     const path = Path.normalize(`${currentDirectory}/config.json`);
     let config: JsonFile | undefined;
 
@@ -22,9 +22,5 @@ export class ConfigLoader {
     }
 
     return (config as JsonFile)?.getContent();
-  }
-
-  private static getCurrentDirectory(): string {
-    return Process.cwd();
   }
 }
