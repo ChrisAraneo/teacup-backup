@@ -1,3 +1,4 @@
+import CryptoJS from "crypto-js";
 import path from "path";
 
 export abstract class File<T> {
