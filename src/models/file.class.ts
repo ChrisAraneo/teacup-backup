@@ -1,7 +1,11 @@
 import path from "path";
 
 export abstract class File<T> {
-  constructor(protected path: string, protected content: T) {}
+  private hashValue: string;
+
+  constructor(protected path: string, protected content: T) {
+    this.updateHashValue(content);
+  }
 
   getPath(): string {
     return this.path;
@@ -44,5 +48,9 @@ export abstract class File<T> {
 
   setPath(path: string): void {
     this.path = path;
+  }
+
+  private updateHashValue(content: T) {
+    this.hashValue = CryptoJS.MD5(content.toString()).toString();
   }
 }
