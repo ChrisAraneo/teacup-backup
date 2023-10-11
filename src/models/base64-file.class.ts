@@ -5,7 +5,7 @@ export class Base64File extends TextFile {
   static async fromFile(path: string): Promise<Base64File> {
     const result = await FileProcessor.readFileToBase64(path);
 
-    return new Base64File(result.path, result.content);
+    return new Base64File(result.path, result.content, result.modifiedDate);
   }
 
   async writeToFile(): Promise<void> {

@@ -1,8 +1,7 @@
+import fs from "node:fs";
 import { Base64File } from "./models/base64-file.class";
 import { JsonFile } from "./models/json-file.class";
 import { TextFile } from "./models/text-file.class";
-
-const fs = require("node:fs");
 
 export class FileProcessor {
   static async readFilesToBase64(paths: string[]): Promise<Base64File[]> {
@@ -11,17 +10,23 @@ export class FileProcessor {
 
   static async readFileToBase64(path: string): Promise<Base64File> {
     return new Promise((resolve, reject) => {
-      fs.readFile(
-        path,
-        { encoding: "base64" },
-        (error: unknown, data: string) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(new Base64File(path, data));
-          }
+      fs.stat(path, (error: unknown, stats) => {
+        if (error) {
+          reject(error);
+        } else {
+          fs.readFile(
+            path,
+            { encoding: "base64" },
+            (error: unknown, data: string) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(new Base64File(path, data, new Date(stats.mtime)));
+              }
+            }
+          );
         }
-      );
+      });
     });
   }
 
@@ -31,11 +36,17 @@ export class FileProcessor {
 
   static async readTextFile(path: string): Promise<TextFile> {
     return new Promise((resolve, reject) => {
-      fs.readFile(path, "utf8", (error: unknown, data: string) => {
+      fs.stat(path, (error, stats) => {
         if (error) {
           reject(error);
         } else {
-          resolve(new TextFile(path, data));
+          fs.readFile(path, "utf8", (error: unknown, data: string) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(new TextFile(path, data, new Date(stats.mtime)));
+            }
+          });
         }
       });
     });
@@ -50,7 +61,11 @@ export class FileProcessor {
       this.readTextFile(path)
         .then((result) => {
           resolve(
-            new JsonFile(result.getPath(), JSON.parse(result.getContent()))
+            new JsonFile(
+              result.getPath(),
+              JSON.parse(result.getContent()),
+              result.getModifiedDate()
+            )
           );
         })
         .catch((error: unknown) => {

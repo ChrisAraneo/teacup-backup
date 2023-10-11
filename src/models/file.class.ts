@@ -4,7 +4,11 @@ import path from "path";
 export abstract class File<T> {
   private hashValue: string;
 
-  constructor(protected path: string, protected content: T) {
+  constructor(
+    protected path: string,
+    protected content: T,
+    protected modifiedDate: Date
+  ) {
     this.updateHashValue(content);
   }
 
@@ -32,6 +36,10 @@ export abstract class File<T> {
 
   getContent(): T {
     return this.content;
+  }
+
+  getModifiedDate(): Date {
+    return this.modifiedDate;
   }
 
   setFilename(
