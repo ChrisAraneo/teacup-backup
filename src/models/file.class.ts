@@ -38,6 +38,10 @@ export abstract class File<T> {
     return this.content;
   }
 
+  getHashValue(): string {
+    return this.hashValue;
+  }
+
   getModifiedDate(): Date {
     return this.modifiedDate;
   }
