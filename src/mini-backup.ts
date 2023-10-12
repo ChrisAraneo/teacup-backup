@@ -80,25 +80,37 @@ export class MiniBackup {
     files.forEach((file) => {
       const currentFilename = file.getFilename();
       const currentExtension = file.getExtension();
+      const modifiedDateFormattedString = file
+        .getModifiedDate()
+        .toISOString()
+        .split("T")[0]
+        .replace("-", "")
+        .replace("-", "");
+      const fileHashValueShort = file.getHashValue().substring(0, 5);
+      const updatedFilename =
+        currentFilename +
+        "_" +
+        modifiedDateFormattedString +
+        fileHashValueShort +
+        "_" +
+        currentExtension;
 
-      file.setPath(
-        `${backupDirectory}/${
-          currentFilename + "_encrypted_" + currentExtension + ".txt"
-        }`
-      );
+      file.setPath(`${backupDirectory}/${updatedFilename + ".mbe"}`);
     });
   }
 
   private updateFilePathsToDecrypted(encryptedFiles: TextFile[]): void {
     encryptedFiles.forEach((file) => {
       const currentFilename = file.getFilename();
-      const ecryptedSubstringIndex = currentFilename.lastIndexOf("_encrypted_");
-      const updatedExtension = currentFilename.substring(
-        ecryptedSubstringIndex + "_encrypted_".length
+      const lastIndexOfUnderscore = currentFilename.lastIndexOf("_");
+      const updatedExtension = currentFilename.substring(lastIndexOfUnderscore + 1);
+      const secondLastIndexOfUnderscore = currentFilename.lastIndexOf(
+        "_",
+        lastIndexOfUnderscore - 1
       );
-      const updatedFilename = currentFilename.replace(
-        "_encrypted_" + updatedExtension,
-        "_decrypted_"
+      const updatedFilename = currentFilename.substring(
+        0,
+        secondLastIndexOfUnderscore
       );
 
       file.setFilename(updatedFilename, updatedExtension);
@@ -109,10 +121,18 @@ export class MiniBackup {
     decryptedFiles.forEach((file) => {
       const currentFilename = file.getFilename();
       const currentExtension = file.getExtension();
-      const updatedFilename = currentFilename.replace(
-        "_decrypted_",
-        "_restored_"
-      );
+      const modifiedDateFormattedString = file
+        .getModifiedDate()
+        .toISOString()
+        .split("T")[0]
+        .replace("-", "")
+        .replace("-", "");
+      const fileHashValueShort = file.getHashValue().substring(0, 5);
+      const updatedFilename =
+        currentFilename +
+        "_restored_" +
+        modifiedDateFormattedString +
+        fileHashValueShort;
 
       file.setFilename(updatedFilename, currentExtension);
     });
