@@ -28,15 +28,26 @@ class App {
       );
       const filesInBase64 = await miniBackup.readFilesToBase64(foundFiles);
       const encrypted = await miniBackup.encryptBase64Files(filesInBase64);
-      const writtenFiles = await miniBackup.writeEncryptedFiles(
+      const writtenEncryptedFiles = await miniBackup.writeEncryptedFiles(
         encrypted,
         backupDirectory
       );
 
       console.log(
         "Backup: ",
-        writtenFiles.map((file) => file.getPath())
+        writtenEncryptedFiles.map((file) => file.getPath())
       );
+
+      setTimeout(async () => {
+        const decrypted = await miniBackup.readEncryptedFiles(
+          writtenEncryptedFiles.map((file) => file.getPath())
+        );
+        const writtenRestoredFiles = await miniBackup.writeRestoredFiles(
+          decrypted
+        );
+
+        console.log("Restored: ", writtenRestoredFiles);
+      }, 2500);
     });
   }
 
