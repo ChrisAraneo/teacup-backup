@@ -16,8 +16,19 @@ class App {
     this.miniBackup.promptUserSecretKey();
 
     const config = (await this.miniBackup.readConfigFile()) as Config;
+    const interval = +config.interval;
 
     if (config.mode === "backup") {
+      if (interval > 0) {
+        console.log(
+          `The application will check files and perform backups on the specified files every ${interval} seconds.`
+        );
+
+        setInterval(() => {
+          this.runBackupFlow(config);
+        }, interval * 1000);
+      }
+
       this.runBackupFlow(config);
     } else if (config.mode === "restore") {
       this.runRestoreFlow(config);
