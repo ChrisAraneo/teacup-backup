@@ -9,7 +9,7 @@ class App {
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
-    console.log("Mini Backup - version 0.1.0");
+    console.log("Mini Backup - version 0.2.0");
 
     this.ignoreWarnings();
 
