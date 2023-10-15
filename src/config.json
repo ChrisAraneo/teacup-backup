@@ -6,5 +6,6 @@
     }
   ],
   "mode": "backup",
-  "backupDirectory": "./backups"
+  "backupDirectory": "./backups",
+  "interval": 3600
 }

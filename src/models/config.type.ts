@@ -5,4 +5,5 @@ export type Config = {
   }>;
   mode: "backup" | "restore";
   backupDirectory: string;
+  interval: number;
 };
