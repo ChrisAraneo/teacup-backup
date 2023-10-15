@@ -9,7 +9,7 @@ class App {
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
-    console.log("Mini Backup v. 0.1.0");
+    console.log("Mini Backup - version 0.1.0");
 
     this.ignoreWarnings();
 
@@ -36,10 +36,15 @@ class App {
     this.createDirectoryIfDoesntExist(backupDirectory);
 
     config.files.forEach(async (file) => {
+      console.log("Searching file:", file.filename);
+
       const foundFiles = await this.miniBackup.findFiles(
         file.filename,
         config.roots
       );
+
+      console.log("Found files:", foundFiles);
+
       const filesInBase64 = await this.miniBackup.readFilesToBase64(foundFiles);
       const encrypted = await this.miniBackup.encryptBase64Files(filesInBase64);
       const writtenEncryptedFiles = await this.miniBackup.writeEncryptedFiles(
@@ -48,7 +53,7 @@ class App {
       );
 
       console.log(
-        "Backup: ",
+        "Backup:",
         writtenEncryptedFiles.map((file) => file.getPath())
       );
     });
@@ -66,12 +71,15 @@ class App {
     const encryptedFiles: string[] = (
       await FileProcessor.listContentsOfDirectory(backupDirectory)
     ).filter((file) => file.lastIndexOf(".mbe") >= 0);
+
+    console.log("Decrypting files:", encryptedFiles);
+
     const decrypted = await this.miniBackup.readEncryptedFiles(encryptedFiles);
     const writtenRestoredFiles = await this.miniBackup.writeRestoredFiles(
       decrypted
     );
 
-    console.log("Restored: ", writtenRestoredFiles);
+    console.log("Restored:", writtenRestoredFiles);
   }
 
   private static ignoreWarnings(): void {
