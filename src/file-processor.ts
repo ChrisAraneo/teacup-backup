@@ -1,38 +1,17 @@
 import fs from "node:fs";
+import { TextFileReader } from "./file-system/text-file-reader.class";
 import { Base64File } from "./models/base64-file.class";
 import { JsonFile } from "./models/json-file.class";
 import { TextFile } from "./models/text-file.class";
 
 export class FileProcessor {
-  static async readTextFiles(paths: string[]): Promise<TextFile[]> {
-    return Promise.all(paths.map((path: string) => this.readTextFile(path)));
-  }
-
-  static async readTextFile(path: string): Promise<TextFile> {
-    return new Promise((resolve, reject) => {
-      fs.stat(path, (error, stats) => {
-        if (error) {
-          reject(error);
-        } else {
-          fs.readFile(path, "utf8", (error: unknown, data: string) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(new TextFile(path, data, new Date(stats.mtime)));
-            }
-          });
-        }
-      });
-    });
-  }
-
   static async readJsonFiles(paths: string[]): Promise<JsonFile[]> {
     return Promise.all(paths.map((path: string) => this.readJsonFile(path)));
   }
 
   static async readJsonFile(path: string): Promise<JsonFile> {
     return new Promise((resolve, reject) => {
-      this.readTextFile(path)
+      TextFileReader.readFile(path)
         .then((result) => {
           resolve(
             new JsonFile(
