@@ -4,32 +4,6 @@ import { JsonFile } from "./models/json-file.class";
 import { TextFile } from "./models/text-file.class";
 
 export class FileProcessor {
-  static async readFilesToBase64(paths: string[]): Promise<Base64File[]> {
-    return Promise.all(paths.map((path) => this.readFileToBase64(path)));
-  }
-
-  static async readFileToBase64(path: string): Promise<Base64File> {
-    return new Promise((resolve, reject) => {
-      fs.stat(path, (error: unknown, stats) => {
-        if (error) {
-          reject(error);
-        } else {
-          fs.readFile(
-            path,
-            { encoding: "base64" },
-            (error: unknown, data: string) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve(new Base64File(path, data, new Date(stats.mtime)));
-              }
-            }
-          );
-        }
-      });
-    });
-  }
-
   static async readTextFiles(paths: string[]): Promise<TextFile[]> {
     return Promise.all(paths.map((path: string) => this.readTextFile(path)));
   }

@@ -2,6 +2,7 @@ import { ConfigLoader } from "./config-loader";
 import { FileEncryptor } from "./file-encryptor";
 import { FileFinder } from "./file-finder";
 import { FileProcessor } from "./file-processor";
+import { Base64FileReader } from "./file-system/base64-file-reader.class";
 import { Base64File } from "./models/base64-file.class";
 import { EncryptedFile } from "./models/encrypted-file.class";
 import { TextFile } from "./models/text-file.class";
@@ -26,7 +27,7 @@ export class MiniBackup {
   }
 
   async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return FileProcessor.readFilesToBase64(files);
+    return Base64FileReader.readFiles(files);
   }
 
   async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
@@ -103,7 +104,9 @@ export class MiniBackup {
     encryptedFiles.forEach((file) => {
       const currentFilename = file.getFilename();
       const lastIndexOfUnderscore = currentFilename.lastIndexOf("_");
-      const updatedExtension = currentFilename.substring(lastIndexOfUnderscore + 1);
+      const updatedExtension = currentFilename.substring(
+        lastIndexOfUnderscore + 1
+      );
       const secondLastIndexOfUnderscore = currentFilename.lastIndexOf(
         "_",
         lastIndexOfUnderscore - 1
