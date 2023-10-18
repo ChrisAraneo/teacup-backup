@@ -1,32 +1,8 @@
 import fs from "node:fs";
-import { TextFileReader } from "./file-system/text-file-reader.class";
 import { Base64File } from "./models/base64-file.class";
-import { JsonFile } from "./models/json-file.class";
 import { TextFile } from "./models/text-file.class";
 
 export class FileProcessor {
-  static async readJsonFiles(paths: string[]): Promise<JsonFile[]> {
-    return Promise.all(paths.map((path: string) => this.readJsonFile(path)));
-  }
-
-  static async readJsonFile(path: string): Promise<JsonFile> {
-    return new Promise((resolve, reject) => {
-      new TextFileReader().readFile(path) // TODO Move to property
-        .then((result) => {
-          resolve(
-            new JsonFile(
-              result.getPath(),
-              JSON.parse(result.getContent()),
-              result.getModifiedDate()
-            )
-          );
-        })
-        .catch((error: unknown) => {
-          reject(error);
-        });
-    });
-  }
-
   static async writeFilesFromBase64(
     filesInBase64: Base64File[]
   ): Promise<void> {

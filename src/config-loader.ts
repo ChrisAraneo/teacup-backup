@@ -1,6 +1,6 @@
 import Path from "path";
 import { CurrentDirectoryProvider } from "./current-directory-provider";
-import { FileProcessor } from "./file-processor";
+import { JsonFileReader } from "./file-system/json-file-reader.class";
 import { JsonFile } from "./models/json-file.class";
 
 export class ConfigLoader {
@@ -10,7 +10,7 @@ export class ConfigLoader {
     let config: JsonFile | undefined;
 
     try {
-      config = await FileProcessor.readJsonFile(path);
+      config = await new JsonFileReader().readFile(path);
     } catch (error: unknown) {
       throw Error(
         "File config.json not found. Create config.json file in the application directory."
