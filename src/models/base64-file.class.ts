@@ -4,9 +4,9 @@ import { TextFile } from "./text-file.class";
 
 export class Base64File extends TextFile {
   static async fromFile(path: string): Promise<Base64File> {
-    const result = await Base64FileReader.readFile(path);
+    const result = await new Base64FileReader().readFile(path);  // TODO Move to property
 
-    return new Base64File(result.path, result.content, result.modifiedDate);
+    return new Base64File(result.path, result.content, result.modifiedDate); // TODO Use above instance?
   }
 
   async writeToFile(): Promise<void> {

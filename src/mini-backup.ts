@@ -27,7 +27,7 @@ export class MiniBackup {
   }
 
   async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return Base64FileReader.readFiles(files);
+    return new Base64FileReader().readFiles(files);  // TODO Move to property
   }
 
   async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {

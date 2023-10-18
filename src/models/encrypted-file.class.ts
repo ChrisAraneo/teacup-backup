@@ -25,7 +25,7 @@ export class EncryptedFile extends TextFile {
   }
 
   static async fromEncryptedFile(path: string): Promise<EncryptedFile> {
-    const result = await TextFileReader.readFile(path);
+    const result = await new TextFileReader().readFile(path);  // TODO Move to property
 
     return new EncryptedFile(
       result.getPath(),

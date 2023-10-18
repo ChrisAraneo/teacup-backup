@@ -11,7 +11,7 @@ export class FileProcessor {
 
   static async readJsonFile(path: string): Promise<JsonFile> {
     return new Promise((resolve, reject) => {
-      TextFileReader.readFile(path)
+      new TextFileReader().readFile(path) // TODO Move to property
         .then((result) => {
           resolve(
             new JsonFile(
