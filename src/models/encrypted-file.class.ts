@@ -1,6 +1,6 @@
 import { FileEncryptor } from "../file-encryptor";
-import { FileProcessor } from "../file-processor";
 import { TextFileReader } from "../file-system/text-file-reader.class";
+import { TextFileWriter } from "../file-system/text-file-writer.class";
 import { Base64File } from "./base64-file.class";
 import { TextFile } from "./text-file.class";
 
@@ -25,7 +25,7 @@ export class EncryptedFile extends TextFile {
   }
 
   static async fromEncryptedFile(path: string): Promise<EncryptedFile> {
-    const result = await new TextFileReader().readFile(path);  // TODO Move to property
+    const result = await new TextFileReader().readFile(path); // TODO Move to property
 
     return new EncryptedFile(
       result.getPath(),
@@ -47,6 +47,6 @@ export class EncryptedFile extends TextFile {
   }
 
   async writeToFile(): Promise<void> {
-    return FileProcessor.writeTextFile(this);
+    return new TextFileWriter().writeFile(this);
   }
 }

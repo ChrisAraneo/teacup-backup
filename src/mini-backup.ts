@@ -1,8 +1,8 @@
 import { ConfigLoader } from "./config-loader";
 import { FileEncryptor } from "./file-encryptor";
 import { FileFinder } from "./file-finder";
-import { FileProcessor } from "./file-processor";
 import { Base64FileReader } from "./file-system/base64-file-reader.class";
+import { Base64FileWriter } from "./file-system/base64-file-writer.class";
 import { Base64File } from "./models/base64-file.class";
 import { EncryptedFile } from "./models/encrypted-file.class";
 import { TextFile } from "./models/text-file.class";
@@ -27,7 +27,7 @@ export class MiniBackup {
   }
 
   async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return new Base64FileReader().readFiles(files);  // TODO Move to property
+    return new Base64FileReader().readFiles(files); // TODO Move to property
   }
 
   async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
@@ -65,7 +65,7 @@ export class MiniBackup {
   async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await FileProcessor.writeFilesFromBase64(files);
+    await new Base64FileWriter().writeFiles(files);
 
     return files.map((file) => file.getPath());
   }
