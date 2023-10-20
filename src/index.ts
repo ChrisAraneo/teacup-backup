@@ -1,6 +1,6 @@
 import fs from "fs";
 import Path from "path";
-import { CurrentDirectoryProvider } from "./current-directory-provider";
+import { CurrentDirectoryProvider } from "./file-system/current-directory-provider";
 import { DirectoryInfo } from "./file-system/directory-info.class";
 import { MiniBackup } from "./mini-backup";
 import { Config } from "./models/config.type";

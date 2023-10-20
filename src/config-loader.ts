@@ -1,5 +1,5 @@
 import Path from "path";
-import { CurrentDirectoryProvider } from "./current-directory-provider";
+import { CurrentDirectoryProvider } from "./file-system/current-directory-provider";
 import { JsonFileReader } from "./file-system/json-file-reader.class";
 import { JsonFile } from "./models/json-file.class";
 
