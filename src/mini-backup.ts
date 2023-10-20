@@ -1,13 +1,13 @@
 import { ConfigLoader } from "./config-loader";
 import { FileEncryptor } from "./file-encryptor";
-import { FileFinder } from "./file-finder";
 import { Base64FileReader } from "./file-system/base64-file-reader.class";
 import { Base64FileWriter } from "./file-system/base64-file-writer.class";
+import { FileFinder } from "./file-system/file-finder";
 import { Base64File } from "./models/base64-file.class";
 import { EncryptedFile } from "./models/encrypted-file.class";
 import { TextFile } from "./models/text-file.class";
 
-var prompt = require("prompt-sync")({
+const prompt = require("prompt-sync")({
   sigint: false,
 });
 
