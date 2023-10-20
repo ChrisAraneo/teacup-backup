@@ -1,7 +1,7 @@
 import CryptoJS from "crypto-js";
 import CryptoAES from "crypto-js/aes";
-import { Base64File } from "./models/base64-file.class";
-import { EncryptedFile } from "./models/encrypted-file.class";
+import { Base64File } from "../models/base64-file.class";
+import { EncryptedFile } from "../models/encrypted-file.class";
 
 type EncryptionResult = {
   path: string;
