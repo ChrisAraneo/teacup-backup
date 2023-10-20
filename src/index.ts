@@ -1,7 +1,7 @@
 import fs from "fs";
 import Path from "path";
 import { CurrentDirectoryProvider } from "./current-directory-provider";
-import { FileProcessor } from "./file-processor";
+import { DirectoryInfo } from "./file-system/directory-info.class";
 import { MiniBackup } from "./mini-backup";
 import { Config } from "./models/config.type";
 
@@ -80,7 +80,7 @@ class App {
     this.createDirectoryIfDoesntExist(backupDirectory);
 
     const encryptedFiles: string[] = (
-      await FileProcessor.listContentsOfDirectory(backupDirectory)
+      await DirectoryInfo.getContents(backupDirectory)
     ).filter((file) => file.lastIndexOf(".mbe") >= 0);
 
     console.log("Decrypting files:", encryptedFiles);
