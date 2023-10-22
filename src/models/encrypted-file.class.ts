@@ -1,4 +1,4 @@
-import { FileEncryptor } from "../crypto/file-encryptor";
+import { FileEncryptor } from "../crypto/file-encryptor.class";
 import { TextFileReader } from "../file-system/text-file-reader.class";
 import { TextFileWriter } from "../file-system/text-file-writer.class";
 import { Base64File } from "./base64-file.class";
