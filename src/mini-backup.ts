@@ -1,5 +1,5 @@
 import { ConfigLoader } from "./config-loader";
-import { FileEncryptor } from "./crypto/file-encryptor.class";
+import { FileDecryptor } from "./crypto/file-decryptor.class";
 import { Base64FileReader } from "./file-system/base64-file-reader.class";
 import { Base64FileWriter } from "./file-system/base64-file-writer.class";
 import { FileFinder } from "./file-system/file-finder";
@@ -52,7 +52,7 @@ export class MiniBackup {
       paths.map((path) => EncryptedFile.fromEncryptedFile(path))
     );
 
-    const decryptedFiles: Base64File[] = FileEncryptor.decryptBase64Files(
+    const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
       encryptedFiles,
       this.secretKey
     );
