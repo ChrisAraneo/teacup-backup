@@ -1,11 +1,7 @@
 import CryptoJS from "crypto-js";
 import CryptoAES from "crypto-js/aes";
 import { Base64File } from "../models/base64-file.class";
-
-type EncryptionResult = {
-  path: string;
-  content: string;
-};
+import { EncryptionResult } from "./encryption-result.type";
 
 export class FileEncryptor {
   static async encryptBase64Files(
