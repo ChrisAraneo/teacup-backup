@@ -1,7 +1,7 @@
-import { ConfigLoader } from "./config-loader";
 import { FileDecryptor } from "./crypto/file-decryptor.class";
 import { Base64FileReader } from "./file-system/base64-file-reader.class";
 import { Base64FileWriter } from "./file-system/base64-file-writer.class";
+import { ConfigLoader } from "./file-system/config-loader";
 import { FileFinder } from "./file-system/file-finder";
 import { Base64File } from "./models/base64-file.class";
 import { EncryptedFile } from "./models/encrypted-file.class";

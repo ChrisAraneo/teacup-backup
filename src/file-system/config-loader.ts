@@ -1,7 +1,7 @@
 import Path from "path";
-import { CurrentDirectoryProvider } from "./file-system/current-directory-provider";
-import { JsonFileReader } from "./file-system/json-file-reader.class";
-import { JsonFile } from "./models/json-file.class";
+import { JsonFile } from "../models/json-file.class";
+import { CurrentDirectoryProvider } from "./current-directory-provider";
+import { JsonFileReader } from "./json-file-reader.class";
 
 export class ConfigLoader {
   static async readConfigFile(): Promise<object> {
