@@ -12,7 +12,12 @@ const prompt = require("prompt-sync")({
 });
 
 export class MiniBackup {
+  private base64FileReader: Base64FileReader;
   private secretKey: string = "";
+
+  constructor() {
+    this.base64FileReader = new Base64FileReader();
+  }
 
   promptUserSecretKey(): void {
     console.log("Secret key (password for encryption):");
@@ -27,7 +32,7 @@ export class MiniBackup {
   }
 
   async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return new Base64FileReader().readFiles(files); // TODO Move to property
+    return this.base64FileReader.readFiles(files);
   }
 
   async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
@@ -65,7 +70,7 @@ export class MiniBackup {
   async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await new Base64FileWriter().writeFiles(files);
+    await new Base64FileWriter().writeFiles(files); // TODO Property
 
     return files.map((file) => file.getPath());
   }

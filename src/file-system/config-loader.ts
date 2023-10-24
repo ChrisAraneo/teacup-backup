@@ -10,7 +10,7 @@ export class ConfigLoader {
     let config: JsonFile | undefined;
 
     try {
-      config = await new JsonFileReader().readFile(path);
+      config = await new JsonFileReader().readFile(path); // TODO Move to property
     } catch (error: unknown) {
       throw Error(
         "File config.json not found. Create config.json file in the application directory."
