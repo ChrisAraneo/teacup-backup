@@ -1,10 +1,10 @@
-import find from "find";
+import find from 'find';
 
 export class FileFinder {
   static async findFile(
     pattern: string | RegExp,
-    root: string = "C:\\",
-    ignoreErrors: boolean = true
+    root: string = 'C:\\',
+    ignoreErrors: boolean = true,
   ): Promise<string[]> {
     return new Promise((resolve, reject) => {
       find
@@ -23,8 +23,8 @@ export class FileFinder {
 
   static async findFiles(
     pattern: string | RegExp,
-    roots: string[] = ["C:\\"],
-    ignoreErrors: boolean = true
+    roots: string[] = ['C:\\'],
+    ignoreErrors: boolean = true,
   ): Promise<string[]> {
     const result: string[] = [];
 
@@ -32,9 +32,7 @@ export class FileFinder {
       return this.findFile(pattern, root, ignoreErrors);
     });
 
-    (await Promise.all(promises)).map((items: string[]) =>
-      result.push(...items)
-    );
+    (await Promise.all(promises)).map((items: string[]) => result.push(...items));
 
     return result;
   }

@@ -1,7 +1,7 @@
-import Path from "path";
-import { JsonFile } from "../models/json-file.class";
-import { CurrentDirectoryProvider } from "./current-directory-provider";
-import { JsonFileReader } from "./json-file-reader.class";
+import Path from 'path';
+import { JsonFile } from '../models/json-file.class';
+import { CurrentDirectoryProvider } from './current-directory-provider';
+import { JsonFileReader } from './json-file-reader.class';
 
 export class ConfigLoader {
   static async readConfigFile(): Promise<object> {
@@ -13,12 +13,12 @@ export class ConfigLoader {
       config = await new JsonFileReader().readFile(path); // TODO Move to property
     } catch (error: unknown) {
       throw Error(
-        "File config.json not found. Create config.json file in the application directory."
+        'File config.json not found. Create config.json file in the application directory.',
       );
     }
 
     if (!config) {
-      throw Error("File config.json is empty or incorrect.");
+      throw Error('File config.json is empty or incorrect.');
     }
 
     return (config as JsonFile)?.getContent();

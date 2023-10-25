@@ -1,8 +1,8 @@
-import { FileEncryptor } from "../crypto/file-encryptor.class";
-import { TextFileReader } from "../file-system/text-file-reader.class";
-import { TextFileWriter } from "../file-system/text-file-writer.class";
-import { Base64File } from "./base64-file.class";
-import { TextFile } from "./text-file.class";
+import { FileEncryptor } from '../crypto/file-encryptor.class';
+import { TextFileReader } from '../file-system/text-file-reader.class';
+import { TextFileWriter } from '../file-system/text-file-writer.class';
+import { Base64File } from './base64-file.class';
+import { TextFile } from './text-file.class';
 
 export class EncryptedFile extends TextFile {
   private static textFileReader: TextFileReader;
@@ -12,7 +12,7 @@ export class EncryptedFile extends TextFile {
     protected path: string,
     protected content: string,
     protected modifiedDate: Date,
-    protected secretKey?: string
+    protected secretKey?: string,
   ) {
     super(path, content, modifiedDate);
 
@@ -23,7 +23,7 @@ export class EncryptedFile extends TextFile {
     if (secretKey) {
       const result = FileEncryptor.encryptBase64File(
         new Base64File(path, content, modifiedDate),
-        secretKey
+        secretKey,
       );
 
       this.path = result.path;
@@ -38,23 +38,11 @@ export class EncryptedFile extends TextFile {
 
     const result = await EncryptedFile.textFileReader.readFile(path);
 
-    return new EncryptedFile(
-      result.getPath(),
-      result.getContent(),
-      result.getModifiedDate()
-    );
+    return new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate());
   }
 
-  static async fromBase64File(
-    file: Base64File,
-    secretKey: string
-  ): Promise<EncryptedFile> {
-    return new EncryptedFile(
-      file.getPath(),
-      file.getContent(),
-      file.getModifiedDate(),
-      secretKey
-    );
+  static async fromBase64File(file: Base64File, secretKey: string): Promise<EncryptedFile> {
+    return new EncryptedFile(file.getPath(), file.getContent(), file.getModifiedDate(), secretKey);
   }
 
   async writeToFile(): Promise<void> {

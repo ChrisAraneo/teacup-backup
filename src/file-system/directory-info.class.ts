@@ -1,4 +1,4 @@
-import FS from "fs";
+import FS from 'fs';
 
 export class DirectoryInfo {
   static async getContents(directory: string): Promise<string[]> {

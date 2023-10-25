@@ -3,7 +3,7 @@ export type Config = {
   files: Array<{
     filename: string;
   }>;
-  mode: "backup" | "restore";
+  mode: 'backup' | 'restore';
   backupDirectory: string;
   interval: number;
 };

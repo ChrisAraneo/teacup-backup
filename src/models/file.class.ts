@@ -1,5 +1,5 @@
-import CryptoJS from "crypto-js";
-import path from "path";
+import CryptoJS from 'crypto-js';
+import path from 'path';
 
 export abstract class File<T> {
   private hashValue: string;
@@ -7,7 +7,7 @@ export abstract class File<T> {
   constructor(
     protected path: string,
     protected content: T,
-    protected modifiedDate: Date
+    protected modifiedDate: Date,
   ) {
     this.updateHashValue(content);
   }
@@ -18,14 +18,14 @@ export abstract class File<T> {
 
   getFilename(): string {
     const basename = path.basename(this.path);
-    const parts = basename.split(".");
+    const parts = basename.split('.');
 
     return parts[0];
   }
 
   getExtension(): string | null {
     const basename = path.basename(this.path);
-    const parts = basename.split(".");
+    const parts = basename.split('.');
 
     if (parts.length < 2) {
       return null;
@@ -46,24 +46,19 @@ export abstract class File<T> {
     return this.modifiedDate;
   }
 
-  setFilename(
-    filename: string,
-    extension: string | null = this.getExtension()
-  ): void {
+  setFilename(filename: string, extension: string | null = this.getExtension()): void {
     const basename = path.basename(this.path);
     const basenameIndex = this.path.lastIndexOf(basename);
 
     this.path =
-      this.path.substring(0, basenameIndex) +
-      filename +
-      (extension ? "." + extension : "");
+      this.path.substring(0, basenameIndex) + filename + (extension ? '.' + extension : '');
   }
 
   setPath(path: string): void {
     this.path = path;
   }
 
-  private updateHashValue(content: T) {
+  private updateHashValue(content: T): void {
     this.hashValue = CryptoJS.MD5(content.toString()).toString();
   }
 }

@@ -1,5 +1,5 @@
-import FS from "fs";
-import { File } from "../models/file.class";
+import FS from 'fs';
+import { File } from '../models/file.class';
 
 export type ReadFileResult = {
   path: string;
@@ -12,18 +12,13 @@ export abstract class FileWriter<T extends File<any>> {
 
   writeFile(file: T): Promise<void> {
     return new Promise((resolve, reject) => {
-      FS.writeFile(
-        file.getPath(),
-        file.getContent(),
-        this.encoding,
-        (error: unknown) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(undefined);
-          }
+      FS.writeFile(file.getPath(), file.getContent(), this.encoding, (error: unknown) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(undefined);
         }
-      );
+      });
     });
   }
 
