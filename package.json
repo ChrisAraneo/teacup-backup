@@ -28,6 +28,7 @@
     "@types/find": "^0.2.2",
     "@types/node": "^20.7.0",
     "esbuild": "0.19.5",
+    "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   },
   "dependencies": {
