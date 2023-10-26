@@ -7,7 +7,7 @@
     "lint": "eslint \"src/**/*.{ts,json}\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.spec.ts\" \"src/**/*.json\"",
     "start": "npm run build && npm run copy-config && node dist/mini-backup.js --no-warnings",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/mini-backup.js",
     "copy-config": "node dev-scripts/copy-config-file.js"
   },
@@ -40,6 +40,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
