@@ -2,6 +2,7 @@ import Path from 'path';
 import { JsonFile } from '../models/json-file.class';
 import { CurrentDirectoryProvider } from './current-directory-provider';
 import { JsonFileReader } from './json-file-reader.class';
+import fs from 'fs';
 
 export class ConfigLoader {
   static async readConfigFile(): Promise<object> {
@@ -10,7 +11,7 @@ export class ConfigLoader {
     let config: JsonFile | undefined;
 
     try {
-      config = await new JsonFileReader().readFile(path); // TODO Move to property
+      config = await new JsonFileReader(fs).readFile(path); // TODO Move to property
     } catch (error: unknown) {
       throw Error(
         'File config.json not found. Create config.json file in the application directory.',

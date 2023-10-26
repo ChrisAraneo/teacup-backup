@@ -1,4 +1,3 @@
-import FS from 'fs';
 import { File } from '../models/file.class';
 
 export type ReadFileResult = {
@@ -8,17 +7,19 @@ export type ReadFileResult = {
 };
 
 export abstract class FileReader<T extends File<any>> {
+  constructor(protected fs) {}
+
   async readFiles(paths: string[]): Promise<T[]> {
     return Promise.all(paths.map((path: string) => this.readFile(path)));
   }
 
   protected async _readFile(path: string, encoding: BufferEncoding): Promise<ReadFileResult> {
     return new Promise((resolve, reject) => {
-      FS.stat(path, (error: unknown, stats) => {
+      this.fs.stat(path, (error: unknown, stats) => {
         if (error) {
           reject(error);
         } else {
-          FS.readFile(path, encoding, (error: unknown, data: string) => {
+          this.fs.readFile(path, encoding, (error: unknown, data: string) => {
             if (error) {
               reject(error);
             } else {

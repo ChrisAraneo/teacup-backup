@@ -3,6 +3,7 @@ import { TextFileReader } from '../file-system/text-file-reader.class';
 import { TextFileWriter } from '../file-system/text-file-writer.class';
 import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
+import fs from 'fs';
 
 export class EncryptedFile extends TextFile {
   private static textFileReader: TextFileReader;
@@ -17,7 +18,7 @@ export class EncryptedFile extends TextFile {
     super(path, content, modifiedDate);
 
     if (!EncryptedFile.textFileReader) {
-      EncryptedFile.textFileReader = new TextFileReader();
+      EncryptedFile.textFileReader = new TextFileReader(fs);
     }
 
     if (secretKey) {
@@ -33,7 +34,7 @@ export class EncryptedFile extends TextFile {
 
   static async fromEncryptedFile(path: string): Promise<EncryptedFile> {
     if (!EncryptedFile.textFileReader) {
-      EncryptedFile.textFileReader = new TextFileReader();
+      EncryptedFile.textFileReader = new TextFileReader(fs);
     }
 
     const result = await EncryptedFile.textFileReader.readFile(path);
@@ -47,7 +48,7 @@ export class EncryptedFile extends TextFile {
 
   async writeToFile(): Promise<void> {
     if (!this.textFileWriter) {
-      this.textFileWriter = new TextFileWriter();
+      this.textFileWriter = new TextFileWriter(fs);
     }
 
     return this.textFileWriter.writeFile(this);

@@ -1,13 +1,14 @@
 import { Base64FileReader } from '../file-system/base64-file-reader.class';
 import { Base64FileWriter } from '../file-system/base64-file-writer.class';
 import { TextFile } from './text-file.class';
+import fs from 'fs';
 
 export class Base64File extends TextFile {
   private static base64FileReader: Base64FileReader;
 
   static async fromFile(path: string): Promise<Base64File> {
     if (!this.base64FileReader) {
-      this.base64FileReader = new Base64FileReader();
+      this.base64FileReader = new Base64FileReader(fs);
     }
 
     const result = await this.base64FileReader.readFile(path);
@@ -16,6 +17,6 @@ export class Base64File extends TextFile {
   }
 
   async writeToFile(): Promise<void> {
-    return new Base64FileWriter().writeFile(this); // TODO To property
+    return new Base64FileWriter(fs).writeFile(this); // TODO To property
   }
 }

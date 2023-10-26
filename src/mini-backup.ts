@@ -7,6 +7,7 @@ import { Base64File } from './models/base64-file.class';
 import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import Prompt from 'prompt-sync';
+import fs from 'fs';
 
 const prompt = Prompt({
   sigint: false,
@@ -17,7 +18,7 @@ export class MiniBackup {
   private secretKey: string = '';
 
   constructor() {
-    this.base64FileReader = new Base64FileReader();
+    this.base64FileReader = new Base64FileReader(fs);
   }
 
   promptUserSecretKey(): void {
@@ -66,7 +67,7 @@ export class MiniBackup {
   async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await new Base64FileWriter().writeFiles(files); // TODO Property
+    await new Base64FileWriter(fs).writeFiles(files); // TODO Property
 
     return files.map((file) => file.getPath());
   }

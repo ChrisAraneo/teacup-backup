@@ -1,4 +1,3 @@
-import FS from 'fs';
 import { File } from '../models/file.class';
 
 export type ReadFileResult = {
@@ -8,11 +7,14 @@ export type ReadFileResult = {
 };
 
 export abstract class FileWriter<T extends File<any>> {
-  constructor(protected encoding: BufferEncoding) {}
+  constructor(
+    protected fs: any,
+    protected encoding: BufferEncoding,
+  ) {}
 
   writeFile(file: T): Promise<void> {
     return new Promise((resolve, reject) => {
-      FS.writeFile(file.getPath(), file.getContent(), this.encoding, (error: unknown) => {
+      this.fs.writeFile(file.getPath(), file.getContent(), this.encoding, (error: unknown) => {
         if (error) {
           reject(error);
         } else {
