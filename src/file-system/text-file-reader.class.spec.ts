@@ -6,7 +6,7 @@ let reader: TextFileReader;
 beforeEach(() => {
   fs = {
     stat: (path: string, callback): void => {
-      if (path === 'test.txt') {
+      if (['test.txt', 'test2.txt', 'test3.txt'].includes(path)) {
         callback(null, {
           mtime: '2023-10-27T21:33:39.661Z',
         });
@@ -15,7 +15,7 @@ beforeEach(() => {
       }
     },
     readFile: (path, encoding, callback): void => {
-      if (path === 'test.txt') {
+      if (['test.txt', 'test2.txt', 'test3.txt'].includes(path)) {
         callback(null, 'Hello World!');
       } else {
         callback('Error');
@@ -35,5 +35,14 @@ describe('TextFileReader', () => {
     expect(call[0]).toBe('test.txt');
     expect(call[1]).toBe('utf-8');
     expect(typeof call[2]).toBe('function');
+  });
+
+  it('#readFiles should read text files', () => {
+    jest.spyOn(fs, 'readFile');
+
+    reader.readFiles(['test.txt', 'test2.txt', 'test3.txt']);
+
+    const calls = jest.mocked(fs.readFile).mock.calls;
+    expect(calls.length).toBe(3);
   });
 });
