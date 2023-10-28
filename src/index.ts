@@ -1,11 +1,12 @@
-import fs from 'fs';
 import Path from 'path';
 import { CurrentDirectoryProvider } from './file-system/current-directory-provider';
 import { DirectoryInfo } from './file-system/directory-info.class';
 import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
+import { FileSystem } from './file-system/file-system.class';
 
 class App {
+  private static fileSystem = new FileSystem();
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
@@ -72,9 +73,9 @@ class App {
 
     this.createDirectoryIfDoesntExist(backupDirectory);
 
-    const encryptedFiles: string[] = (await DirectoryInfo.getContents(backupDirectory)).filter(
-      (file) => file.lastIndexOf('.mbe') >= 0,
-    );
+    const encryptedFiles: string[] = (
+      await DirectoryInfo.getContents(backupDirectory, this.fileSystem)
+    ).filter((file) => file.lastIndexOf('.mbe') >= 0);
 
     console.log('Decrypting files:', encryptedFiles);
 
@@ -89,8 +90,9 @@ class App {
   }
 
   private static createDirectoryIfDoesntExist(directory: string): void {
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory);
+    // TODO Move to another class?
+    if (!this.fileSystem.existsSync(directory)) {
+      this.fileSystem.mkdirSync(directory);
     }
   }
 }

@@ -2,16 +2,19 @@ import Path from 'path';
 import { JsonFile } from '../models/json-file.class';
 import { CurrentDirectoryProvider } from './current-directory-provider';
 import { JsonFileReader } from './json-file-reader.class';
-import fs from 'fs';
+import { FileSystem } from './file-system.class';
 
 export class ConfigLoader {
-  static async readConfigFile(): Promise<object> {
+  constructor(protected fileSystem: FileSystem) {}
+
+  async readConfigFile(): Promise<object> {
+    const fileSystem = this.fileSystem;
     const currentDirectory = CurrentDirectoryProvider.getCurrentDirectory();
     const path = Path.normalize(`${currentDirectory}/config.json`);
     let config: JsonFile | undefined;
 
     try {
-      config = await new JsonFileReader(fs).readFile(path); // TODO Move to property
+      config = await new JsonFileReader(fileSystem).readFile(path); // TODO Move to property
     } catch (error: unknown) {
       throw Error(
         'File config.json not found. Create config.json file in the application directory.',

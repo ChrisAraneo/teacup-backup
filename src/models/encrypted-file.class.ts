@@ -3,22 +3,22 @@ import { TextFileReader } from '../file-system/text-file-reader.class';
 import { TextFileWriter } from '../file-system/text-file-writer.class';
 import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
-import fs from 'fs';
+import { FileSystem } from '../file-system/file-system.class';
 
 export class EncryptedFile extends TextFile {
-  private static textFileReader: TextFileReader;
-  private textFileWriter: TextFileWriter;
+  protected textFileReader: TextFileReader;
 
   private constructor(
     protected path: string,
     protected content: string,
     protected modifiedDate: Date,
     protected secretKey?: string,
+    protected fileSystem: FileSystem = new FileSystem(),
   ) {
     super(path, content, modifiedDate);
 
-    if (!EncryptedFile.textFileReader) {
-      EncryptedFile.textFileReader = new TextFileReader(fs);
+    if (!this.textFileReader) {
+      this.textFileReader = new TextFileReader(fileSystem);
     }
 
     if (secretKey) {
@@ -32,23 +32,22 @@ export class EncryptedFile extends TextFile {
     }
   }
 
-  static async fromEncryptedFile(path: string): Promise<EncryptedFile> {
-    if (!EncryptedFile.textFileReader) {
-      EncryptedFile.textFileReader = new TextFileReader(fs);
-    }
-
-    const result = await EncryptedFile.textFileReader.readFile(path);
-
-    return new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate());
-  }
-
   static async fromBase64File(file: Base64File, secretKey: string): Promise<EncryptedFile> {
     return new EncryptedFile(file.getPath(), file.getContent(), file.getModifiedDate(), secretKey);
   }
 
-  async writeToFile(): Promise<void> {
+  static async fromEncryptedFile(
+    path: string,
+    fileSystem: FileSystem = new FileSystem(),
+  ): Promise<EncryptedFile> {
+    const result = await new TextFileReader(fileSystem).readFile(path); // TODO Refactor
+
+    return new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate());
+  }
+
+  async writeToFile(fileSystem: FileSystem = new FileSystem()): Promise<void> {
     if (!this.textFileWriter) {
-      this.textFileWriter = new TextFileWriter(fs);
+      this.textFileWriter = new TextFileWriter(fileSystem);
     }
 
     return this.textFileWriter.writeFile(this);

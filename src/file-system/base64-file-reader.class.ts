@@ -1,8 +1,13 @@
 import { Base64File } from '../models/base64-file.class';
 import { FileReader } from './file-reader.class';
 import { ReadFileResult } from './read-file-result.type';
+import { FileSystem } from './file-system.class';
 
 export class Base64FileReader extends FileReader<Base64File> {
+  constructor(protected fileSystem: FileSystem) {
+    super(fileSystem);
+  }
+
   async readFile(path: string): Promise<Base64File> {
     return new Promise((resolve, reject) => {
       this._readFile(path, 'base64')
