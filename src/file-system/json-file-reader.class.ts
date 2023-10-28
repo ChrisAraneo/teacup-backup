@@ -1,5 +1,6 @@
 import { JsonFile } from '../models/json-file.class';
-import { FileReader, ReadFileResult } from './file-reader.class';
+import { FileReader } from './file-reader.class';
+import { ReadFileResult } from './read-file-result.type';
 
 export class JsonFileReader extends FileReader<JsonFile> {
   async readFile(path: string): Promise<JsonFile> {

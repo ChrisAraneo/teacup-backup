@@ -1,5 +1,6 @@
 import { TextFile } from '../models/text-file.class';
-import { FileReader, ReadFileResult } from './file-reader.class';
+import { FileReader } from './file-reader.class';
+import { ReadFileResult } from './read-file-result.type';
 
 export class TextFileReader extends FileReader<TextFile> {
   async readFile(path: string): Promise<TextFile> {

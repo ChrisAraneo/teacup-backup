@@ -1,10 +1,5 @@
 import { File } from '../models/file.class';
-
-export type ReadFileResult = {
-  path: string;
-  data: string;
-  modifiedDate: Date;
-};
+import { ReadFileResult } from './read-file-result.type';
 
 export abstract class FileReader<T extends File<any>> {
   constructor(protected fs) {}
