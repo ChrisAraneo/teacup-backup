@@ -1,14 +1,15 @@
-import find from 'find';
+import { FileSystem } from './file-system.class';
 
 export class FileFinder {
   static async findFile(
     pattern: string | RegExp,
     root: string = 'C:\\',
     ignoreErrors: boolean = true,
+    fileSystem: FileSystem = new FileSystem(),
   ): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      find
-        .file(pattern, root, (result) => {
+      fileSystem
+        .findFile(pattern, root, (result) => {
           resolve(result);
         })
         .error((error) => {
