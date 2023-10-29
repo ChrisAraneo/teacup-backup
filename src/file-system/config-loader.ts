@@ -1,6 +1,6 @@
 import Path from 'path';
 import { JsonFile } from '../models/json-file.class';
-import { CurrentDirectoryProvider } from './current-directory-provider';
+import { CurrentDirectoryProvider } from './current-directory-provider.class';
 import { JsonFileReader } from './json-file-reader.class';
 import { FileSystem } from './file-system.class';
 
