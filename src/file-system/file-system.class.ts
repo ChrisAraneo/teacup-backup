@@ -6,6 +6,7 @@ import fs, {
   Stats,
   WriteFileOptions,
 } from 'fs';
+import find, { AsyncFindStream } from 'find';
 import { Abortable } from 'node:events';
 
 export class FileSystem {
@@ -54,5 +55,13 @@ export class FileSystem {
     callback?: (err: NodeJS.ErrnoException | null, path?: string) => void,
   ): void {
     return fs.mkdir(path, options, callback);
+  }
+
+  findFile(
+    pattern: string | RegExp,
+    root: string,
+    callback: (files: string[]) => void,
+  ): AsyncFindStream {
+    return find.file(pattern, root, callback);
   }
 }
