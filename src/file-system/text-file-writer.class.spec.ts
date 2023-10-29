@@ -1,16 +1,10 @@
 import { TextFile } from '../models/text-file.class';
 import { TextFileWriter } from './text-file-writer.class';
 import { FileSystem } from './file-system.class';
+import { FileSystemMock } from './file-system.mock.class';
 
 let fileSystem: FileSystem;
 let writer: TextFileWriter;
-
-class FileSystemMock extends FileSystem {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  writeFile(_path: any, _data: any, _options: any, _callback: any): Promise<void> {
-    return;
-  }
-}
 
 beforeEach(() => {
   fileSystem = new FileSystemMock();
