@@ -9,6 +9,9 @@ import { TextFile } from './models/text-file.class';
 import { FileSystem } from './file-system/file-system.class';
 import Prompt from 'prompt-sync';
 import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
+import { Config } from './models/config.type';
+import { DirectoryInfo } from './file-system/directory-info.class';
+import Path from 'path';
 
 const prompt = Prompt({
   sigint: false,
@@ -35,19 +38,74 @@ export class MiniBackup {
     this.secretKey = prompt({ echo: '*' });
   }
 
-  async findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Promise<string[]> {
+  async readConfigFile(): Promise<object> {
+    return this.configLoader.readConfigFile();
+  }
+
+  async runBackupFlow(config: Config): Promise<void> {
+    const backupDirectory = Path.normalize(
+      `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
+    );
+
+    this.createDirectoryIfDoesntExist(backupDirectory);
+
+    config.files.forEach(async (file) => {
+      console.log('Searching file:', file.filename);
+
+      const foundFiles = await this.findFiles(file.filename, config.roots);
+
+      console.log('Found files:', foundFiles);
+
+      const filesInBase64 = await this.readFilesToBase64(foundFiles);
+      const encrypted = await this.encryptBase64Files(filesInBase64);
+      const writtenEncryptedFiles = await this.writeEncryptedFiles(encrypted, backupDirectory);
+
+      console.log(
+        'Backup:',
+        writtenEncryptedFiles.map((file) => file.getPath()),
+      );
+    });
+  }
+
+  async runRestoreFlow(config: Config): Promise<void> {
+    const backupDirectory = Path.normalize(
+      `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
+    );
+
+    this.createDirectoryIfDoesntExist(backupDirectory);
+
+    const encryptedFiles: string[] = (
+      await DirectoryInfo.getContents(backupDirectory, this.fileSystem)
+    ).filter((file) => file.lastIndexOf('.mbe') >= 0);
+
+    console.log('Decrypting files:', encryptedFiles);
+
+    const decrypted = await this.readEncryptedFiles(encryptedFiles);
+    const writtenRestoredFiles = await this.writeRestoredFiles(decrypted);
+
+    console.log('Restored:', writtenRestoredFiles);
+  }
+
+  private createDirectoryIfDoesntExist(directory: string): void {
+    // TODO Move to another class?
+    if (!this.fileSystem.existsSync(directory)) {
+      this.fileSystem.mkdirSync(directory);
+    }
+  }
+
+  private async findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Promise<string[]> {
     return FileFinder.findFiles(pattern, roots);
   }
 
-  async readFilesToBase64(files: string[]): Promise<Base64File[]> {
+  private async readFilesToBase64(files: string[]): Promise<Base64File[]> {
     return this.base64FileReader.readFiles(files);
   }
 
-  async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
+  private async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
     return Promise.all(files.map((item) => EncryptedFile.fromBase64File(item, this.secretKey)));
   }
 
-  async writeEncryptedFiles(
+  private async writeEncryptedFiles(
     files: EncryptedFile[],
     backupDirectory: string,
   ): Promise<EncryptedFile[]> {
@@ -58,7 +116,7 @@ export class MiniBackup {
     return files;
   }
 
-  async readEncryptedFiles(paths: string[]): Promise<Base64File[]> {
+  private async readEncryptedFiles(paths: string[]): Promise<Base64File[]> {
     const encryptedFiles: EncryptedFile[] = await Promise.all(
       paths.map((path) => EncryptedFile.fromEncryptedFile(path)),
     );
@@ -73,16 +131,12 @@ export class MiniBackup {
     return decryptedFiles;
   }
 
-  async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
+  private async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await this.base64FileWriter.writeFiles(files); // TODO Property
+    await this.base64FileWriter.writeFiles(files);
 
     return files.map((file) => file.getPath());
-  }
-
-  async readConfigFile(): Promise<object> {
-    return this.configLoader.readConfigFile();
   }
 
   private updateFilePathsToEncrypted(files: TextFile[], backupDirectory: string): void {
