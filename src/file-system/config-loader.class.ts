@@ -7,12 +7,15 @@ import { FileSystem } from './file-system.class';
 export class ConfigLoader {
   private jsonFileReader: JsonFileReader;
 
-  constructor(protected fileSystem: FileSystem) {
+  constructor(
+    protected currentDirectoryProvider: CurrentDirectoryProvider,
+    protected fileSystem: FileSystem,
+  ) {
     this.jsonFileReader = new JsonFileReader(fileSystem);
   }
 
   async readConfigFile(): Promise<object> {
-    const currentDirectory = CurrentDirectoryProvider.getCurrentDirectory();
+    const currentDirectory = this.currentDirectoryProvider.getCurrentDirectory();
     const path = Path.normalize(`${currentDirectory}/config.json`);
     let config: JsonFile | undefined;
 

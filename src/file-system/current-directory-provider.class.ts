@@ -1,5 +1,5 @@
 export class CurrentDirectoryProvider {
-  static getCurrentDirectory(): string {
+  getCurrentDirectory(): string {
     return __dirname;
   }
 }

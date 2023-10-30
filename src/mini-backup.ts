@@ -8,6 +8,7 @@ import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import { FileSystem } from './file-system/file-system.class';
 import Prompt from 'prompt-sync';
+import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
 
 const prompt = Prompt({
   sigint: false,
@@ -15,6 +16,7 @@ const prompt = Prompt({
 
 export class MiniBackup {
   private fileSystem: FileSystem;
+  private currentDirectoryProvider: CurrentDirectoryProvider;
   private configLoader: ConfigLoader;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
@@ -22,7 +24,8 @@ export class MiniBackup {
 
   constructor() {
     this.fileSystem = new FileSystem();
-    this.configLoader = new ConfigLoader(this.fileSystem);
+    this.currentDirectoryProvider = new CurrentDirectoryProvider();
+    this.configLoader = new ConfigLoader(this.currentDirectoryProvider, this.fileSystem);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
   }
