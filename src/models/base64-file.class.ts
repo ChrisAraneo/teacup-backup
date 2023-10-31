@@ -20,6 +20,6 @@ export class Base64File extends TextFile {
   }
 
   async writeToFile(fileSystem: FileSystem = new FileSystem()): Promise<void> {
-    return new Base64FileWriter(fileSystem).writeFile(this); // TODO To property
+    return new Base64FileWriter(fileSystem).writeFile(this);
   }
 }

@@ -40,7 +40,7 @@ export class EncryptedFile extends TextFile {
     path: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Promise<EncryptedFile> {
-    const result = await new TextFileReader(fileSystem).readFile(path); // TODO Refactor
+    const result = await new TextFileReader(fileSystem).readFile(path);
 
     return new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate());
   }
