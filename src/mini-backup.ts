@@ -92,7 +92,18 @@ export class MiniBackup {
   private createDirectoryIfDoesntExist(directory: string): void {
     // TODO Move to another class?
     if (!this.fileSystem.existsSync(directory)) {
-      this.fileSystem.mkdirSync(directory);
+      this.logger.debug(`Creating backup directory: '${directory}'`);
+      this.fileSystem.mkdirSync(
+        directory,
+        { recursive: true },
+        (error: NodeJS.ErrnoException, path?: string) => {
+          if (error) {
+            throw Error("Can't create backup directory");
+          } else if (path) {
+            this.logger.debug('Created backup directory');
+          }
+        },
+      );
     }
   }
 
