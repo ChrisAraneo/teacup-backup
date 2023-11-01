@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 const source = path.normalize(`${__dirname}/../src/config.json`);
 const destination = path.normalize(`${__dirname}/../dist/config.json`);
