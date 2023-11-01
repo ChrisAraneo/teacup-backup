@@ -1,5 +1,5 @@
-import winston from 'winston';
-import { Logger as WinstonLogger } from 'winston';
+import { Logger as WinstonLogger, format, createLogger, transports } from 'winston';
+const { combine, timestamp, printf, colorize, prettyPrint, simple } = format;
 
 export class Logger {
   private logger: WinstonLogger;
@@ -10,15 +10,41 @@ export class Logger {
     this.initialize();
   }
 
+  debug(message: string, ...meta: any[]): void {
+    this.logger.debug(message, ...meta);
+  }
+
   info(message: string, ...meta: any[]): void {
     this.logger.info(message, ...meta);
   }
 
+  error(message: string, ...meta: any[]): void {
+    this.logger.error(message, ...meta);
+  }
+
   private initialize(): void {
-    this.logger = winston.createLogger({
-      level: 'info',
-      format: winston.format.json(),
-      transports: [new winston.transports.Console({ format: winston.format.simple() })],
+    this.logger = createLogger({
+      level: 'debug',
+      format: combine(
+        timestamp({
+          format: 'YYYY-MM-dd HH:MM:SS',
+        }),
+        prettyPrint(),
+        format.splat(),
+        simple(),
+        printf((msg) => {
+          const message = msg.message;
+          const splat = msg[Symbol.for('splat')];
+
+          return colorize().colorize(
+            msg.level,
+            `[${msg.timestamp}] [${msg.level.toLocaleUpperCase()}] - ${message}${
+              splat ? ' ' + JSON.stringify(splat) : ''
+            }`,
+          );
+        }),
+      ),
+      transports: [new transports.Console()],
     });
   }
 
