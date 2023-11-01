@@ -12,12 +12,14 @@ import { CurrentDirectoryProvider } from './file-system/current-directory-provid
 import { Config } from './models/config.type';
 import { DirectoryInfo } from './file-system/directory-info.class';
 import Path from 'path';
+import { Logger } from './utils/logger.class';
 
 const prompt = Prompt({
   sigint: false,
 });
 
 export class MiniBackup {
+  private logger: Logger;
   private fileSystem: FileSystem;
   private currentDirectoryProvider: CurrentDirectoryProvider;
   private configLoader: ConfigLoader;
@@ -26,6 +28,7 @@ export class MiniBackup {
   private secretKey: string = '';
 
   constructor() {
+    this.logger = new Logger();
     this.fileSystem = new FileSystem();
     this.currentDirectoryProvider = new CurrentDirectoryProvider();
     this.configLoader = new ConfigLoader(this.currentDirectoryProvider, this.fileSystem);
@@ -34,7 +37,7 @@ export class MiniBackup {
   }
 
   promptUserSecretKey(): void {
-    console.log('Secret key (password for encryption):');
+    this.logger.info('Secret key (password for encryption):');
     this.secretKey = prompt({ echo: '*' });
   }
 
@@ -50,18 +53,18 @@ export class MiniBackup {
     this.createDirectoryIfDoesntExist(backupDirectory);
 
     config.files.forEach(async (file) => {
-      console.log('Searching file:', file.filename);
+      this.logger.info('Searching file:', file.filename);
 
       const foundFiles = await this.findFiles(file.filename, config.roots);
 
-      console.log('Found files:', foundFiles);
+      this.logger.info('Found files:', foundFiles);
 
       const filesInBase64 = await this.readFilesToBase64(foundFiles);
       const encrypted = await this.encryptBase64Files(filesInBase64);
       const writtenEncryptedFiles = await this.writeEncryptedFiles(encrypted, backupDirectory);
 
-      console.log(
-        'Backup:',
+      this.logger.info(
+        'Created backup:',
         writtenEncryptedFiles.map((file) => file.getPath()),
       );
     });
@@ -78,12 +81,12 @@ export class MiniBackup {
       await DirectoryInfo.getContents(backupDirectory, this.fileSystem)
     ).filter((file) => file.lastIndexOf('.mbe') >= 0);
 
-    console.log('Decrypting files:', encryptedFiles);
+    this.logger.info('Decrypting files:', encryptedFiles);
 
     const decrypted = await this.readEncryptedFiles(encryptedFiles);
     const writtenRestoredFiles = await this.writeRestoredFiles(decrypted);
 
-    console.log('Restored:', writtenRestoredFiles);
+    this.logger.info('Restored:', writtenRestoredFiles);
   }
 
   private createDirectoryIfDoesntExist(directory: string): void {

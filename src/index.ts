@@ -1,13 +1,13 @@
 import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
+import { Logger } from './utils/logger.class';
 
 class App {
+  private static logger = new Logger();
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
-    console.log('Mini Backup - version 0.2.0');
-
-    this.ignoreWarnings();
+    this.logger.info('Mini Backup - version 0.2.0');
 
     this.miniBackup.promptUserSecretKey();
 
@@ -16,7 +16,7 @@ class App {
 
     if (config.mode === 'backup') {
       if (interval > 0) {
-        console.log(
+        this.logger.info(
           `The application will check files and perform backups on the specified files every ${interval} seconds.`,
         );
 
@@ -31,10 +31,6 @@ class App {
     } else {
       throw Error('Invalid mode');
     }
-  }
-
-  private static ignoreWarnings(): void {
-    console.warn = (): undefined => {};
   }
 }
 
