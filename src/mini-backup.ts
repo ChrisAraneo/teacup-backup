@@ -13,6 +13,7 @@ import { Config } from './models/config.type';
 import { DirectoryInfo } from './file-system/directory-info.class';
 import Path from 'path';
 import { Logger } from './utils/logger.class';
+import { Observable } from 'rxjs';
 
 const prompt = Prompt({
   sigint: false,
@@ -21,6 +22,7 @@ const prompt = Prompt({
 export class MiniBackup {
   private logger: Logger;
   private fileSystem: FileSystem;
+  private fileFinder: FileFinder;
   private currentDirectoryProvider: CurrentDirectoryProvider;
   private configLoader: ConfigLoader;
   private base64FileReader: Base64FileReader;
@@ -30,6 +32,7 @@ export class MiniBackup {
   constructor() {
     this.logger = new Logger();
     this.fileSystem = new FileSystem();
+    this.fileFinder = new FileFinder();
     this.currentDirectoryProvider = new CurrentDirectoryProvider();
     this.configLoader = new ConfigLoader(this.currentDirectoryProvider, this.fileSystem);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
@@ -55,18 +58,19 @@ export class MiniBackup {
     config.files.forEach(async (file) => {
       this.logger.info('Searching file:', file.filename);
 
-      const foundFiles = await this.findFiles(file.filename, config.roots);
+      // TODO Refactor to declarative code later
+      this.findFiles(file.filename, config.roots).subscribe(async (foundFiles) => {
+        this.logger.info('Found files:', foundFiles);
 
-      this.logger.info('Found files:', foundFiles);
+        const filesInBase64 = await this.readFilesToBase64(foundFiles);
+        const encrypted = await this.encryptBase64Files(filesInBase64);
+        const writtenEncryptedFiles = await this.writeEncryptedFiles(encrypted, backupDirectory);
 
-      const filesInBase64 = await this.readFilesToBase64(foundFiles);
-      const encrypted = await this.encryptBase64Files(filesInBase64);
-      const writtenEncryptedFiles = await this.writeEncryptedFiles(encrypted, backupDirectory);
-
-      this.logger.info(
-        'Created backup:',
-        writtenEncryptedFiles.map((file) => file.getPath()),
-      );
+        this.logger.info(
+          'Created backup:',
+          writtenEncryptedFiles.map((file) => file.getPath()),
+        );
+      });
     });
   }
 
@@ -107,8 +111,8 @@ export class MiniBackup {
     }
   }
 
-  private async findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Promise<string[]> {
-    return FileFinder.findFiles(pattern, roots);
+  private findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Observable<string[]> {
+    return this.fileFinder.findFiles(pattern, roots);
   }
 
   private async readFilesToBase64(files: string[]): Promise<Base64File[]> {
