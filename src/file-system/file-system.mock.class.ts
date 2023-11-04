@@ -1,3 +1,4 @@
+import { AsyncFindStream } from 'find';
 import { FileSystem } from './file-system.class';
 
 export class FileSystemMock extends FileSystem {
@@ -34,6 +35,25 @@ export class FileSystemMock extends FileSystem {
     } else {
       callback('Error');
     }
+  }
+
+  findFile(
+    pattern: string | RegExp,
+    _root: string,
+    callback: (files: string[]) => void,
+  ): AsyncFindStream {
+    if (
+      typeof pattern === 'string' &&
+      (this.isCorrectTextFile(pattern) ||
+        this.isCorrectJsonFile(pattern) ||
+        this.isCorrectConfigFile(pattern))
+    ) {
+      callback([pattern as string]);
+    } else {
+      throw 'Error';
+    }
+
+    return undefined as AsyncFindStream;
   }
 
   private isCorrectTextFile(path: string): boolean {
