@@ -1,4 +1,5 @@
 import { AsyncFindStream } from 'find';
+import { PathLike } from 'fs';
 import { FileSystem } from './file-system.class';
 
 export class FileSystemMock extends FileSystem {
@@ -54,6 +55,13 @@ export class FileSystemMock extends FileSystem {
     }
 
     return undefined as AsyncFindStream;
+  }
+
+  readdir(
+    _path: PathLike,
+    callback: (err: NodeJS.ErrnoException | null, files: string[]) => void,
+  ): void {
+    callback(null, ['test.txt', 'test2.txt', 'test3.txt', 'test.json', 'test2.json', 'test3.json']);
   }
 
   private isCorrectTextFile(path: string): boolean {
