@@ -1,4 +1,4 @@
-import { Observable, forkJoin, from, map } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 import { FileSystem } from './file-system.class';
 
 export class FileFinder {
@@ -8,7 +8,21 @@ export class FileFinder {
     ignoreErrors: boolean = true,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<string[]> {
-    return from(this._findFile(pattern, root, ignoreErrors, fileSystem));
+    return new Observable<string[]>((subscriber) => {
+      fileSystem
+        .findFile(pattern, root, (result: string[]) => {
+          subscriber.next(result);
+          subscriber.complete();
+        })
+        .error((error) => {
+          if (ignoreErrors) {
+            subscriber.next([]);
+            subscriber.complete();
+          } else {
+            subscriber.error(error);
+          }
+        });
+    });
   }
 
   findFiles(
@@ -31,26 +45,5 @@ export class FileFinder {
         return result;
       }),
     );
-  }
-
-  private _findFile(
-    pattern: string | RegExp,
-    root: string = 'C:\\',
-    ignoreErrors: boolean = true,
-    fileSystem: FileSystem = new FileSystem(),
-  ): Promise<string[]> {
-    return new Promise<string[]>((resolve, reject) => {
-      fileSystem
-        .findFile(pattern, root, (result: string[]) => {
-          resolve(result);
-        })
-        .error((error) => {
-          if (!ignoreErrors) {
-            reject(error);
-          } else {
-            resolve([]);
-          }
-        });
-    });
   }
 }
