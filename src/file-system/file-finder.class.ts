@@ -29,9 +29,10 @@ export class FileFinder {
     pattern: string | RegExp,
     roots: string[] = ['C:\\'],
     ignoreErrors: boolean = true,
+    fileSystem: FileSystem = new FileSystem(),
   ): Observable<string[]> {
     const observables = roots.map((root: string) => {
-      return this.findFile(pattern, root, ignoreErrors);
+      return this.findFile(pattern, root, ignoreErrors, fileSystem);
     });
 
     return forkJoin(observables).pipe(
