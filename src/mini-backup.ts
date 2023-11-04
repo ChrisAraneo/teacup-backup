@@ -1,19 +1,19 @@
+import Path from 'path';
+import Prompt from 'prompt-sync';
+import { Observable, filter } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
 import { ConfigLoader } from './file-system/config-loader.class';
+import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
+import { DirectoryInfo } from './file-system/directory-info.class';
 import { FileFinder } from './file-system/file-finder.class';
+import { FileSystem } from './file-system/file-system.class';
 import { Base64File } from './models/base64-file.class';
+import { Config } from './models/config.type';
 import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
-import { FileSystem } from './file-system/file-system.class';
-import Prompt from 'prompt-sync';
-import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
-import { Config } from './models/config.type';
-import { DirectoryInfo } from './file-system/directory-info.class';
-import Path from 'path';
 import { Logger } from './utils/logger.class';
-import { Observable } from 'rxjs';
 
 const prompt = Prompt({
   sigint: false,
@@ -81,16 +81,16 @@ export class MiniBackup {
 
     this.createDirectoryIfDoesntExist(backupDirectory);
 
-    const encryptedFiles: string[] = (
-      await DirectoryInfo.getContents(backupDirectory, this.fileSystem)
-    ).filter((file) => file.lastIndexOf('.mbe') >= 0);
+    DirectoryInfo.getContents(backupDirectory, this.fileSystem) // TODO Refactor
+      .pipe(filter((file) => file.lastIndexOf('.mbe') >= 0))
+      .subscribe(async (encryptedFiles: string[]) => {
+        this.logger.info('Decrypting files:', encryptedFiles);
 
-    this.logger.info('Decrypting files:', encryptedFiles);
+        const decrypted = await this.readEncryptedFiles(encryptedFiles);
+        const writtenRestoredFiles = await this.writeRestoredFiles(decrypted);
 
-    const decrypted = await this.readEncryptedFiles(encryptedFiles);
-    const writtenRestoredFiles = await this.writeRestoredFiles(decrypted);
-
-    this.logger.info('Restored:', writtenRestoredFiles);
+        this.logger.info('Restored:', writtenRestoredFiles);
+      });
   }
 
   private createDirectoryIfDoesntExist(directory: string): void {

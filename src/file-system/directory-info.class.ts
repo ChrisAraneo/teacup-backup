@@ -1,16 +1,18 @@
+import { Observable } from 'rxjs';
 import { FileSystem } from './file-system.class';
 
 export class DirectoryInfo {
-  static async getContents(
+  static getContents(
     directory: string,
     fileSystem: FileSystem = new FileSystem(),
-  ): Promise<string[]> {
-    return new Promise((resolve, reject) => {
+  ): Observable<string[]> {
+    return new Observable((subscriber) => {
       fileSystem.readdir(directory, (error: unknown, files: string[]) => {
         if (error) {
-          reject(error);
+          subscriber.error(error);
         } else {
-          resolve(files);
+          subscriber.next(files);
+          subscriber.complete();
         }
       });
     });
