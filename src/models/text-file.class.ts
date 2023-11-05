@@ -1,6 +1,7 @@
+import { lastValueFrom } from 'rxjs';
 import { TextFileWriter } from '../file-system/text-file-writer.class';
-import { File } from './file.class';
 import { FileSystem } from './../file-system/file-system.class';
+import { File } from './file.class';
 
 export class TextFile extends File<string> {
   protected textFileWriter: TextFileWriter;
@@ -10,6 +11,6 @@ export class TextFile extends File<string> {
       this.textFileWriter = new TextFileWriter(fileSystem);
     }
 
-    return this.textFileWriter.writeFile(this);
+    return await lastValueFrom(this.textFileWriter.writeFile(this));
   }
 }

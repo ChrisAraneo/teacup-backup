@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { Base64File } from '../models/base64-file.class';
 import { TextFile } from '../models/text-file.class';
 import { Base64FileWriter } from './base64-file-writer.class';
@@ -13,11 +14,11 @@ beforeEach(() => {
 });
 
 describe('Base64FileWriter', () => {
-  it('#writeFile should write a text file', () => {
+  it('#writeFile should write a text file', async () => {
     const file = new Base64File('test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-10-26'));
     jest.spyOn(fileSystem, 'writeFile');
 
-    writer.writeFile(file);
+    await firstValueFrom(writer.writeFile(file));
 
     const call = jest.mocked(fileSystem.writeFile).mock.calls[0];
     expect(call[0]).toBe('test.txt');
@@ -26,7 +27,7 @@ describe('Base64FileWriter', () => {
     expect(typeof call[3]).toBe('function');
   });
 
-  it('#writeFiles should write a text files', () => {
+  it('#writeFiles should write a text files', async () => {
     const files = [
       new TextFile('test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-10-26')),
       new TextFile('test2.txt', 'VGVzdA==', new Date('2023-10-26')),
@@ -34,7 +35,7 @@ describe('Base64FileWriter', () => {
     ];
     jest.spyOn(fileSystem, 'writeFile');
 
-    writer.writeFiles(files);
+    await firstValueFrom(writer.writeFiles(files));
 
     const calls = jest.mocked(fileSystem.writeFile).mock.calls;
     expect(calls.length).toBe(3);

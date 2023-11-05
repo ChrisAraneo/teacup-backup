@@ -1,3 +1,4 @@
+import { Observable, forkJoin, map } from 'rxjs';
 import { File } from '../models/file.class';
 import { FileSystem } from './file-system.class';
 
@@ -7,24 +8,25 @@ export abstract class FileWriter<T extends File<any>> {
     protected encoding: BufferEncoding,
   ) {}
 
-  writeFile(file: T): Promise<void> {
-    return new Promise((resolve, reject) => {
+  writeFile(file: T): Observable<void> {
+    return new Observable((subscriber) => {
       this.fileSystem.writeFile(
         file.getPath(),
         file.getContent(),
         this.encoding,
         (error: unknown) => {
           if (error) {
-            reject(error);
+            subscriber.error(error);
           } else {
-            resolve(undefined);
+            subscriber.next(undefined);
+            subscriber.complete();
           }
         },
       );
     });
   }
 
-  async writeFiles(files: T[]): Promise<void> {
-    await Promise.all(files.map((file) => this.writeFile(file)));
+  writeFiles(files: T[]): Observable<void> {
+    return forkJoin(files.map((file) => this.writeFile(file))).pipe(map(() => {}));
   }
 }

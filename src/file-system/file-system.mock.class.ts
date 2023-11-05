@@ -5,6 +5,8 @@ import { FileSystem } from './file-system.class';
 export class FileSystemMock extends FileSystem {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   writeFile(_path, _data, _options, _callback): Promise<void> {
+    _callback();
+
     return;
   }
 

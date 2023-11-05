@@ -1,7 +1,8 @@
+import { lastValueFrom } from 'rxjs';
 import { TextFile } from '../models/text-file.class';
-import { TextFileWriter } from './text-file-writer.class';
 import { FileSystem } from './file-system.class';
 import { FileSystemMock } from './file-system.mock.class';
+import { TextFileWriter } from './text-file-writer.class';
 
 let fileSystem: FileSystem;
 let writer: TextFileWriter;
@@ -12,11 +13,11 @@ beforeEach(() => {
 });
 
 describe('TextFileWriter', () => {
-  it('#writeFile should write a text file', () => {
+  it('#writeFile should write a text file', async () => {
     const file = new TextFile('test.txt', 'Hello World!', new Date('2023-10-26'));
     jest.spyOn(fileSystem, 'writeFile');
 
-    writer.writeFile(file);
+    await lastValueFrom(writer.writeFile(file));
 
     const call = jest.mocked(fileSystem.writeFile).mock.calls[0];
     expect(call[0]).toBe('test.txt');
@@ -25,7 +26,7 @@ describe('TextFileWriter', () => {
     expect(typeof call[3]).toBe('function');
   });
 
-  it('#writeFiles should write a text files', () => {
+  it('#writeFiles should write a text files', async () => {
     const files = [
       new TextFile('test.txt', 'Hello World!', new Date('2023-10-26')),
       new TextFile('test2.txt', 'Test', new Date('2023-10-26')),
@@ -33,7 +34,7 @@ describe('TextFileWriter', () => {
     ];
     jest.spyOn(fileSystem, 'writeFile');
 
-    writer.writeFiles(files);
+    await lastValueFrom(writer.writeFiles(files));
 
     const calls = jest.mocked(fileSystem.writeFile).mock.calls;
     expect(calls.length).toBe(3);
