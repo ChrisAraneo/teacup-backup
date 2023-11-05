@@ -1,3 +1,4 @@
+import { lastValueFrom } from 'rxjs';
 import { FileSystem } from './file-system.class';
 import { FileSystemMock } from './file-system.mock.class';
 import { JsonFileReader } from './json-file-reader.class';
@@ -11,10 +12,10 @@ beforeEach(() => {
 });
 
 describe('JsonFileReader', () => {
-  it('#readFile should read a text file', () => {
+  it('#readFile should read a text file', async () => {
     jest.spyOn(fileSystem, 'readFile');
 
-    reader.readFile('test.json');
+    await lastValueFrom(reader.readFile('test.json'));
 
     const call = jest.mocked(fileSystem.readFile).mock.calls[0];
     expect(call[0]).toBe('test.json');
@@ -22,10 +23,10 @@ describe('JsonFileReader', () => {
     expect(typeof call[2]).toBe('function');
   });
 
-  it('#readFiles should read text files', () => {
+  it('#readFiles should read text files', async () => {
     jest.spyOn(fileSystem, 'readFile');
 
-    reader.readFiles(['test.json', 'test2.json', 'test3.json']);
+    await lastValueFrom(reader.readFiles(['test.json', 'test2.json', 'test3.json']));
 
     const calls = jest.mocked(fileSystem.readFile).mock.calls;
     expect(calls.length).toBe(3);

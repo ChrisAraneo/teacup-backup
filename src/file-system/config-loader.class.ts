@@ -3,6 +3,7 @@ import { JsonFile } from '../models/json-file.class';
 import { CurrentDirectoryProvider } from './current-directory-provider.class';
 import { JsonFileReader } from './json-file-reader.class';
 import { FileSystem } from './file-system.class';
+import { firstValueFrom } from 'rxjs';
 
 export class ConfigLoader {
   private jsonFileReader: JsonFileReader;
@@ -20,7 +21,7 @@ export class ConfigLoader {
     let config: JsonFile | undefined;
 
     try {
-      config = await this.jsonFileReader.readFile(path);
+      config = await firstValueFrom(this.jsonFileReader.readFile(path));
     } catch (error: unknown) {
       throw Error(
         'File config.json not found. Create config.json file in the application directory.',

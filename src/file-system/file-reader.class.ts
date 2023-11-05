@@ -1,25 +1,27 @@
 import { File } from '../models/file.class';
 import { ReadFileResult } from './read-file-result.type';
 import { FileSystem } from './file-system.class';
+import { Observable, forkJoin } from 'rxjs';
 
 export abstract class FileReader<T extends File<any>> {
   constructor(protected fileSystem: FileSystem) {}
 
-  async readFiles(paths: string[]): Promise<T[]> {
-    return Promise.all(paths.map((path: string) => this.readFile(path)));
+  readFiles(paths: string[]): Observable<T[]> {
+    return forkJoin(paths.map((path: string) => this.readFile(path)));
   }
 
-  protected async _readFile(path: string, encoding: BufferEncoding): Promise<ReadFileResult> {
-    return new Promise((resolve, reject) => {
+  protected _readFile(path: string, encoding: BufferEncoding): Observable<ReadFileResult> {
+    return new Observable((subscriber) => {
       this.fileSystem.stat(path, (error: unknown, stats) => {
         if (error) {
-          reject(error);
+          subscriber.error(error);
         } else {
           this.fileSystem.readFile(path, encoding, (error: unknown, data: string) => {
             if (error) {
-              reject(error);
+              subscriber.error(error);
             } else {
-              resolve({ path, data, modifiedDate: new Date(stats.mtime) }); // TODO Further refactoring?
+              subscriber.next({ path, data, modifiedDate: new Date(stats.mtime) });
+              subscriber.complete();
             }
           });
         }
@@ -27,5 +29,5 @@ export abstract class FileReader<T extends File<any>> {
     });
   }
 
-  abstract readFile(path: string): Promise<T>;
+  abstract readFile(path: string): Observable<T>;
 }

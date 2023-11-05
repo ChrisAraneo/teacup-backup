@@ -2,6 +2,7 @@ import { Base64FileReader } from '../file-system/base64-file-reader.class';
 import { Base64FileWriter } from '../file-system/base64-file-writer.class';
 import { TextFile } from './text-file.class';
 import { FileSystem } from '../file-system/file-system.class';
+import { firstValueFrom } from 'rxjs';
 
 export class Base64File extends TextFile {
   private static base64FileReader: Base64FileReader;
@@ -14,7 +15,7 @@ export class Base64File extends TextFile {
       this.base64FileReader = new Base64FileReader(fileSystem);
     }
 
-    const result = await this.base64FileReader.readFile(path);
+    const result = await firstValueFrom(this.base64FileReader.readFile(path));
 
     return new Base64File(result.getPath(), result.getContent(), result.getModifiedDate());
   }

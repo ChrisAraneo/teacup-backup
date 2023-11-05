@@ -1,6 +1,6 @@
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, filter } from 'rxjs';
+import { Observable, filter, lastValueFrom } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
@@ -116,7 +116,7 @@ export class MiniBackup {
   }
 
   private async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return this.base64FileReader.readFiles(files);
+    return await lastValueFrom(this.base64FileReader.readFiles(files));
   }
 
   private async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
