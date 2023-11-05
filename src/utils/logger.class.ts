@@ -27,7 +27,7 @@ export class Logger {
       level: 'debug',
       format: combine(
         timestamp({
-          format: 'YYYY-MM-dd HH:MM:SS',
+          format: 'YYYY-MM-DD HH:MM:SS',
         }),
         prettyPrint(),
         format.splat(),
