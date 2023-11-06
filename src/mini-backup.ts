@@ -1,6 +1,6 @@
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, filter, lastValueFrom } from 'rxjs';
+import { Observable, filter, firstValueFrom, forkJoin, lastValueFrom } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
@@ -135,8 +135,8 @@ export class MiniBackup {
   }
 
   private async readEncryptedFiles(paths: string[]): Promise<Base64File[]> {
-    const encryptedFiles: EncryptedFile[] = await Promise.all(
-      paths.map((path) => EncryptedFile.fromEncryptedFile(path)),
+    const encryptedFiles: EncryptedFile[] = await lastValueFrom(
+      forkJoin(paths.map((path) => EncryptedFile.fromEncryptedFile(path))),
     );
 
     const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
@@ -152,7 +152,7 @@ export class MiniBackup {
   private async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await this.base64FileWriter.writeFiles(files);
+    await firstValueFrom(this.base64FileWriter.writeFiles(files));
 
     return files.map((file) => file.getPath());
   }

@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { ConfigLoader } from './config-loader.class';
 import { CurrentDirectoryProvider } from './current-directory-provider.class';
 import { CurrentDirectoryProviderMock } from './current-directory-provider.mock.class';
@@ -15,15 +16,15 @@ beforeEach(() => {
 });
 
 describe('ConfigLoader', () => {
-  it('#readConfigFile should read config.json', () => {
-    configLoader.readConfigFile().then((config) => {
-      expect(config).toStrictEqual({
-        backupDirectory: './backups',
-        files: [{ filename: 'this-is-example-filename.txt' }],
-        interval: 3600,
-        mode: 'backup',
-        roots: ['C:\\', 'D:\\', 'E:\\'],
-      });
+  it('#readConfigFile should read config.json', async () => {
+    const config = await firstValueFrom(configLoader.readConfigFile());
+
+    expect(config).toStrictEqual({
+      backupDirectory: './backups',
+      files: [{ filename: 'this-is-example-filename.txt' }],
+      interval: 3600,
+      mode: 'backup',
+      roots: ['C:\\', 'D:\\', 'E:\\'],
     });
   });
 });

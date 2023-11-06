@@ -28,13 +28,13 @@ export class FileSystemMock extends FileSystem {
   readFile(path: string, _options, callback: (error: any, data?: any) => any): void {
     if (this.isCorrectTextFile(path)) {
       callback(null, 'Hello World!');
-    } else if (this.isCorrectJsonFile(path)) {
-      callback(null, '{"name":"Joel"}');
     } else if (this.isCorrectConfigFile(path)) {
       callback(
         null,
         '{"backupDirectory":"./backups","files":[{"filename":"this-is-example-filename.txt"}],"interval":3600,"mode":"backup","roots":["C:\\\\","D:\\\\","E:\\\\"]}',
       );
+    } else if (this.isCorrectJsonFile(path)) {
+      callback(null, '{"name":"Joel"}');
     } else {
       callback('Error');
     }

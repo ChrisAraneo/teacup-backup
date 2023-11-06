@@ -1,9 +1,10 @@
+import { Observable, map } from 'rxjs';
 import { FileEncryptor } from '../crypto/file-encryptor.class';
+import { FileSystem } from '../file-system/file-system.class';
 import { TextFileReader } from '../file-system/text-file-reader.class';
 import { TextFileWriter } from '../file-system/text-file-writer.class';
 import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
-import { FileSystem } from '../file-system/file-system.class';
 
 export class EncryptedFile extends TextFile {
   protected textFileReader: TextFileReader;
@@ -32,20 +33,25 @@ export class EncryptedFile extends TextFile {
     }
   }
 
-  static async fromBase64File(file: Base64File, secretKey: string): Promise<EncryptedFile> {
+  static fromBase64File(file: Base64File, secretKey: string): EncryptedFile {
     return new EncryptedFile(file.getPath(), file.getContent(), file.getModifiedDate(), secretKey);
   }
 
-  static async fromEncryptedFile(
+  static fromEncryptedFile(
     path: string,
     fileSystem: FileSystem = new FileSystem(),
-  ): Promise<EncryptedFile> {
-    const result = await new TextFileReader(fileSystem).readFile(path);
-
-    return new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate());
+  ): Observable<EncryptedFile> {
+    return new TextFileReader(fileSystem)
+      .readFile(path)
+      .pipe(
+        map(
+          (result) =>
+            new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate()),
+        ),
+      );
   }
 
-  async writeToFile(fileSystem: FileSystem = new FileSystem()): Promise<void> {
+  writeToFile(fileSystem: FileSystem = new FileSystem()): Observable<void> {
     if (!this.textFileWriter) {
       this.textFileWriter = new TextFileWriter(fileSystem);
     }
