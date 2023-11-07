@@ -1,6 +1,6 @@
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, filter, firstValueFrom, forkJoin, lastValueFrom } from 'rxjs';
+import { Observable, filter, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
@@ -44,11 +44,11 @@ export class MiniBackup {
     this.secretKey = prompt({ echo: '*' });
   }
 
-  async readConfigFile(): Promise<object> {
+  readConfigFile(): Observable<object> {
     return this.configLoader.readConfigFile();
   }
 
-  async runBackupFlow(config: Config): Promise<void> {
+  runBackupFlow(config: Config): void {
     const backupDirectory = Path.normalize(
       `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
     );
@@ -58,39 +58,46 @@ export class MiniBackup {
     config.files.forEach(async (file) => {
       this.logger.info('Searching file:', file.filename);
 
-      // TODO Refactor to declarative code later
-      this.findFiles(file.filename, config.roots).subscribe(async (foundFiles) => {
+      this.findFiles(file.filename, config.roots).subscribe((foundFiles) => {
         this.logger.info('Found files:', foundFiles);
 
-        const filesInBase64 = await this.readFilesToBase64(foundFiles);
-        const encrypted = await this.encryptBase64Files(filesInBase64);
-        const writtenEncryptedFiles = await this.writeEncryptedFiles(encrypted, backupDirectory);
-
-        this.logger.info(
-          'Created backup:',
-          writtenEncryptedFiles.map((file) => file.getPath()),
+        this.readFilesToBase64(foundFiles).pipe(
+          mergeMap((filesInBase64) => this.encryptBase64Files(filesInBase64)),
+          mergeMap((encrypted) => this.writeEncryptedFiles(encrypted, backupDirectory)),
+          tap((files) => {
+            this.logger.info(
+              'Created backup:',
+              files.map((file) => file.getPath()),
+            );
+          }),
         );
       });
     });
   }
 
-  async runRestoreFlow(config: Config): Promise<void> {
+  runRestoreFlow(config: Config): void {
     const backupDirectory = Path.normalize(
       `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
     );
 
     this.createDirectoryIfDoesntExist(backupDirectory);
 
-    DirectoryInfo.getContents(backupDirectory, this.fileSystem) // TODO Refactor
-      .pipe(filter((file) => file.lastIndexOf('.mbe') >= 0))
-      .subscribe(async (encryptedFiles: string[]) => {
-        this.logger.info('Decrypting files:', encryptedFiles);
-
-        const decrypted = await this.readEncryptedFiles(encryptedFiles);
-        const writtenRestoredFiles = await this.writeRestoredFiles(decrypted);
-
-        this.logger.info('Restored:', writtenRestoredFiles);
-      });
+    DirectoryInfo.getContents(backupDirectory, this.fileSystem)
+      .pipe(
+        filter((file) => file.lastIndexOf('.mbe') >= 0),
+        tap((files) => {
+          this.logger.info('Decrypting files:', files);
+        }),
+        mergeMap((encryptedFiles) =>
+          this.readEncryptedFiles(encryptedFiles).pipe(
+            mergeMap((decrypted) => this.writeRestoredFiles(decrypted)),
+          ),
+        ),
+        tap((writtenRestoredFiles) => {
+          this.logger.info('Restored:', writtenRestoredFiles);
+        }),
+      )
+      .subscribe();
   }
 
   private createDirectoryIfDoesntExist(directory: string): void {
@@ -115,46 +122,44 @@ export class MiniBackup {
     return this.fileFinder.findFiles(pattern, roots);
   }
 
-  private async readFilesToBase64(files: string[]): Promise<Base64File[]> {
-    return await lastValueFrom(this.base64FileReader.readFiles(files));
+  private readFilesToBase64(files: string[]): Observable<Base64File[]> {
+    return this.base64FileReader.readFiles(files);
   }
 
-  private async encryptBase64Files(files: Base64File[]): Promise<EncryptedFile[]> {
-    return Promise.all(files.map((item) => EncryptedFile.fromBase64File(item, this.secretKey)));
+  private encryptBase64Files(files: Base64File[]): Observable<EncryptedFile[]> {
+    return forkJoin(files.map((item) => of(EncryptedFile.fromBase64File(item, this.secretKey))));
   }
 
-  private async writeEncryptedFiles(
+  private writeEncryptedFiles(
     files: EncryptedFile[],
     backupDirectory: string,
-  ): Promise<EncryptedFile[]> {
+  ): Observable<EncryptedFile[]> {
     this.updateFilePathsToEncrypted(files, backupDirectory);
 
-    await Promise.all(files.map((file) => file.writeToFile()));
-
-    return files;
+    return forkJoin(files.map((file) => file.writeToFile())).pipe(map(() => files));
   }
 
-  private async readEncryptedFiles(paths: string[]): Promise<Base64File[]> {
-    const encryptedFiles: EncryptedFile[] = await lastValueFrom(
-      forkJoin(paths.map((path) => EncryptedFile.fromEncryptedFile(path))),
+  private readEncryptedFiles(paths: string[]): Observable<Base64File[]> {
+    return forkJoin(paths.map((path) => EncryptedFile.fromEncryptedFile(path))).pipe(
+      map((encryptedFiles) => {
+        const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
+          encryptedFiles,
+          this.secretKey,
+        );
+
+        this.updateFilePathsToDecrypted(decryptedFiles);
+
+        return decryptedFiles;
+      }),
     );
-
-    const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
-      encryptedFiles,
-      this.secretKey,
-    );
-
-    this.updateFilePathsToDecrypted(decryptedFiles);
-
-    return decryptedFiles;
   }
 
-  private async writeRestoredFiles(files: Base64File[]): Promise<string[]> {
+  private writeRestoredFiles(files: Base64File[]): Observable<string[]> {
     this.updateFilePathsToRestored(files);
 
-    await firstValueFrom(this.base64FileWriter.writeFiles(files));
-
-    return files.map((file) => file.getPath());
+    return this.base64FileWriter
+      .writeFiles(files)
+      .pipe(map(() => files.map((file) => file.getPath())));
   }
 
   private updateFilePathsToEncrypted(files: TextFile[], backupDirectory: string): void {

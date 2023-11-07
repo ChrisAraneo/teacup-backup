@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
@@ -11,7 +12,7 @@ class App {
 
     this.miniBackup.promptUserSecretKey();
 
-    const config = (await this.miniBackup.readConfigFile()) as Config;
+    const config = (await firstValueFrom(this.miniBackup.readConfigFile())) as Config;
     const interval = +config.interval;
 
     if (config.mode === 'backup') {
