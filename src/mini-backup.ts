@@ -55,7 +55,7 @@ export class MiniBackup {
 
     this.createDirectoryIfDoesntExist(backupDirectory);
 
-    config.files.forEach(async (file) => {
+    config.files.forEach((file) => {
       this.logger.info('Searching file:', file.filename);
 
       this.findFiles(file.filename, config.roots).subscribe((foundFiles) => {
