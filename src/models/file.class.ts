@@ -31,7 +31,7 @@ export abstract class File<T> {
       return null;
     }
 
-    return parts[1];
+    return parts[parts.length - 1];
   }
 
   getContent(): T {
