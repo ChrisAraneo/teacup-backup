@@ -58,20 +58,24 @@ export class MiniBackup {
     config.files.forEach((file) => {
       this.logger.info('Searching file:', file.filename);
 
-      this.findFiles(file.filename, config.roots).subscribe((foundFiles) => {
-        this.logger.info('Found files:', foundFiles);
+      this.findFiles(file.filename, config.roots)
+        .pipe(
+          mergeMap((foundFiles) => {
+            this.logger.info('Found files:', foundFiles);
 
-        this.readFilesToBase64(foundFiles).pipe(
-          mergeMap((filesInBase64) => this.encryptBase64Files(filesInBase64)),
-          mergeMap((encrypted) => this.writeEncryptedFiles(encrypted, backupDirectory)),
-          tap((files) => {
-            this.logger.info(
-              'Created backup:',
-              files.map((file) => file.getPath()),
+            return this.readFilesToBase64(foundFiles).pipe(
+              mergeMap((filesInBase64) => this.encryptBase64Files(filesInBase64)),
+              mergeMap((encrypted) => this.writeEncryptedFiles(encrypted, backupDirectory)),
+              tap((files) => {
+                this.logger.info(
+                  'Created backup:',
+                  files.map((file) => file.getPath()),
+                );
+              }),
             );
           }),
-        );
-      });
+        )
+        .subscribe();
     });
   }
 
