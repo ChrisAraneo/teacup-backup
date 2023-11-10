@@ -13,6 +13,7 @@ export class FileSystemMock extends FileSystem {
   stat(path: string, callback: (error: any, data?: any) => any): void {
     if (
       this.isCorrectTextFile(path) ||
+      this.isCorrectEncryptedFile(path) ||
       this.isCorrectJsonFile(path) ||
       this.isCorrectConfigFile(path)
     ) {
@@ -28,6 +29,8 @@ export class FileSystemMock extends FileSystem {
   readFile(path: string, _options, callback: (error: any, data?: any) => any): void {
     if (this.isCorrectTextFile(path)) {
       callback(null, 'Hello World!');
+    } else if (this.isCorrectEncryptedFile(path)) {
+      callback(null, 'U2FsdGVkX19B53TiyfRaPnNzSe5uo2K8dIO/fD5h+slCLO30KJAjw4HGKxqRBgGC');
     } else if (this.isCorrectConfigFile(path)) {
       callback(
         null,
@@ -48,6 +51,7 @@ export class FileSystemMock extends FileSystem {
     if (
       typeof pattern === 'string' &&
       (this.isCorrectTextFile(pattern) ||
+        this.isCorrectEncryptedFile(pattern) ||
         this.isCorrectJsonFile(pattern) ||
         this.isCorrectConfigFile(pattern))
     ) {
@@ -68,6 +72,10 @@ export class FileSystemMock extends FileSystem {
 
   private isCorrectTextFile(path: string): boolean {
     return ['test.txt', 'test2.txt', 'test3.txt'].includes(path);
+  }
+
+  private isCorrectEncryptedFile(path: string): boolean {
+    return ['test.mbe', 'directory/test.mbe'].includes(path);
   }
 
   private isCorrectJsonFile(path: string): boolean {
