@@ -11,9 +11,59 @@ beforeEach(() => {
 
 describe('Base64File', () => {
   it('instance should be created', async () => {
-    const file = new Base64File('test.txt', 'Hello World!', new Date('2023-11-08'));
+    const file = new Base64File('test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-08'));
 
     expect(file).toBeInstanceOf(Base64File);
+  });
+
+  it('#getPath should return correct path', async () => {
+    const file = new Base64File('directory/test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-10'));
+    const path = file.getPath();
+
+    expect(path).toBe('directory/test.txt');
+  });
+
+  it('#getFilename should return correct filename', async () => {
+    const file = new Base64File(
+      'directory/test.name.txt',
+      'SGVsbG8gV29ybGQh',
+      new Date('2023-11-10'),
+    );
+    const path = file.getFilename();
+
+    expect(path).toBe('test');
+  });
+
+  it('#getExtension should return correct extension', async () => {
+    const file = new Base64File(
+      'directory/this.is.test.name.txt',
+      'SGVsbG8gV29ybGQh',
+      new Date('2023-11-10'),
+    );
+    const extension = file.getExtension();
+
+    expect(extension).toBe('txt');
+  });
+
+  it('#getContent should return correct file content', async () => {
+    const file = new Base64File('directory/test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-10'));
+    const content = file.getContent();
+
+    expect(content).toBe('SGVsbG8gV29ybGQh');
+  });
+
+  it('#getHashValue should return correct hash value', async () => {
+    const file = new Base64File('directory/test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-10'));
+    const hash = file.getHashValue();
+
+    expect(hash).toBe('ca5a479cddd6308dcf42e76e232ca96a');
+  });
+
+  it('#getDate should return correct date', async () => {
+    const file = new Base64File('directory/test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-10'));
+    const date = file.getModifiedDate();
+
+    expect(date.toISOString()).toBe('2023-11-10T00:00:00.000Z');
   });
 
   it('#fromFile should read file and create instance', async () => {
