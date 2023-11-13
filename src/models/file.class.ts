@@ -19,8 +19,9 @@ export abstract class File<T> {
   getFilename(): string {
     const basename = path.basename(this.path);
     const parts = basename.split('.');
+    parts.pop();
 
-    return parts[0];
+    return parts.join('.');
   }
 
   getExtension(): string | null {
