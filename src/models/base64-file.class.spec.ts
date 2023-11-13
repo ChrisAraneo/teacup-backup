@@ -31,7 +31,21 @@ describe('Base64File', () => {
     );
     const path = file.getFilename();
 
-    expect(path).toBe('test');
+    expect(path).toBe('test.name');
+  });
+
+  it('#setFilename should change filename', async () => {
+    const file = new Base64File(
+      'directory/test.name.txt',
+      'SGVsbG8gV29ybGQh',
+      new Date('2023-11-13'),
+    );
+    const filename = file.getFilename();
+    file.setFilename('test.name2', 'txt');
+    const updated = file.getFilename();
+
+    expect(filename).toBe('test.name');
+    expect(updated).toBe('test.name2');
   });
 
   it('#getExtension should return correct extension', async () => {

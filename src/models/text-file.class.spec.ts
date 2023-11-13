@@ -24,10 +24,20 @@ describe('TextFile', () => {
   });
 
   it('#getFilename should return correct filename', async () => {
-    const file = new TextFile('test.txt', 'Hello World!', new Date('2023-11-11'));
+    const file = new TextFile('test.name.txt', 'Hello World!', new Date('2023-11-11'));
     const path = file.getFilename();
 
-    expect(path).toBe('test');
+    expect(path).toBe('test.name');
+  });
+
+  it('#setFilename should change filename', async () => {
+    const file = new TextFile('test.name.txt', 'Hello World!', new Date('2023-11-13'));
+    const filename = file.getFilename();
+    file.setFilename('test.name2');
+    const updated = file.getFilename();
+
+    expect(filename).toBe('test.name');
+    expect(updated).toBe('test.name2');
   });
 
   it('#getExtension should return correct extension', async () => {

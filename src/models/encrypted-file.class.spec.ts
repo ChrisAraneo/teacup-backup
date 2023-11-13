@@ -35,6 +35,18 @@ describe('EncryptedFile', () => {
     expect(path).toBe('test');
   });
 
+  it('#setFilename should change filename', async () => {
+    const file = await lastValueFrom(
+      EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),
+    );
+    const filename = file.getFilename();
+    file.setFilename('test.name2');
+    const updated = file.getFilename();
+
+    expect(filename).toBe('test');
+    expect(updated).toBe('test.name2');
+  });
+
   it('#getExtension should return correct extension', async () => {
     const file = await lastValueFrom(
       EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),

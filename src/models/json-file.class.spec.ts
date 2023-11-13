@@ -15,10 +15,20 @@ describe('JsonFile', () => {
   });
 
   it('#getFilename should return correct filename', async () => {
-    const file = new JsonFile('test.json', { name: 'Tommy' }, new Date('2023-11-10'));
+    const file = new JsonFile('test.name.json', { name: 'Tommy' }, new Date('2023-11-10'));
     const path = file.getFilename();
 
-    expect(path).toBe('test');
+    expect(path).toBe('test.name');
+  });
+
+  it('#setFilename should change filename', async () => {
+    const file = new JsonFile('test.name.json', { name: 'Tommy' }, new Date('2023-11-13'));
+    const filename = file.getFilename();
+    file.setFilename('test.name2', 'json');
+    const updated = file.getFilename();
+
+    expect(filename).toBe('test.name');
+    expect(updated).toBe('test.name2');
   });
 
   it('#getExtension should return correct extension', async () => {
