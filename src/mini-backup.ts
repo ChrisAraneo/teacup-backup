@@ -14,6 +14,7 @@ import { Config } from './models/config.type';
 import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import { Logger } from './utils/logger.class';
+import { DirectoryCreator } from './file-system/directory-creator.class';
 
 const prompt = Prompt({
   sigint: false,
@@ -24,6 +25,7 @@ export class MiniBackup {
   private fileSystem: FileSystem;
   private fileFinder: FileFinder;
   private currentDirectoryProvider: CurrentDirectoryProvider;
+  private directoryCreator: DirectoryCreator;
   private configLoader: ConfigLoader;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
@@ -34,6 +36,7 @@ export class MiniBackup {
     this.fileSystem = new FileSystem();
     this.fileFinder = new FileFinder();
     this.currentDirectoryProvider = new CurrentDirectoryProvider();
+    this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
     this.configLoader = new ConfigLoader(this.currentDirectoryProvider, this.fileSystem);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
@@ -51,7 +54,7 @@ export class MiniBackup {
   runBackupFlow(config: Config): void {
     const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
-    this.createDirectoryIfDoesntExist(backupDirectory);
+    this.directoryCreator.createIfDoesntExist(backupDirectory);
 
     const logFoundFiles = tap((foundFiles: string[]) =>
       this.logger.info('Found files:', foundFiles),
@@ -86,7 +89,7 @@ export class MiniBackup {
   runRestoreFlow(config: Config): void {
     const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
-    this.createDirectoryIfDoesntExist(backupDirectory);
+    this.directoryCreator.createIfDoesntExist(backupDirectory);
 
     const filterFilesByExtension = map((files: string[]) =>
       files.filter((file: string) => file.lastIndexOf('.mbe') >= 0),
@@ -116,24 +119,6 @@ export class MiniBackup {
 
   private getNormalizedBackupDirectory(directory: string): string {
     return Path.normalize(`${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`);
-  }
-
-  private createDirectoryIfDoesntExist(directory: string): void {
-    // TODO Move to another class?
-    if (!this.fileSystem.existsSync(directory)) {
-      this.logger.debug(`Creating backup directory: '${directory}'`);
-      this.fileSystem.mkdirSync(
-        directory,
-        { recursive: true },
-        (error: NodeJS.ErrnoException, path?: string) => {
-          if (error) {
-            throw Error("Can't create backup directory");
-          } else if (path) {
-            this.logger.debug('Created backup directory');
-          }
-        },
-      );
-    }
   }
 
   private findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Observable<string[]> {
