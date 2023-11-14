@@ -1,6 +1,6 @@
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, filter, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
@@ -49,59 +49,73 @@ export class MiniBackup {
   }
 
   runBackupFlow(config: Config): void {
-    const backupDirectory = Path.normalize(
-      `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
-    );
+    const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
     this.createDirectoryIfDoesntExist(backupDirectory);
+
+    const logFoundFiles = tap((foundFiles: string[]) =>
+      this.logger.info('Found files:', foundFiles),
+    );
+    const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
+      this.encryptBase64Files(filesInBase64),
+    );
+    const writeFiles = mergeMap((encrypted: EncryptedFile[]) =>
+      this.writeEncryptedFiles(encrypted, backupDirectory),
+    );
+    const logCreatedBackup = tap((files: EncryptedFile[]) =>
+      this.logger.info(
+        'Created backup:',
+        files.map((file) => file.getPath()),
+      ),
+    );
 
     config.files.forEach((file) => {
       this.logger.info('Searching file:', file.filename);
 
       this.findFiles(file.filename, config.roots)
         .pipe(
-          mergeMap((foundFiles) => {
-            this.logger.info('Found files:', foundFiles);
-
-            return this.readFilesToBase64(foundFiles).pipe(
-              mergeMap((filesInBase64) => this.encryptBase64Files(filesInBase64)),
-              mergeMap((encrypted) => this.writeEncryptedFiles(encrypted, backupDirectory)),
-              tap((files) => {
-                this.logger.info(
-                  'Created backup:',
-                  files.map((file) => file.getPath()),
-                );
-              }),
-            );
-          }),
+          logFoundFiles,
+          mergeMap((foundFiles) =>
+            this.readFilesToBase64(foundFiles).pipe(encryptFiles, writeFiles, logCreatedBackup),
+          ),
         )
         .subscribe();
     });
   }
 
   runRestoreFlow(config: Config): void {
-    const backupDirectory = Path.normalize(
-      `${this.currentDirectoryProvider.getCurrentDirectory()}/${config.backupDirectory}`,
-    );
+    const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
     this.createDirectoryIfDoesntExist(backupDirectory);
 
+    const filterFilesByExtension = map((files: string[]) =>
+      files.filter((file: string) => file.lastIndexOf('.mbe') >= 0),
+    );
+
+    const logFilesToDecrypt = tap((files) => this.logger.info('Decrypting files:', files));
+
+    const writeRestoredFiles = mergeMap((decrypted: Base64File[]) =>
+      this.writeRestoredFiles(decrypted),
+    );
+
+    const logRestoredFiles = tap((writtenRestoredFiles) =>
+      this.logger.info('Restored:', writtenRestoredFiles),
+    );
+
     DirectoryInfo.getContents(backupDirectory, this.fileSystem)
       .pipe(
-        filter((file) => file.lastIndexOf('.mbe') >= 0),
-        tap((files) => {
-          this.logger.info('Decrypting files:', files);
-        }),
-        mergeMap((encryptedFiles) =>
-          this.readEncryptedFiles(encryptedFiles).pipe(
-            mergeMap((decrypted) => this.writeRestoredFiles(decrypted)),
-          ),
+        filterFilesByExtension,
+        logFilesToDecrypt,
+        mergeMap((encryptedFiles: string[]) =>
+          this.readEncryptedFiles(encryptedFiles).pipe(writeRestoredFiles),
         ),
-        tap((writtenRestoredFiles) => {
-          this.logger.info('Restored:', writtenRestoredFiles);
-        }),
+        logRestoredFiles,
       )
       .subscribe();
+  }
+
+  private getNormalizedBackupDirectory(directory: string): string {
+    return Path.normalize(`${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`);
   }
 
   private createDirectoryIfDoesntExist(directory: string): void {
