@@ -1,5 +1,5 @@
 import { AsyncFindStream } from 'find';
-import { PathLike } from 'fs';
+import { MakeDirectoryOptions, PathLike } from 'fs';
 import { FileSystem } from './file-system.class';
 
 export class FileSystemMock extends FileSystem {
@@ -27,6 +27,16 @@ export class FileSystemMock extends FileSystem {
     } else {
       callback('Error');
     }
+  }
+
+  mkdirSync(
+    path: PathLike,
+    options?: MakeDirectoryOptions & {
+      recursive: true;
+    },
+    callback?: (err: NodeJS.ErrnoException | null, path?: string) => void,
+  ): void {
+    return callback(null, path as string);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
