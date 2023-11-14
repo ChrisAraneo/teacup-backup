@@ -10,6 +10,10 @@ export class FileSystemMock extends FileSystem {
     return;
   }
 
+  existsSync(path: PathLike): boolean {
+    return path !== 'notExistingDir';
+  }
+
   stat(path: string, callback: (error: any, data?: any) => any): void {
     if (
       this.isCorrectTextFile(path) ||
