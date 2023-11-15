@@ -1,4 +1,4 @@
-# Mini Backup (v0.2.0)
+# Mini Backup (v0.3.0)
 
 ![Mini backup logo](logo.png?raw=true)
 

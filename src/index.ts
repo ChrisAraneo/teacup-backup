@@ -8,7 +8,7 @@ class App {
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
-    this.logger.info('Mini Backup - version 0.2.0');
+    this.logger.info('Mini Backup - version 0.3.0');
 
     this.miniBackup.promptUserSecretKey();
 
