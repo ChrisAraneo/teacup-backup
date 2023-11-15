@@ -1,11 +1,15 @@
 {
   "name": "mini-backup",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Mini Backup is a small Node script that finds, encrypts and backs up selected files.",
   "main": "index.js",
   "scripts": {
-    "start": "npx tsc && node dev-scripts/copy-config-file.js && node dist/index.js --no-warnings",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint \"src/**/*.{ts,json}\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.spec.ts\" \"src/**/*.json\"",
+    "start": "npm run build && npm run copy-config && node dist/mini-backup.js --no-warnings",
+    "test": "jest",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/mini-backup.js",
+    "copy-config": "node dev-scripts/copy-config-file.js"
   },
   "repository": {
     "type": "git",
@@ -24,13 +28,28 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.2",
     "@types/find": "^0.2.2",
+    "@types/jest": "^29.5.6",
     "@types/node": "^20.7.0",
+    "@types/winston": "^2.4.4",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "babel-jest": "^29.7.0",
+    "esbuild": "0.19.5",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jsonc": "^2.10.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.0.3",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
     "file-base64": "^1.0.0",
     "find": "^0.3.0",
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "rxjs": "^7.8.1",
+    "winston": "^3.11.0"
   }
 }

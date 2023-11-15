@@ -1,6 +1,11 @@
-:: Windows
-:: Copy dist directory and this script to the autostart directory to run script on system start.
+:: Run on startup on Windows
 ::
-:: Copy to %AppData%\Microsoft\Windows\Start Menu\Programs\Startup
+:: 1) Build app (have dist directory)
+:: 2) Update config.json
+:: 3) Create shortcut to this bat file
+:: 4) Place shortcut in startup directory
+:: %AppData%\Microsoft\Windows\Start Menu\Programs\Startup
 :: or %ProgramData%\Microsoft\Windows\Start Menu\Programs\Startup for all users
-node dist\index.js
+:: 5) Done
+::
+node ..\dist\mini-backup.js

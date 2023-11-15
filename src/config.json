@@ -1,11 +1,11 @@
 {
-  "mode": "backup",
   "backupDirectory": "./backups",
-  "interval": 3600,
-  "roots": ["C:\\", "D:\\", "E:\\"],
   "files": [
     {
       "filename": "this-is-example-filename.txt"
     }
-  ]
+  ],
+  "interval": 3600,
+  "mode": "backup",
+  "roots": ["C:\\", "D:\\", "E:\\"]
 }
