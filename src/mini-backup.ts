@@ -110,7 +110,7 @@ export class MiniBackup {
         filterFilesByExtension,
         logFilesToDecrypt,
         mergeMap((encryptedFiles: string[]) =>
-          this.readEncryptedFiles(encryptedFiles).pipe(writeRestoredFiles),
+          this.readEncryptedFiles(encryptedFiles, config).pipe(writeRestoredFiles),
         ),
         logRestoredFiles,
       )
@@ -118,7 +118,13 @@ export class MiniBackup {
   }
 
   private getNormalizedBackupDirectory(directory: string): string {
-    return Path.normalize(`${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`);
+    return this.getNormalizedPath(
+      `${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`,
+    );
+  }
+
+  private getNormalizedPath(path: string): string {
+    return Path.normalize(path);
   }
 
   private findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Observable<string[]> {
@@ -142,8 +148,15 @@ export class MiniBackup {
     return forkJoin(files.map((file) => file.writeToFile())).pipe(map(() => files));
   }
 
-  private readEncryptedFiles(paths: string[]): Observable<Base64File[]> {
-    return forkJoin(paths.map((path) => EncryptedFile.fromEncryptedFile(path))).pipe(
+  private readEncryptedFiles(files: string[], config: Config): Observable<Base64File[]> {
+    return forkJoin(
+      files.map((file) => {
+        const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
+        const path = this.getNormalizedPath(`${backupDirectory}/${file}`);
+
+        return EncryptedFile.fromEncryptedFile(path);
+      }),
+    ).pipe(
       map((encryptedFiles) => {
         const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
           encryptedFiles,
