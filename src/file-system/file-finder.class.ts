@@ -13,13 +13,14 @@ export class FileFinder {
     if (!this.fileSystem.existsSync(root)) {
       return from(
         new Promise<FindFileResult>((resolve) =>
-          resolve({
-            success: false,
-            pattern: pattern.toString(),
-            root,
-            result: [],
-            message: `Root doesn\'t exist: ${root}`,
-          }),
+          resolve(
+            this.createFindFileResult({
+              success: false,
+              pattern,
+              root,
+              message: `Root doesn\'t exist: ${root}`,
+            }),
+          ),
         ),
       );
     }
@@ -27,23 +28,28 @@ export class FileFinder {
     return new Observable<FindFileResult>((subscriber) => {
       fileSystem
         .findFile(pattern, root, (result: string[]) => {
-          subscriber.next({
-            success: true,
-            pattern: pattern.toString(),
-            root,
-            result: result,
-            message: null,
-          });
+          subscriber.next(
+            this.createFindFileResult({
+              success: true,
+              pattern,
+              root,
+              result: result,
+            }),
+          );
           subscriber.complete();
         })
         .error((error: Error) => {
-          subscriber.next({
-            success: false,
-            pattern: pattern.toString(),
-            root,
-            result: [],
-            message: JSON.stringify(error, Object.getOwnPropertyNames(error)).replace('\\\\', '\\'),
-          });
+          subscriber.next(
+            this.createFindFileResult({
+              success: true,
+              pattern,
+              root,
+              message: JSON.stringify(error, Object.getOwnPropertyNames(error)).replace(
+                '\\\\',
+                '\\',
+              ),
+            }),
+          );
           subscriber.complete();
         });
     });
@@ -59,5 +65,21 @@ export class FileFinder {
         return this.findFile(pattern, root, fileSystem);
       }),
     );
+  }
+
+  private createFindFileResult(input: {
+    success: boolean;
+    pattern: string | RegExp;
+    root: string;
+    result?: string[];
+    message?: string | null;
+  }): FindFileResult {
+    return {
+      success: input.success,
+      pattern: typeof input.pattern === 'string' ? input.pattern : input.pattern.toString(),
+      root: input.root,
+      result: input?.result ?? [],
+      message: input?.message ?? null,
+    };
   }
 }
