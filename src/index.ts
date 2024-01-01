@@ -1,15 +1,24 @@
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
+import { ConfigLoader } from './file-system/config-loader.class';
+import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
+import { FileSystem } from './file-system/file-system.class';
 
 class App {
-  private static logger = new Logger();
-  private static miniBackup = new MiniBackup();
+  private static logger: Logger;
+  private static miniBackup: MiniBackup;
+  private static configLoader: ConfigLoader = new ConfigLoader(
+    new CurrentDirectoryProvider(),
+    new FileSystem(),
+  );
 
   static async main(): Promise<void> {
-    const config = (await firstValueFrom(this.miniBackup.readConfigFile())) as Config;
-    this.logger.setLogLevel(config['log-level']);
+    const config = (await firstValueFrom(App.readConfigFile())) as Config;
+
+    App.logger = new Logger(config['log-level']);
+    App.miniBackup = new MiniBackup(App.logger);
 
     this.logger.info('Mini Backup - version 0.3.0');
 
@@ -34,6 +43,10 @@ class App {
     } else {
       this.logger.error('Invalid mode');
     }
+  }
+
+  private static readConfigFile(): Observable<object> {
+    return this.configLoader.readConfigFile();
   }
 }
 

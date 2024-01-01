@@ -1,26 +1,50 @@
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, forkJoin, from } from 'rxjs';
 import { FileSystem } from './file-system.class';
+import { FindFileResult } from './find-file-result.type';
 
 export class FileFinder {
+  constructor(private fileSystem: FileSystem = new FileSystem()) {}
+
   findFile(
     pattern: string | RegExp,
     root: string = 'C:\\',
-    ignoreErrors: boolean = true,
     fileSystem: FileSystem = new FileSystem(),
-  ): Observable<string[]> {
-    return new Observable<string[]>((subscriber) => {
+  ): Observable<FindFileResult> {
+    if (!this.fileSystem.existsSync(root)) {
+      return from(
+        new Promise<FindFileResult>((resolve) =>
+          resolve({
+            success: false,
+            pattern: pattern.toString(),
+            root,
+            result: [],
+            message: `Root doesn\'t exist: ${root}`,
+          }),
+        ),
+      );
+    }
+
+    return new Observable<FindFileResult>((subscriber) => {
       fileSystem
         .findFile(pattern, root, (result: string[]) => {
-          subscriber.next(result);
+          subscriber.next({
+            success: true,
+            pattern: pattern.toString(),
+            root,
+            result: result,
+            message: null,
+          });
           subscriber.complete();
         })
-        .error((error) => {
-          if (ignoreErrors) {
-            subscriber.next([]);
-            subscriber.complete();
-          } else {
-            subscriber.error(error);
-          }
+        .error((error: Error) => {
+          subscriber.next({
+            success: false,
+            pattern: pattern.toString(),
+            root,
+            result: [],
+            message: JSON.stringify(error, Object.getOwnPropertyNames(error)).replace('\\\\', '\\'),
+          });
+          subscriber.complete();
         });
     });
   }
@@ -28,22 +52,11 @@ export class FileFinder {
   findFiles(
     pattern: string | RegExp,
     roots: string[] = ['C:\\'],
-    ignoreErrors: boolean = true,
     fileSystem: FileSystem = new FileSystem(),
-  ): Observable<string[]> {
-    const observables = roots.map((root: string) => {
-      return this.findFile(pattern, root, ignoreErrors, fileSystem);
-    });
-
-    return forkJoin(observables).pipe(
-      map((arrays: string[][]) => {
-        const result: string[] = [];
-
-        arrays.forEach((array: string[]) => {
-          result.push(...array);
-        });
-
-        return result;
+  ): Observable<FindFileResult[]> {
+    return forkJoin(
+      roots.map((root: string) => {
+        return this.findFile(pattern, root, fileSystem);
       }),
     );
   }
