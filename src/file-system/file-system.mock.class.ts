@@ -11,7 +11,7 @@ export class FileSystemMock extends FileSystem {
   }
 
   existsSync(path: PathLike): boolean {
-    return path !== 'notExistingDir';
+    return !path.toString().includes('notExistingDir');
   }
 
   stat(path: string, callback: (error: any, data?: any) => any): void {
