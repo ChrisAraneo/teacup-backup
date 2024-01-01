@@ -8,11 +8,13 @@ class App {
   private static miniBackup = new MiniBackup();
 
   static async main(): Promise<void> {
+    const config = (await firstValueFrom(this.miniBackup.readConfigFile())) as Config;
+    this.logger.setLogLevel(config['log-level']);
+
     this.logger.info('Mini Backup - version 0.3.0');
 
     this.miniBackup.promptUserSecretKey();
 
-    const config = (await firstValueFrom(this.miniBackup.readConfigFile())) as Config;
     const interval = +config.interval;
 
     if (config.mode === 'backup') {

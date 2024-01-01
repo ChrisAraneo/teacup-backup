@@ -29,6 +29,11 @@ export class Logger {
     this.logger.error(message, ...meta);
   }
 
+  setLogLevel(logLevel: string = 'info'): void {
+    this.logLevel = logLevel;
+    this.initialize();
+  }
+
   private initialize(): void {
     this.logger = createLogger({
       level: this.logLevel,
