@@ -30,7 +30,7 @@ class App {
     } else if (config.mode === 'restore') {
       this.miniBackup.runRestoreFlow(config);
     } else {
-      throw Error('Invalid mode');
+      this.logger.error('Invalid mode');
     }
   }
 }
