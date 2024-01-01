@@ -6,7 +6,7 @@
     }
   ],
   "interval": 3600,
+  "log-level": "debug",
   "mode": "backup",
-  "roots": ["C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\"],
-  "log-level": "debug"
+  "roots": ["C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\"]
 }
