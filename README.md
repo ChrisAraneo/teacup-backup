@@ -22,15 +22,16 @@ Before running the application fill the values in the `src/config.json` configur
 
 ```json
 {
-  "mode": "backup",
   "backupDirectory": "./backups",
-  "interval": 3600,
-  "roots": ["C:\\", "D:\\", "E:\\"],
   "files": [
     {
       "filename": "this-is-example-filename.txt"
     }
-  ]
+  ],
+  "interval": 3600,
+  "log-level": "debug",
+  "mode": "backup",
+  "roots": ["C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\"]
 }
 ```
 
@@ -41,6 +42,7 @@ Before running the application fill the values in the `src/config.json` configur
 - `interval` - time interval in seconds, how often backups are to be performed, for example `3600`
 - `roots` - root directories where to search for files to back up
 - `files` - array of files to find and backup; each element o array should be an object with filename property
+- `log-level` - level of detail of displayed logs (severity of errors); recommended `"info"`
 
 # Executing backup
 
