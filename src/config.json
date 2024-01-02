@@ -2,11 +2,18 @@
   "backupDirectory": "./backups",
   "files": [
     {
-      "filename": "this-is-example-filename.txt"
+      "filename": "index.ts"
     }
   ],
+  "ftp": {
+    "directory": "./mini-backup",
+    "enabled": true,
+    "host": "192.168.50.1",
+    "password": "Qwerty123/",
+    "user": "user"
+  },
   "interval": 3600,
   "log-level": "debug",
   "mode": "backup",
-  "roots": ["C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\"]
+  "roots": ["D:\\"]
 }
