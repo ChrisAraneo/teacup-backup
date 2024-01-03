@@ -1,6 +1,7 @@
+import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/base64-file-writer.class';
@@ -9,6 +10,7 @@ import { DirectoryCreator } from './file-system/directory-creator.class';
 import { DirectoryInfo } from './file-system/directory-info.class';
 import { FileFinder } from './file-system/file-finder.class';
 import { FileSystem } from './file-system/file-system.class';
+import { FtpClient } from './ftp/ftp-client.class';
 import { Base64File } from './models/base64-file.class';
 import { Config } from './models/config.type';
 import { EncryptedFile } from './models/encrypted-file.class';
@@ -26,6 +28,7 @@ export class MiniBackup {
   private directoryCreator: DirectoryCreator;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
+  private ftpClient: FtpClient;
   private secretKey: string = '';
 
   constructor(private logger: Logger) {
@@ -35,6 +38,7 @@ export class MiniBackup {
     this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
+    this.ftpClient = new FtpClient(new BasicFtp.Client());
   }
 
   promptUserSecretKey(): void {
@@ -62,6 +66,32 @@ export class MiniBackup {
         files.map((file) => file.getPath()),
       ),
     );
+    const logUploadedBackup = tap((directory: string | null) => {
+      if (directory) {
+        this.logger.info(`Uploaded directory to FTP server: ${JSON.stringify(directory)}`);
+      }
+    });
+    const uploadFiles = mergeMap(() => {
+      if (config.ftp?.enabled) {
+        const { host, user, password, directory } = config.ftp;
+        const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
+
+        return this.ftpClient
+          .uploadDirectory(host, user, password, backupDirectory, directory)
+          .pipe(
+            map(() => backupDirectory),
+            catchError((error) => {
+              this.logger.error(
+                JSON.stringify(error, Object.getOwnPropertyNames(error)).replace('\\\\', '\\'),
+              );
+
+              return null;
+            }),
+          );
+      } else {
+        return null;
+      }
+    });
 
     config.files.forEach((file) => {
       this.logger.info('Searching file:', file.filename);
@@ -70,7 +100,13 @@ export class MiniBackup {
         .pipe(
           logFoundFiles,
           mergeMap((foundFiles) =>
-            this.readFilesToBase64(foundFiles).pipe(encryptFiles, writeFiles, logCreatedBackup),
+            this.readFilesToBase64(foundFiles).pipe(
+              encryptFiles,
+              writeFiles,
+              logCreatedBackup,
+              uploadFiles,
+              logUploadedBackup,
+            ),
           ),
         )
         .subscribe();
