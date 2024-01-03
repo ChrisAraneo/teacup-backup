@@ -85,11 +85,11 @@ export class MiniBackup {
                 JSON.stringify(error, Object.getOwnPropertyNames(error)).replace('\\\\', '\\'),
               );
 
-              return null;
+              return of(null);
             }),
           );
       } else {
-        return null;
+        return of(null);
       }
     });
 
