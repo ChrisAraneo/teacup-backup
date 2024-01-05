@@ -1,8 +1,8 @@
 import Path from 'path';
-import { JsonFile } from '../models/json-file.class';
-import { CurrentDirectoryProvider } from './current-directory-provider.class';
-import { JsonFileReader } from './json-file-reader.class';
-import { FileSystem } from './file-system.class';
+import { JsonFile } from '../../models/json-file.class';
+import { CurrentDirectoryProvider } from '../current-directory-provider/current-directory-provider.class';
+import { JsonFileReader } from '../file-reader/json-file-reader.class';
+import { FileSystem } from '../file-system/file-system.class';
 import { Observable, catchError, map } from 'rxjs';
 
 export class ConfigLoader {

@@ -1,6 +1,6 @@
 import { Observable, forkJoin, map } from 'rxjs';
-import { File } from '../models/file.class';
-import { FileSystem } from './file-system.class';
+import { File } from '../../models/file.class';
+import { FileSystem } from '../file-system/file-system.class';
 
 export abstract class FileWriter<T extends File<any>> {
   constructor(

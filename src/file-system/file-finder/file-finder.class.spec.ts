@@ -1,7 +1,7 @@
 import { lastValueFrom } from 'rxjs';
 import { FileFinder } from './file-finder.class';
-import { FileSystem } from './file-system.class';
-import { FileSystemMock } from './file-system.mock.class';
+import { FileSystem } from '../file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system.mock.class';
 
 let fileSystem: FileSystem;
 let fileFinder: FileFinder;

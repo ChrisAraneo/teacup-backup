@@ -1,5 +1,5 @@
-import { FileSystem } from './file-system.class';
-import { Logger } from '../utils/logger.class';
+import { FileSystem } from '../file-system/file-system.class';
+import { Logger } from '../../utils/logger.class';
 
 export class DirectoryCreator {
   constructor(

@@ -1,10 +1,10 @@
 import { Observable, forkJoin } from 'rxjs';
-import { File } from '../models/file.class';
+import { File } from '../../models/file.class';
 import {
   FILE_CONTENT_READING_ERROR_MESSAGE,
   FILE_METADATA_READING_ERROR_MESSAGE,
 } from './file-reader.consts';
-import { FileSystem } from './file-system.class';
+import { FileSystem } from '../file-system/file-system.class';
 import { ReadFileResult } from './read-file-result.type';
 
 export abstract class FileReader<T extends File<any>> {

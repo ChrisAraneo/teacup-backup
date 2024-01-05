@@ -1,7 +1,7 @@
-import { FileSystem } from './file-system.class';
-import { FileSystemMock } from './file-system.mock.class';
+import { FileSystem } from '../file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system.mock.class';
 import { DirectoryCreator } from './directory-creator.class';
-import { Logger } from '../utils/logger.class';
+import { Logger } from '../../utils/logger.class';
 
 let fileSystem: FileSystem;
 let logger: Logger;

@@ -1,6 +1,6 @@
 import { lastValueFrom } from 'rxjs';
-import { FileSystem } from '../file-system/file-system.class';
-import { FileSystemMock } from '../file-system/file-system.mock.class';
+import { FileSystem } from '../file-system/file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system/file-system.mock.class';
 import { TextFile } from './text-file.class';
 
 let fileSystem: FileSystem;

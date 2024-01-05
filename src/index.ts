@@ -2,9 +2,9 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
-import { ConfigLoader } from './file-system/config-loader.class';
-import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
-import { FileSystem } from './file-system/file-system.class';
+import { ConfigLoader } from './file-system/config-loader/config-loader.class';
+import { CurrentDirectoryProvider } from './file-system/current-directory-provider/current-directory-provider.class';
+import { FileSystem } from './file-system/file-system/file-system.class';
 
 class App {
   private static logger: Logger;

@@ -1,5 +1,5 @@
 import { Observable, forkJoin, from } from 'rxjs';
-import { FileSystem } from './file-system.class';
+import { FileSystem } from '../file-system/file-system.class';
 import { FindFileResult } from './find-file-result.type';
 
 export class FileFinder {
