@@ -5,7 +5,7 @@ import { Observable, catchError, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { Base64FileReader } from './file-system/file-reader/base64-file-reader.class';
 import { Base64FileWriter } from './file-system/file-writer/base64-file-writer.class';
-import { CurrentDirectoryProvider } from './file-system/current-directory-provider/current-directory-provider.class';
+import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';
 import { DirectoryInfo } from './file-system/directory-info/directory-info.class';
 import { FileFinder } from './file-system/file-finder/file-finder.class';
@@ -24,7 +24,7 @@ const prompt = Prompt({
 export class MiniBackup {
   private fileSystem: FileSystem;
   private fileFinder: FileFinder;
-  private currentDirectoryProvider: CurrentDirectoryProvider;
+  private currentDirectory: CurrentDirectory;
   private directoryCreator: DirectoryCreator;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
@@ -34,7 +34,7 @@ export class MiniBackup {
   constructor(private logger: Logger) {
     this.fileSystem = new FileSystem();
     this.fileFinder = new FileFinder();
-    this.currentDirectoryProvider = new CurrentDirectoryProvider();
+    this.currentDirectory = new CurrentDirectory();
     this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
@@ -145,9 +145,7 @@ export class MiniBackup {
   }
 
   private getNormalizedBackupDirectory(directory: string): string {
-    return this.getNormalizedPath(
-      `${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`,
-    );
+    return this.getNormalizedPath(`${this.currentDirectory.getCurrentDirectory()}/${directory}`);
   }
 
   private getNormalizedPath(path: string): string {

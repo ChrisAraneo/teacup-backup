@@ -3,14 +3,14 @@ import { MiniBackup } from './mini-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
-import { CurrentDirectoryProvider } from './file-system/current-directory-provider/current-directory-provider.class';
+import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { FileSystem } from './file-system/file-system/file-system.class';
 
 class App {
   private static logger: Logger;
   private static miniBackup: MiniBackup;
   private static configLoader: ConfigLoader = new ConfigLoader(
-    new CurrentDirectoryProvider(),
+    new CurrentDirectory(),
     new FileSystem(),
   );
 

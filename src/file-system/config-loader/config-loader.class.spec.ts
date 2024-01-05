@@ -1,18 +1,18 @@
 import { firstValueFrom } from 'rxjs';
 import { ConfigLoader } from './config-loader.class';
-import { CurrentDirectoryProvider } from '../current-directory-provider/current-directory-provider.class';
-import { CurrentDirectoryProviderMock } from '../current-directory-provider/current-directory-provider.mock.class';
+import { CurrentDirectory } from '../current-directory/current-directory.class';
+import { CurrentDirectoryMock } from '../current-directory/current-directory.mock.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
 
 let fileSystem: FileSystem;
-let currentDirectoryProvider: CurrentDirectoryProvider;
+let currentDirectory: CurrentDirectory;
 let configLoader: ConfigLoader;
 
 beforeEach(() => {
   fileSystem = new FileSystemMock();
-  currentDirectoryProvider = new CurrentDirectoryProviderMock();
-  configLoader = new ConfigLoader(currentDirectoryProvider, fileSystem);
+  currentDirectory = new CurrentDirectoryMock();
+  configLoader = new ConfigLoader(currentDirectory, fileSystem);
 });
 
 describe('ConfigLoader', () => {
