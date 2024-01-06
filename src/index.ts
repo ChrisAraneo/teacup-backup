@@ -1,10 +1,10 @@
 import { Observable, firstValueFrom } from 'rxjs';
-import { MiniBackup } from './mini-backup';
-import { Config } from './models/config.type';
-import { Logger } from './utils/logger.class';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { FileSystem } from './file-system/file-system/file-system.class';
+import { MiniBackup } from './mini-backup';
+import { Config } from './models/config.type';
+import { Logger } from './utils/logger.class';
 
 class App {
   private static logger: Logger;
@@ -15,7 +15,15 @@ class App {
   );
 
   static async main(): Promise<void> {
-    const config = (await firstValueFrom(App.readConfigFile())) as Config;
+    const config: Config | undefined = (await firstValueFrom(App.readConfigFile()).catch(
+      (error) => {
+        new Logger('error').error(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      },
+    )) as Config;
+
+    if (!config) {
+      return;
+    }
 
     App.logger = new Logger(config['log-level']);
     App.miniBackup = new MiniBackup(App.logger);
