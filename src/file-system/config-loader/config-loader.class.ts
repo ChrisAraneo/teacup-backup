@@ -1,4 +1,4 @@
-import { isBoolean, isNumber, isString } from 'lodash';
+import { isArray, isBoolean, isNumber, isObject, isString } from 'lodash';
 import Path from 'path';
 import { Observable, catchError, map } from 'rxjs';
 import { Config, FtpConfig } from '../../models/config.type';
@@ -63,13 +63,12 @@ export class ConfigLoader {
   }
 
   private isStringArray(object: unknown): object is string[] {
-    return Array.isArray(object) && object.every((item) => isString(item));
+    return isArray(object) && object.every((item) => isString(item));
   }
 
   private isFilesArray(object: unknown): object is { filename: string }[] {
     return (
-      Array.isArray(object) &&
-      object.every((item) => typeof item === 'object' && isString(item?.filename))
+      isArray(object) && object.every((item) => isObject(item) && isString((item as any)?.filename))
     );
   }
 
