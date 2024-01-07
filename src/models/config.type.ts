@@ -1,8 +1,6 @@
 export type Config = {
   roots: string[];
-  files: Array<{
-    filename: string;
-  }>;
+  files: string[];
   mode: 'backup' | 'restore';
   backupDirectory: string;
   interval: number;

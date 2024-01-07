@@ -93,10 +93,10 @@ export class MiniBackup {
       }
     });
 
-    config.files.forEach((file) => {
-      this.logger.info('Searching file:', file.filename);
+    config.files.forEach((file: string) => {
+      this.logger.info('Searching file:', file);
 
-      this.findFiles(file.filename, config.roots)
+      this.findFiles(file, config.roots)
         .pipe(
           logFoundFiles,
           mergeMap((foundFiles) =>

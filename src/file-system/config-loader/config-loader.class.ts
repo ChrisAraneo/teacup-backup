@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isObject, isString } from 'lodash';
+import { isArray, isBoolean, isNumber, isString } from 'lodash';
 import Path from 'path';
 import { Observable, catchError, map } from 'rxjs';
 import { Config, FtpConfig } from '../../models/config.type';
@@ -44,7 +44,7 @@ export class ConfigLoader {
     }
 
     const validRoots = this.isStringArray((<Config>object).roots);
-    const validFiles = this.isFilesArray((<Config>object).files);
+    const validFiles = this.isStringArray((<Config>object).files);
     const validMode = (<Config>object).mode === 'backup' || (<Config>object).mode === 'restore';
     const validBackupDirectory = isString((<Config>object).backupDirectory);
     const validInterval = isNumber((<Config>object).interval);
@@ -64,12 +64,6 @@ export class ConfigLoader {
 
   private isStringArray(object: unknown): object is string[] {
     return isArray(object) && object.every((item) => isString(item));
-  }
-
-  private isFilesArray(object: unknown): object is { filename: string }[] {
-    return (
-      isArray(object) && object.every((item) => isObject(item) && isString((item as any)?.filename))
-    );
   }
 
   private isFtpConfig(object: unknown): object is FtpConfig {

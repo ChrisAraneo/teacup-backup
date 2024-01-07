@@ -22,7 +22,7 @@ describe('ConfigLoader', () => {
 
     expect(config).toStrictEqual({
       backupDirectory: './backups',
-      files: [{ filename: 'index.ts' }],
+      files: ['index.ts'],
       ftp: {
         directory: 'mini-backup/',
         enabled: true,
