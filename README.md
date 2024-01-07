@@ -60,7 +60,7 @@ If you would like to send the backup to an FTP server, you can provide credentia
 - `backupDirectory` - (relative) directory for storing backup files, recommended `"./backups"`
 - `interval` - time interval in seconds, how often backups are to be performed, for example `3600`
 - `roots` - root directories where to search for files to back up
-- `files` - array of files to find and backup; each element o array should be an object with filename property
+- `files` - array of files to find and backup; each element of array should be a filename or regex to file
 - `log-level` - level of detail of displayed logs (severity of errors); recommended `"info"`
 - `ftp` - contains object with credentials to the FTP server and the name of the directory:
     - `directory` - path to backup directory on FTP
