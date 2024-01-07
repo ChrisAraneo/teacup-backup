@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { FileSystem } from './file-system.class';
+import { FileSystem } from '../file-system/file-system.class';
 
 export class DirectoryInfo {
   static getContents(

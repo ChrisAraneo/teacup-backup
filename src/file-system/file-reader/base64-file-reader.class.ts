@@ -1,7 +1,7 @@
-import { Base64File } from '../models/base64-file.class';
+import { Base64File } from '../../models/base64-file.class';
 import { FileReader } from './file-reader.class';
 import { ReadFileResult } from './read-file-result.type';
-import { FileSystem } from './file-system.class';
+import { FileSystem } from '../file-system/file-system.class';
 import { Observable, map } from 'rxjs';
 
 export class Base64FileReader extends FileReader<Base64File> {

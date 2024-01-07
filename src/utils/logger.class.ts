@@ -4,7 +4,10 @@ const { combine, timestamp, printf, colorize, prettyPrint, simple } = format;
 export class Logger {
   private logger: WinstonLogger;
 
-  constructor(private areWarningsIgnored: boolean = true) {
+  constructor(
+    private logLevel: string = 'info',
+    private areWarningsIgnored: boolean = true,
+  ) {
     this.areWarningsIgnored && this.ignoreWarnings();
 
     this.initialize();
@@ -18,13 +21,22 @@ export class Logger {
     this.logger.info(message, ...meta);
   }
 
+  warn(message: string, ...meta: any[]): void {
+    this.logger.warn(message, ...meta);
+  }
+
   error(message: string, ...meta: any[]): void {
     this.logger.error(message, ...meta);
   }
 
+  setLogLevel(logLevel: string = 'info'): void {
+    this.logLevel = logLevel;
+    this.initialize();
+  }
+
   private initialize(): void {
     this.logger = createLogger({
-      level: 'debug',
+      level: this.logLevel,
       format: combine(
         timestamp({
           format: 'YYYY-MM-DD HH:MM:SS',

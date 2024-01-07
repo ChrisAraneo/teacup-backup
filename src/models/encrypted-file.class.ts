@@ -1,8 +1,8 @@
 import { Observable, map } from 'rxjs';
 import { FileEncryptor } from '../crypto/file-encryptor.class';
-import { FileSystem } from '../file-system/file-system.class';
-import { TextFileReader } from '../file-system/text-file-reader.class';
-import { TextFileWriter } from '../file-system/text-file-writer.class';
+import { FileSystem } from '../file-system/file-system/file-system.class';
+import { TextFileReader } from '../file-system/file-reader/text-file-reader.class';
+import { TextFileWriter } from '../file-system/file-writer/text-file-writer.class';
 import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
 

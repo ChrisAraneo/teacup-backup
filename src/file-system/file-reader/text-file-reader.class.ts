@@ -1,5 +1,5 @@
 import { Observable, map } from 'rxjs';
-import { TextFile } from '../models/text-file.class';
+import { TextFile } from '../../models/text-file.class';
 import { FileReader } from './file-reader.class';
 import { ReadFileResult } from './read-file-result.type';
 

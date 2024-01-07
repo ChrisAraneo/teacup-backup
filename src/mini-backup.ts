@@ -1,54 +1,49 @@
+import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, mergeMap, of, tap } from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
-import { Base64FileReader } from './file-system/base64-file-reader.class';
-import { Base64FileWriter } from './file-system/base64-file-writer.class';
-import { ConfigLoader } from './file-system/config-loader.class';
-import { CurrentDirectoryProvider } from './file-system/current-directory-provider.class';
-import { DirectoryInfo } from './file-system/directory-info.class';
-import { FileFinder } from './file-system/file-finder.class';
-import { FileSystem } from './file-system/file-system.class';
+import { Base64FileReader } from './file-system/file-reader/base64-file-reader.class';
+import { Base64FileWriter } from './file-system/file-writer/base64-file-writer.class';
+import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
+import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';
+import { DirectoryInfo } from './file-system/directory-info/directory-info.class';
+import { FileFinder } from './file-system/file-finder/file-finder.class';
+import { FileSystem } from './file-system/file-system/file-system.class';
+import { FtpClient } from './ftp/ftp-client.class';
 import { Base64File } from './models/base64-file.class';
 import { Config } from './models/config.type';
 import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import { Logger } from './utils/logger.class';
-import { DirectoryCreator } from './file-system/directory-creator.class';
 
 const prompt = Prompt({
   sigint: false,
 });
 
 export class MiniBackup {
-  private logger: Logger;
   private fileSystem: FileSystem;
   private fileFinder: FileFinder;
-  private currentDirectoryProvider: CurrentDirectoryProvider;
+  private currentDirectory: CurrentDirectory;
   private directoryCreator: DirectoryCreator;
-  private configLoader: ConfigLoader;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
+  private ftpClient: FtpClient;
   private secretKey: string = '';
 
-  constructor() {
-    this.logger = new Logger();
+  constructor(private logger: Logger) {
     this.fileSystem = new FileSystem();
     this.fileFinder = new FileFinder();
-    this.currentDirectoryProvider = new CurrentDirectoryProvider();
+    this.currentDirectory = new CurrentDirectory();
     this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
-    this.configLoader = new ConfigLoader(this.currentDirectoryProvider, this.fileSystem);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
+    this.ftpClient = new FtpClient(new BasicFtp.Client());
   }
 
   promptUserSecretKey(): void {
     this.logger.info('Secret key (password for encryption):');
     this.secretKey = prompt({ echo: '*' });
-  }
-
-  readConfigFile(): Observable<object> {
-    return this.configLoader.readConfigFile();
   }
 
   runBackupFlow(config: Config): void {
@@ -71,15 +66,47 @@ export class MiniBackup {
         files.map((file) => file.getPath()),
       ),
     );
+    const logUploadedBackup = tap((directory: string | null) => {
+      if (directory) {
+        this.logger.info(`Uploaded directory to FTP server: ${JSON.stringify(directory)}`);
+      }
+    });
+    const uploadFiles = mergeMap(() => {
+      if (config.ftp?.enabled) {
+        const { host, user, password, directory } = config.ftp;
+        const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
-    config.files.forEach((file) => {
-      this.logger.info('Searching file:', file.filename);
+        return this.ftpClient
+          .uploadDirectory(host, user, password, backupDirectory, directory)
+          .pipe(
+            map(() => backupDirectory),
+            catchError((error) => {
+              this.logger.error(
+                JSON.stringify(error, Object.getOwnPropertyNames(error)).replace('\\\\', '\\'),
+              );
 
-      this.findFiles(file.filename, config.roots)
+              return of(null);
+            }),
+          );
+      } else {
+        return of(null);
+      }
+    });
+
+    config.files.forEach((file: string) => {
+      this.logger.info('Searching file:', file);
+
+      this.findFiles(file, config.roots)
         .pipe(
           logFoundFiles,
           mergeMap((foundFiles) =>
-            this.readFilesToBase64(foundFiles).pipe(encryptFiles, writeFiles, logCreatedBackup),
+            this.readFilesToBase64(foundFiles).pipe(
+              encryptFiles,
+              writeFiles,
+              logCreatedBackup,
+              uploadFiles,
+              logUploadedBackup,
+            ),
           ),
         )
         .subscribe();
@@ -118,9 +145,7 @@ export class MiniBackup {
   }
 
   private getNormalizedBackupDirectory(directory: string): string {
-    return this.getNormalizedPath(
-      `${this.currentDirectoryProvider.getCurrentDirectory()}/${directory}`,
-    );
+    return this.getNormalizedPath(`${this.currentDirectory.getCurrentDirectory()}/${directory}`);
   }
 
   private getNormalizedPath(path: string): string {
@@ -128,7 +153,17 @@ export class MiniBackup {
   }
 
   private findFiles(pattern: string | RegExp, roots: string[] = ['C:\\']): Observable<string[]> {
-    return this.fileFinder.findFiles(pattern, roots);
+    return this.fileFinder.findFiles(pattern, roots).pipe(
+      tap((results) => {
+        this.logger.debug(JSON.stringify(results));
+      }),
+      map((results) =>
+        results
+          .filter((item) => item.result?.length > 0)
+          .map((item) => item.result)
+          .flat(),
+      ),
+    );
   }
 
   private readFilesToBase64(files: string[]): Observable<Base64File[]> {

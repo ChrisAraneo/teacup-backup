@@ -1,4 +1,4 @@
-# Mini Backup (v0.3.0)
+# Mini Backup (v0.4.0)
 
 ![Mini backup logo](logo.png?raw=true)
 
@@ -6,12 +6,15 @@
 
 I needed a simple utility script to search for files and then make copies of those files.
 
-Mini Backup works in two modes: "backup" and "restore". In the case of backup mode, the script searches for files with a given name on the disk, then encrypts them and saves them to the selected directory. In restore mode, the script decrypts all previously saved files.
+Mini Backup works in two modes: "backup" and "restore". In the case of backup mode, the script searches for files with given name, then encrypts found files and saves them to the selected directory. In restore mode, the script decrypts all previously saved files.
+
+Mini Backup also has the functionality of uploading files to an FTP server.
 
 To run Mini Backup you need the programs listed in section *Used technologies*. Then just modify the configuration file as needed (`src/config.json`) and run the command
 ```bash
 /mini-backup$ npm run start
 ```
+
 More details below.
 
 # Set the config.json file
@@ -22,15 +25,32 @@ Before running the application fill the values in the `src/config.json` configur
 
 ```json
 {
-  "mode": "backup",
   "backupDirectory": "./backups",
+  "files": ["index.ts"],
   "interval": 3600,
-  "roots": ["C:\\", "D:\\", "E:\\"],
-  "files": [
-    {
-      "filename": "this-is-example-filename.txt"
-    }
-  ]
+  "log-level": "debug",
+  "mode": "backup",
+  "roots": ["C:\\"]
+}
+```
+
+If you would like to send the backup to an FTP server, you can provide credentials and path to backup directory, for example:
+
+```json
+{
+  "backupDirectory": "./backups",
+  "files": ["index.ts"],
+  "ftp": {
+    "directory": "backups/mini-backup",
+    "enabled": true,
+    "host": "192.168.50.1",
+    "password": "Qwerty123/",
+    "user": "user"
+  },
+  "interval": 3600,
+  "log-level": "debug",
+  "mode": "backup",
+  "roots": ["D:\\"]
 }
 ```
 
@@ -40,7 +60,14 @@ Before running the application fill the values in the `src/config.json` configur
 - `backupDirectory` - (relative) directory for storing backup files, recommended `"./backups"`
 - `interval` - time interval in seconds, how often backups are to be performed, for example `3600`
 - `roots` - root directories where to search for files to back up
-- `files` - array of files to find and backup; each element o array should be an object with filename property
+- `files` - array of files to find and backup; each element of array should be a filename or regex to file
+- `log-level` - level of detail of displayed logs (severity of errors); recommended `"info"`
+- `ftp` - contains object with credentials to the FTP server and the name of the directory:
+    - `directory` - path to backup directory on FTP
+    - `enabled` - `true` to enable sending to FTP, `false` otherwise
+    - `host` - IP to the FTP server
+    - `user` - username
+    - `password` - password
 
 # Executing backup
 

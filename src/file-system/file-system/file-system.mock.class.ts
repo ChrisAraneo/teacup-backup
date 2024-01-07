@@ -11,7 +11,7 @@ export class FileSystemMock extends FileSystem {
   }
 
   existsSync(path: PathLike): boolean {
-    return path !== 'notExistingDir';
+    return !path.toString().includes('notExistingDir');
   }
 
   stat(path: string, callback: (error: any, data?: any) => any): void {
@@ -48,7 +48,7 @@ export class FileSystemMock extends FileSystem {
     } else if (this.isCorrectConfigFile(path)) {
       callback(
         null,
-        '{"backupDirectory":"./backups","files":[{"filename":"this-is-example-filename.txt"}],"interval":3600,"mode":"backup","roots":["C:\\\\","D:\\\\","E:\\\\"]}',
+        `{"backupDirectory":".\/backups","files":["index.ts"],"ftp":{"directory":"mini-backup\/","enabled":true,"host":"192.168.50.1","password":"Qwerty123\/","user":"user"},"interval":3600,"log-level":"debug","mode":"backup","roots":["root"]}`,
       );
     } else if (this.isCorrectJsonFile(path)) {
       callback(null, '{"name":"Joel"}');

@@ -1,9 +1,9 @@
 import { firstValueFrom } from 'rxjs';
-import { Base64File } from '../models/base64-file.class';
-import { TextFile } from '../models/text-file.class';
+import { Base64File } from '../../models/base64-file.class';
+import { TextFile } from '../../models/text-file.class';
 import { Base64FileWriter } from './base64-file-writer.class';
-import { FileSystem } from './file-system.class';
-import { FileSystemMock } from './file-system.mock.class';
+import { FileSystem } from '../file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system.mock.class';
 
 let fileSystem: FileSystem;
 let writer: Base64FileWriter;
