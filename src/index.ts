@@ -28,7 +28,7 @@ class App {
     App.logger = new Logger(config['log-level']);
     App.miniBackup = new MiniBackup(App.logger);
 
-    this.logger.info('Mini Backup - version 0.3.0');
+    this.logger.info('Mini Backup - version 0.4.0');
 
     this.miniBackup.promptUserSecretKey();
 

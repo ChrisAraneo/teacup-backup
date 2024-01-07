@@ -1,6 +1,6 @@
 {
   "name": "mini-backup",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Mini Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
   "main": "index.js",
   "scripts": {
