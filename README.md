@@ -1,18 +1,18 @@
-# Mini Backup (v0.4.0)
+# Teacup Backup (v0.4.1)
 
-![Mini backup logo](logo.png?raw=true)
+![Teacup backup logo](logo.png?raw=true)
 
 # What & why?
 
 I needed a simple utility script to search for files and then make copies of those files.
 
-Mini Backup works in two modes: "backup" and "restore". In the case of backup mode, the script searches for files with given name, then encrypts found files and saves them to the selected directory. In restore mode, the script decrypts all previously saved files.
+Teacup Backup works in two modes: "backup" and "restore". In the case of backup mode, the script searches for files with given name, then encrypts found files and saves them to the selected directory. In restore mode, the script decrypts all previously saved files.
 
-Mini Backup also has the functionality of uploading files to an FTP server.
+Teacup Backup also has the functionality of uploading files to an FTP server.
 
-To run Mini Backup you need the programs listed in section *Used technologies*. Then just modify the configuration file as needed (`src/config.json`) and run the command
+To run Teacup Backup you need the programs listed in section *Used technologies*. Then just modify the configuration file as needed (`src/config.json`) and run the command
 ```bash
-/mini-backup$ npm run start
+/teacup-backup$ npm run start
 ```
 
 More details below.
@@ -41,7 +41,7 @@ If you would like to send the backup to an FTP server, you can provide credentia
   "backupDirectory": "./backups",
   "files": ["index.ts"],
   "ftp": {
-    "directory": "backups/mini-backup",
+    "directory": "backups/teacup-backup",
     "enabled": true,
     "host": "192.168.50.1",
     "password": "Qwerty123/",
@@ -75,12 +75,12 @@ Once you have filled the `config.json`, you can install the required dependencie
 
 Install dependencies:
 ```bash
-/mini-backup$ npm install
+/teacup-backup$ npm install
 ```
 
 Run the script:
 ```bash
-/mini-backup$ npm run start
+/teacup-backup$ npm run start
 ```
 
 # Restoring files
@@ -89,7 +89,7 @@ If `"restore"` mode is set in the configuration file, then all encrypted files i
 
 Run the script:
 ```bash
-/mini-backup$ npm run start
+/teacup-backup$ npm run start
 ```
 
 # Used technologies

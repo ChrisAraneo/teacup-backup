@@ -16,7 +16,7 @@ describe('FtpClient', () => {
     jest.spyOn(basicClient, 'access');
 
     await firstValueFrom(
-      ftpClient.uploadDirectory('1.1.1.1', 'admin', 'password', 'backup', 'mini-backup'),
+      ftpClient.uploadDirectory('1.1.1.1', 'admin', 'password', 'backup', 'teacup-backup'),
     );
 
     const call = jest.mocked(basicClient.access).mock.calls[0];
@@ -27,11 +27,11 @@ describe('FtpClient', () => {
     jest.spyOn(basicClient, 'uploadFromDir');
 
     await firstValueFrom(
-      ftpClient.uploadDirectory('1.1.1.1', 'admin', 'password', 'backup', 'mini-backup'),
+      ftpClient.uploadDirectory('1.1.1.1', 'admin', 'password', 'backup', 'teacup-backup'),
     );
 
     const call = jest.mocked(basicClient.uploadFromDir).mock.calls[0];
     expect(call[0]).toStrictEqual('backup');
-    expect(call[1]).toStrictEqual('mini-backup');
+    expect(call[1]).toStrictEqual('teacup-backup');
   });
 });

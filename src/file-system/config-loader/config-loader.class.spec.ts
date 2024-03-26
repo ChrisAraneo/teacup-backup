@@ -24,7 +24,7 @@ describe('ConfigLoader', () => {
       backupDirectory: './backups',
       files: ['index.ts'],
       ftp: {
-        directory: 'mini-backup/',
+        directory: 'teacup-backup/',
         enabled: true,
         host: '192.168.50.1',
         password: 'Qwerty123/',
