@@ -2,13 +2,13 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { FileSystem } from './file-system/file-system/file-system.class';
-import { MiniBackup } from './mini-backup';
+import { TeacupBackup } from './teacup-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
 
 class App {
   private static logger: Logger;
-  private static miniBackup: MiniBackup;
+  private static teacupBackup: TeacupBackup;
   private static configLoader: ConfigLoader = new ConfigLoader(
     new CurrentDirectory(),
     new FileSystem(),
@@ -26,11 +26,11 @@ class App {
     }
 
     App.logger = new Logger(config['log-level']);
-    App.miniBackup = new MiniBackup(App.logger);
+    App.teacupBackup = new TeacupBackup(App.logger);
 
-    this.logger.info('Mini Backup - version 0.4.0');
+    this.logger.info('Teacup Backup - version 0.4.1');
 
-    this.miniBackup.promptUserSecretKey();
+    this.teacupBackup.promptUserSecretKey();
 
     const interval = +config.interval;
 
@@ -41,13 +41,13 @@ class App {
         );
 
         setInterval(() => {
-          this.miniBackup.runBackupFlow(config);
+          this.teacupBackup.runBackupFlow(config);
         }, interval * 1000);
       }
 
-      this.miniBackup.runBackupFlow(config);
+      this.teacupBackup.runBackupFlow(config);
     } else if (config.mode === 'restore') {
-      this.miniBackup.runRestoreFlow(config);
+      this.teacupBackup.runRestoreFlow(config);
     } else {
       this.logger.error('Invalid mode');
     }

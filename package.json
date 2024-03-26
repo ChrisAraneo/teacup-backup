@@ -1,19 +1,19 @@
 {
-  "name": "mini-backup",
-  "version": "0.4.0",
-  "description": "Mini Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
+  "name": "teacup-backup",
+  "version": "0.4.1",
+  "description": "Teacup Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
   "main": "index.js",
   "scripts": {
     "lint": "eslint \"src/**/*.{ts,json}\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.spec.ts\" \"src/**/*.json\"",
-    "start": "npm run build && npm run copy-config && node dist/mini-backup.js --no-warnings",
+    "start": "npm run build && npm run copy-config && node dist/teacup-backup.js --no-warnings",
     "test": "jest",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/mini-backup.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/teacup-backup.js",
     "copy-config": "node dev-scripts/copy-config-file.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChrisAraneo/mini-backup.git"
+    "url": "git+https://github.com/ChrisAraneo/teacup-backup.git"
   },
   "keywords": [
     "backup",
@@ -22,9 +22,9 @@
   "author": "Krzysztof Pająk (Chris Araneo)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ChrisAraneo/mini-backup/issues"
+    "url": "https://github.com/ChrisAraneo/teacup-backup/issues"
   },
-  "homepage": "https://github.com/ChrisAraneo/mini-backup#readme",
+  "homepage": "https://github.com/ChrisAraneo/teacup-backup#readme",
   "devDependencies": {
     "@types/crypto-js": "^4.1.2",
     "@types/find": "^0.2.2",

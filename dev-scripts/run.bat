@@ -8,4 +8,4 @@
 :: or %ProgramData%\Microsoft\Windows\Start Menu\Programs\Startup for all users
 :: 5) Done
 ::
-node ..\dist\mini-backup.js
+node ..\dist\teacup-backup.js

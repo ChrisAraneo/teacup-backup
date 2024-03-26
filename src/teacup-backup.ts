@@ -21,7 +21,7 @@ const prompt = Prompt({
   sigint: false,
 });
 
-export class MiniBackup {
+export class TeacupBackup {
   private fileSystem: FileSystem;
   private fileFinder: FileFinder;
   private currentDirectory: CurrentDirectory;
