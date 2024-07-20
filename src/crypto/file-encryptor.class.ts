@@ -9,18 +9,10 @@ export class FileEncryptor {
   }
 
   static encryptBase64File(file: Base64File, secretKey: string): EncryptionResult {
-    let encrypted = '';
-
-    try {
-      encrypted = CryptoAES.encrypt(file.getContent(), secretKey).toString(CryptoJS.format.OpenSSL);
-    } catch (error) {
-      throw error;
-    }
-
-    if (encrypted) {
-      return { path: file.getPath(), content: encrypted };
-    } else {
-      throw Error('Encrypted content is empty!');
-    }
+    return {
+      path: file.getPath(),
+      content:
+        CryptoAES.encrypt(file.getContent(), secretKey).toString(CryptoJS.format.OpenSSL) || '',
+    };
   }
 }
