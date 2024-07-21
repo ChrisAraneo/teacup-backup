@@ -1,6 +1,5 @@
 import { firstValueFrom } from 'rxjs';
 import { CurrentDirectory } from '../current-directory/current-directory.class';
-import { CurrentDirectoryMock } from '../current-directory/current-directory.mock.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
 import { ConfigLoader } from './config-loader.class';
@@ -70,6 +69,12 @@ describe('ConfigLoader', () => {
     }
   });
 });
+
+class CurrentDirectoryMock extends CurrentDirectory {
+  getCurrentDirectory(): string {
+    return 'test-directory';
+  }
+}
 
 class InvalidConfigFileSystemMock extends FileSystemMock {
   readFile(_path: string, _options, callback: (error: any, data?: any) => any): void {
