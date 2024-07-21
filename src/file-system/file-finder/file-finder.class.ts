@@ -1,3 +1,4 @@
+import { isString } from 'lodash';
 import { Observable, forkJoin, from } from 'rxjs';
 import { FileSystem } from '../file-system/file-system.class';
 import { FindFileResult } from './find-file-result.type';
@@ -7,7 +8,7 @@ export class FileFinder {
 
   findFile(
     pattern: string | RegExp,
-    root: string = 'C:\\',
+    root: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<FindFileResult> {
     if (!this.fileSystem.existsSync(root)) {
@@ -18,6 +19,7 @@ export class FileFinder {
               success: false,
               pattern,
               root,
+              result: [],
               message: `Root doesn\'t exist: ${root}`,
             }),
           ),
@@ -34,6 +36,7 @@ export class FileFinder {
               pattern,
               root,
               result: result,
+              message: null,
             }),
           );
           subscriber.complete();
@@ -44,6 +47,7 @@ export class FileFinder {
               success: true,
               pattern,
               root,
+              result: [],
               message: JSON.stringify(error, Object.getOwnPropertyNames(error)).replace(
                 '\\\\',
                 '\\',
@@ -57,7 +61,7 @@ export class FileFinder {
 
   findFiles(
     pattern: string | RegExp,
-    roots: string[] = ['C:\\'],
+    roots: string[],
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<FindFileResult[]> {
     return forkJoin(
@@ -71,15 +75,15 @@ export class FileFinder {
     success: boolean;
     pattern: string | RegExp;
     root: string;
-    result?: string[];
-    message?: string | null;
+    result: string[];
+    message: string | null;
   }): FindFileResult {
     return {
       success: input.success,
-      pattern: typeof input.pattern === 'string' ? input.pattern : input.pattern.toString(),
+      pattern: isString(input.pattern) ? input.pattern : input.pattern.toString(),
       root: input.root,
-      result: input?.result ?? [],
-      message: input?.message ?? null,
+      result: input.result,
+      message: input.message,
     };
   }
 }
