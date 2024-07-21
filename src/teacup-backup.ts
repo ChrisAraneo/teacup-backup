@@ -46,10 +46,10 @@ export class TeacupBackup {
     this.secretKey = prompt({ echo: '*' });
   }
 
-  runBackupFlow(config: Config): void {
+  async runBackupFlow(config: Config): Promise<void> {
     const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
-    this.directoryCreator.createIfDoesntExist(backupDirectory);
+    await this.directoryCreator.createIfDoesntExist(backupDirectory);
 
     const logFoundFiles = tap((foundFiles: string[]) =>
       this.logger.info('Found files:', foundFiles),
