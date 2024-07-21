@@ -22,13 +22,28 @@ describe('FileFinder', () => {
     expect(call[1]).toBe('D:\\');
   });
 
+  it('#findFile should return successful result when file found', async () => {
+    jest.spyOn(fileSystem, 'findFile');
+
+    const result = await lastValueFrom(fileFinder.findFile('test.json', 'D:\\', fileSystem));
+
+    expect(result.success).toBe(true);
+    expect(result.pattern).toBe('test.json');
+    expect(result.root).toBe('D:\\');
+    expect(result.message).toBe(null);
+    expect(result.result).toStrictEqual(['test.json']);
+  });
+
   it("#findFile should return unsuccessful result when root directory doesn't exist", async () => {
     const result = await lastValueFrom(
       fileFinder.findFile('test.json', 'notExistingDir', fileSystem),
     );
 
     expect(result.success).toBe(false);
+    expect(result.pattern).toBe('test.json');
+    expect(result.root).toBe('notExistingDir');
     expect(result.message).toBe("Root doesn't exist: notExistingDir");
+    expect(result.result).toStrictEqual([]);
   });
 
   it('#findFiles should call file system method', async () => {
