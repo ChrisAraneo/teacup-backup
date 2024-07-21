@@ -11,8 +11,7 @@ export class FileEncryptor {
   static encryptBase64File(file: Base64File, secretKey: string): EncryptionResult {
     return {
       path: file.getPath(),
-      content:
-        CryptoAES.encrypt(file.getContent(), secretKey).toString(CryptoJS.format.OpenSSL) || '',
+      content: CryptoAES.encrypt(file.getContent(), secretKey).toString(CryptoJS.format.OpenSSL),
     };
   }
 }

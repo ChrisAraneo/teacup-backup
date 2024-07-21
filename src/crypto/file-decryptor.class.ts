@@ -11,7 +11,7 @@ export class FileDecryptor {
   static decryptBase64File(file: EncryptedFile, secretKey: string): Base64File {
     return new Base64File(
       file.getPath(),
-      CryptoAES.decrypt(file.getContent(), secretKey).toString(CryptoJS.enc.Utf8) || '',
+      CryptoAES.decrypt(file.getContent(), secretKey).toString(CryptoJS.enc.Utf8),
       file.getModifiedDate(),
     );
   }
