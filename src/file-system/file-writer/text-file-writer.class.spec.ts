@@ -39,4 +39,29 @@ describe('TextFileWriter', () => {
     const calls = jest.mocked(fileSystem.writeFile).mock.calls;
     expect(calls.length).toBe(3);
   });
+
+  it('#writeFiles should throw error when file system failed to write file', async () => {
+    const files = [
+      new TextFile('test.txt', 'Hello World!', new Date('2023-10-26')),
+      new TextFile('test2.txt', 'Test', new Date('2023-10-26')),
+      new TextFile('test3.txt', 'Lorem ipsum', new Date('2023-10-26')),
+    ];
+    let error: unknown;
+    fileSystem = new FileWriteErrorMock();
+    writer = new TextFileWriter(fileSystem);
+
+    try {
+      await lastValueFrom(writer.writeFiles(files));
+    } catch (e: unknown) {
+      error = e;
+    }
+
+    expect(error).toBe('Error');
+  });
 });
+
+class FileWriteErrorMock extends FileSystemMock {
+  async writeFile(_path, _data, _options, _callback): Promise<void> {
+    _callback('Error');
+  }
+}
