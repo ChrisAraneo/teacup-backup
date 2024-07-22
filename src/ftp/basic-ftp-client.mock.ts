@@ -1,5 +1,7 @@
 import { AccessOptions, FTPResponse } from 'basic-ftp';
 
+// Stryker disable all : It's mock
+
 export class BasicFtpClientMock {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   access(options?: AccessOptions): Promise<FTPResponse> {
