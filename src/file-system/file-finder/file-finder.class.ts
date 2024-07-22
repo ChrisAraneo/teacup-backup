@@ -47,10 +47,7 @@ export class FileFinder {
               pattern,
               root,
               result: [],
-              message: JSON.stringify(error, Object.getOwnPropertyNames(error)).replace(
-                '\\\\',
-                '\\',
-              ),
+              message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
             }),
           );
           subscriber.complete();
