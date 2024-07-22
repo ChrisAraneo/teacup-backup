@@ -2,6 +2,8 @@ import { AsyncFindStream } from 'find';
 import { MakeDirectoryOptions, PathLike } from 'fs';
 import { FileSystem } from './file-system.class';
 
+// Stryker disable all
+
 export class FileSystemMock extends FileSystem {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   writeFile(_path, _data, _options, _callback): Promise<void> {

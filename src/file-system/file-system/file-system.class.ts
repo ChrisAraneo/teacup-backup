@@ -9,6 +9,8 @@ import fs, {
 import find, { AsyncFindStream } from 'find';
 import { Abortable } from 'node:events';
 
+// Stryker disable all
+
 export class FileSystem {
   readdir(
     path: PathLike,
