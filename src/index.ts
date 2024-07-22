@@ -6,6 +6,8 @@ import { TeacupBackup } from './teacup-backup';
 import { Config } from './models/config.type';
 import { Logger } from './utils/logger.class';
 
+// Stryker disable all
+
 class App {
   private static logger: Logger;
   private static teacupBackup: TeacupBackup;

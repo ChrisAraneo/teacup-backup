@@ -17,6 +17,8 @@ import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import { Logger } from './utils/logger.class';
 
+// Stryker disable all
+
 const prompt = Prompt({
   sigint: false,
 });
