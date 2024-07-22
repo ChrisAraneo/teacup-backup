@@ -18,6 +18,11 @@ export abstract class File<T> {
 
   getFilename(): string {
     const basename = path.basename(this.path);
+
+    if (!basename.includes('.')) {
+      return basename;
+    }
+
     const parts = basename.split('.');
     parts.pop();
 

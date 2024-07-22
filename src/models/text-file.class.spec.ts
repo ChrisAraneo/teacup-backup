@@ -23,6 +23,13 @@ describe('TextFile', () => {
     expect(path).toBe('test.txt');
   });
 
+  it('#getPath should return correct path after change', async () => {
+    const file = new TextFile('test.txt', 'Hello World!', new Date('2023-11-11'));
+    file.setPath('changed.txt');
+
+    expect(file.getPath()).toBe('changed.txt');
+  });
+
   it('#getFilename should return correct filename', async () => {
     const file = new TextFile('test.name.txt', 'Hello World!', new Date('2023-11-11'));
     const path = file.getFilename();
@@ -40,11 +47,25 @@ describe('TextFile', () => {
     expect(updated).toBe('test.name2');
   });
 
+  it('#setFilename should change filename without extension', async () => {
+    const file = new TextFile('test.name.txt', 'Hello World!', new Date('2023-11-13'));
+    file.setFilename('test', null);
+
+    expect(file.getFilename()).toBe('test');
+  });
+
   it('#getExtension should return correct extension', async () => {
     const file = new TextFile('test.txt', 'Hello World!', new Date('2023-11-11'));
     const extension = file.getExtension();
 
     expect(extension).toBe('txt');
+  });
+
+  it('#getExtension should return null', async () => {
+    const file = new TextFile('no-extension', 'Hello World!', new Date('2023-11-11'));
+    const extension = file.getExtension();
+
+    expect(extension).toBe(null);
   });
 
   it('#getContent should return correct file content', async () => {
@@ -69,10 +90,10 @@ describe('TextFile', () => {
   });
 
   it('#writeToFile should write file', async () => {
-    const file = new TextFile('test.txt', 'Hello World!', new Date('2023-11-11'));
+    const file = new TextFile('test.txt', 'Hello World!', new Date('2023-11-11'), fileSystem);
     jest.spyOn(fileSystem, 'writeFile');
 
-    await lastValueFrom(file.writeToFile(fileSystem));
+    await lastValueFrom(file.writeToFile());
 
     const call = jest.mocked(fileSystem.writeFile).mock.calls[0];
     expect(call[0]).toBe('test.txt');

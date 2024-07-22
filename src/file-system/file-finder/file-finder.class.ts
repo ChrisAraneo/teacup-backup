@@ -1,5 +1,5 @@
 import { isString } from 'lodash';
-import { Observable, forkJoin, from } from 'rxjs';
+import { Observable, catchError, forkJoin, of } from 'rxjs';
 import { FileSystem } from '../file-system/file-system.class';
 import { FindFileResult } from './find-file-result.type';
 
@@ -11,23 +11,22 @@ export class FileFinder {
     root: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<FindFileResult> {
-    if (!this.fileSystem.existsSync(root)) {
-      return from(
-        new Promise<FindFileResult>((resolve) =>
-          resolve(
-            this.createFindFileResult({
-              success: false,
-              pattern,
-              root,
-              result: [],
-              message: `Root doesn\'t exist: ${root}`,
-            }),
-          ),
-        ),
-      );
-    }
-
     return new Observable<FindFileResult>((subscriber) => {
+      if (!this.fileSystem.existsSync(root)) {
+        subscriber.next(
+          this.createFindFileResult({
+            success: false,
+            pattern,
+            root,
+            result: [],
+            message: `Root doesn\'t exist: ${root}`,
+          }),
+        );
+        subscriber.complete();
+
+        return;
+      }
+
       fileSystem
         .findFile(pattern, root, (result: string[]) => {
           subscriber.next(
@@ -56,7 +55,19 @@ export class FileFinder {
           );
           subscriber.complete();
         });
-    });
+    }).pipe(
+      catchError((error: unknown) => {
+        return of(
+          this.createFindFileResult({
+            success: false,
+            pattern,
+            root,
+            result: [],
+            message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+          }),
+        );
+      }),
+    );
   }
 
   findFiles(

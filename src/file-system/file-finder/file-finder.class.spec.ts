@@ -46,6 +46,18 @@ describe('FileFinder', () => {
     expect(result.result).toStrictEqual([]);
   });
 
+  it('#findFile should return unsuccessful result when file was not found', async () => {
+    const result = await lastValueFrom(
+      fileFinder.findFile('this-file-does-not-exist__', 'C:\\\\', fileSystem),
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.pattern).toBe('this-file-does-not-exist__');
+    expect(result.root).toBe('C:\\\\');
+    expect(result.message).toBe('"Error"');
+    expect(result.result).toStrictEqual([]);
+  });
+
   it('#findFiles should call file system method', async () => {
     jest.spyOn(fileSystem, 'findFile');
 

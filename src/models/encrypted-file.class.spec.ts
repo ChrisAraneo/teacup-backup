@@ -1,7 +1,8 @@
 import { lastValueFrom } from 'rxjs';
-import { Base64File } from './base64-file.class';
-import { FileSystemMock } from '../file-system/file-system/file-system.mock.class';
+import { FileDecryptor } from '../crypto/file-decryptor.class';
 import { FileSystem } from '../file-system/file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system/file-system.mock.class';
+import { Base64File } from './base64-file.class';
 import { EncryptedFile } from './encrypted-file.class';
 
 let fileSystem: FileSystem;
@@ -26,6 +27,15 @@ describe('EncryptedFile', () => {
     expect(path).toBe('directory/test.mbe');
   });
 
+  it('#getPath should return correct path after change', async () => {
+    const file = await lastValueFrom(
+      EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),
+    );
+    file.setPath('directory/changed.mbe');
+
+    expect(file.getPath()).toBe('directory/changed.mbe');
+  });
+
   it('#getFilename should return correct filename', async () => {
     const file = await lastValueFrom(
       EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),
@@ -47,6 +57,15 @@ describe('EncryptedFile', () => {
     expect(updated).toBe('test.name2');
   });
 
+  it('#setFilename should change filename without extension', async () => {
+    const file = await lastValueFrom(
+      EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),
+    );
+    file.setFilename('test', null);
+
+    expect(file.getFilename()).toBe('test');
+  });
+
   it('#getExtension should return correct extension', async () => {
     const file = await lastValueFrom(
       EncryptedFile.fromEncryptedFile('directory/test.mbe', fileSystem),
@@ -54,6 +73,15 @@ describe('EncryptedFile', () => {
     const extension = file.getExtension();
 
     expect(extension).toBe('mbe');
+  });
+
+  it('#getExtension should return null', async () => {
+    const file = await lastValueFrom(
+      EncryptedFile.fromEncryptedFile('directory/no-extension', fileSystem),
+    );
+    const extension = file.getExtension();
+
+    expect(extension).toBe(null);
   });
 
   it('#getContent should return correct file content', async () => {
@@ -83,11 +111,14 @@ describe('EncryptedFile', () => {
     expect(date.toISOString()).toBe('2023-10-27T21:33:39.661Z');
   });
 
-  it('#fromBase64File should create encrypted file', async () => {
+  it('#fromBase64File should create correct encrypted file', async () => {
     const encrypted = new Base64File('test.txt', 'Hello World!', new Date('2023-11-01'));
-    const file = EncryptedFile.fromBase64File(encrypted, 'secret-key');
+    const file = EncryptedFile.fromBase64File(encrypted, 'very-secret-key');
 
     expect(file).toBeInstanceOf(EncryptedFile);
+    expect(FileDecryptor.decryptBase64File(file, 'very-secret-key').getContent()).toBe(
+      'Hello World!',
+    );
   });
 
   it('#fromEncryptedFile should read file', async () => {
@@ -105,7 +136,7 @@ describe('EncryptedFile', () => {
     const file = await lastValueFrom(EncryptedFile.fromEncryptedFile('test.txt', fileSystem));
     jest.spyOn(fileSystem, 'writeFile');
 
-    await lastValueFrom(file.writeToFile(fileSystem));
+    await lastValueFrom(file.writeToFile());
 
     const call = jest.mocked(fileSystem.writeFile).mock.calls[0];
     expect(call[0]).toBe('test.txt');
