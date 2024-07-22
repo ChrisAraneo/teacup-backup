@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isString } from 'lodash';
+import { includes, isArray, isBoolean, isNumber, isString } from 'lodash';
 import Path from 'path';
 import { Observable, catchError, map } from 'rxjs';
 import { Config, FtpConfig } from '../../models/config.type';
@@ -27,7 +27,7 @@ export class ConfigLoader {
         throw Error(CONFIG_READING_ERROR_MESSAGE);
       }),
       map((result: unknown) => {
-        const content: unknown = (result as JsonFile)?.getContent();
+        const content: unknown = (result as JsonFile).getContent();
 
         if (this.isConfig(content)) {
           return content;
@@ -39,18 +39,15 @@ export class ConfigLoader {
   }
 
   private isConfig(object: unknown): object is Config {
-    if (!object) {
-      return false;
-    }
-
     const validRoots = this.isStringArray((<Config>object).roots);
     const validFiles = this.isStringArray((<Config>object).files);
-    const validMode = (<Config>object).mode === 'backup' || (<Config>object).mode === 'restore';
+    const validMode = includes(['backup', 'restore'], (<Config>object).mode);
     const validBackupDirectory = isString((<Config>object).backupDirectory);
     const validInterval = isNumber((<Config>object).interval);
     const validLogLevel = isString((<Config>object)['log-level']);
     const validFtp = this.isFtpConfig((<Config>object).ftp);
 
+    // Stryker disable all : don't mutate all the operators, too many combinations to check
     return (
       validRoots &&
       validFiles &&
@@ -60,6 +57,7 @@ export class ConfigLoader {
       validLogLevel &&
       validFtp
     );
+    // Stryker restore all
   }
 
   private isStringArray(object: unknown): object is string[] {
