@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 describe('ConfigLoader', () => {
-  it('#readConfigFile should return config object when file contains valid config', async () => {
+  it('#readConfigFile should return config object when file contains valid config with backup mode', async () => {
     const config = await firstValueFrom(configLoader.readConfigFile());
 
     expect(config).toStrictEqual({
@@ -36,39 +36,99 @@ describe('ConfigLoader', () => {
     });
   });
 
-  it('#readConfigFile should throw error when file contains invalid properties or values', async () => {
+  it('#readConfigFile should return config object when file contains valid config with restore mode', async () => {
+    fileSystem = new RestoreModeFileSystemMock();
+    configLoader = new ConfigLoader(currentDirectory, fileSystem);
+
+    const config = await firstValueFrom(configLoader.readConfigFile());
+
+    expect(config).toStrictEqual({
+      backupDirectory: './backups',
+      files: ['index.ts'],
+      ftp: {
+        directory: 'teacup-backup/',
+        enabled: true,
+        host: '192.168.50.1',
+        password: 'Qwerty123/',
+        user: 'user',
+      },
+      interval: 3600,
+      'log-level': 'debug',
+      mode: 'restore',
+      roots: ['root'],
+    });
+  });
+
+  it('#readConfigFile should throw error when file contains invalid config', async () => {
     fileSystem = new InvalidConfigFileSystemMock();
     configLoader = new ConfigLoader(currentDirectory, fileSystem);
+    let error: Error;
 
     try {
       await firstValueFrom(configLoader.readConfigFile());
-    } catch (error: any) {
-      expect(error?.message).toBe(INVALID_CONFIG_ERROR_MESSAGE);
+    } catch (e: unknown) {
+      error = e as Error;
     }
+
+    expect(error?.message).toBe(INVALID_CONFIG_ERROR_MESSAGE);
+  });
+
+  it('#readConfigFile should throw error when file contains invalid mode', async () => {
+    fileSystem = new InvalidModeFileSystemMock();
+    configLoader = new ConfigLoader(currentDirectory, fileSystem);
+    let error: Error;
+
+    try {
+      await firstValueFrom(configLoader.readConfigFile());
+    } catch (e: unknown) {
+      error = e as Error;
+    }
+
+    expect(error.message).toBe(INVALID_CONFIG_ERROR_MESSAGE);
   });
 
   it('#readConfigFile should throw error when file is invalid json', async () => {
     fileSystem = new InvalidJsonFileSystemMock();
     configLoader = new ConfigLoader(currentDirectory, fileSystem);
+    let error: Error;
 
     try {
       await firstValueFrom(configLoader.readConfigFile());
-    } catch (error: any) {
-      expect(error?.message).toBe(CONFIG_READING_ERROR_MESSAGE);
+    } catch (e: unknown) {
+      error = e as Error;
     }
+
+    expect(error?.message).toBe(CONFIG_READING_ERROR_MESSAGE);
   });
 
   it('#readConfigFile should throw error when result of reading file is empty', async () => {
     fileSystem = new EmptyConfigFileSystemMock();
     configLoader = new ConfigLoader(currentDirectory, fileSystem);
+    let error: Error;
 
     try {
       await firstValueFrom(configLoader.readConfigFile());
-    } catch (error: any) {
-      expect(error?.message).toBe(CONFIG_READING_ERROR_MESSAGE);
+    } catch (e: unknown) {
+      error = e as Error;
     }
+
+    expect(error?.message).toBe(CONFIG_READING_ERROR_MESSAGE);
   });
 });
+
+class RestoreModeFileSystemMock extends FileSystemMock {
+  readFile(_path: string, _options, callback: (error: any, data?: any) => any): void {
+    super.readFile(_path, _options, (error: unknown, data: any) => {
+      callback(
+        null,
+        JSON.stringify({
+          ...JSON.parse(data),
+          mode: 'restore',
+        }),
+      );
+    });
+  }
+}
 
 class CurrentDirectoryMock extends CurrentDirectory {
   getCurrentDirectory(): string {
@@ -79,6 +139,15 @@ class CurrentDirectoryMock extends CurrentDirectory {
 class InvalidConfigFileSystemMock extends FileSystemMock {
   readFile(_path: string, _options, callback: (error: any, data?: any) => any): void {
     callback(null, `{"interval": null}`);
+  }
+}
+
+class InvalidModeFileSystemMock extends FileSystemMock {
+  readFile(_path: string, _options, callback: (error: any, data?: any) => any): void {
+    callback(
+      null,
+      `{"backupDirectory":".\/backups","files":["index.ts"],"ftp":{"directory":"teacup-backup\/","enabled":true,"host":"192.168.50.1","password":"Qwerty123\/","user":"user"},"interval":3600,"log-level":"debug","mode":"invalid","roots":["root"]}`,
+    );
   }
 }
 
