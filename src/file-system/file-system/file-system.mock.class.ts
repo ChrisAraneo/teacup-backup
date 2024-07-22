@@ -85,15 +85,17 @@ export class FileSystemMock extends FileSystem {
   }
 
   private isCorrectTextFile(path: string): boolean {
-    return ['test.txt', 'test2.txt', 'test3.txt'].includes(path);
+    return ['test.txt', 'test2.txt', 'test3.txt', 'no-extension'].includes(path);
   }
 
   private isCorrectEncryptedFile(path: string): boolean {
-    return ['test.mbe', 'directory/test.mbe'].includes(path);
+    return ['test.mbe', 'directory/test.mbe', 'no-extension', 'directory/no-extension'].includes(
+      path,
+    );
   }
 
   private isCorrectJsonFile(path: string): boolean {
-    return ['test.json', 'test2.json', 'test3.json'].includes(path);
+    return ['test.json', 'test2.json', 'test3.json', 'no-extension'].includes(path);
   }
 
   private isCorrectConfigFile(path: string): boolean {
