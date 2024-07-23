@@ -11,12 +11,14 @@ export class FileFinder {
     root: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<FindFileResult> {
+    const _pattern: RegExp = isString(pattern) ? new RegExp(pattern, 'i') : pattern;
+
     return new Observable<FindFileResult>((subscriber) => {
       if (!this.fileSystem.existsSync(root)) {
         subscriber.next(
           this.createFindFileResult({
             success: false,
-            pattern,
+            pattern: _pattern,
             root,
             result: [],
             message: `Root doesn\'t exist: ${root}`,
@@ -27,37 +29,24 @@ export class FileFinder {
         return;
       }
 
-      fileSystem
-        .findFile(pattern, root, (result: string[]) => {
-          subscriber.next(
-            this.createFindFileResult({
-              success: true,
-              pattern,
-              root,
-              result: result,
-              message: null,
-            }),
-          );
-          subscriber.complete();
-        })
-        .error((error: Error) => {
-          subscriber.next(
-            this.createFindFileResult({
-              success: true,
-              pattern,
-              root,
-              result: [],
-              message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-            }),
-          );
-          subscriber.complete();
-        });
+      fileSystem.findFile(_pattern, root, (result: string[]) => {
+        subscriber.next(
+          this.createFindFileResult({
+            success: true,
+            pattern: _pattern,
+            root,
+            result: result,
+            message: null,
+          }),
+        );
+        subscriber.complete();
+      });
     }).pipe(
       catchError((error: unknown) => {
         return of(
           this.createFindFileResult({
             success: false,
-            pattern,
+            pattern: _pattern,
             root,
             result: [],
             message: JSON.stringify(error, Object.getOwnPropertyNames(error)),
@@ -88,9 +77,14 @@ export class FileFinder {
   }): FindFileResult {
     return {
       success: input.success,
-      pattern: isString(input.pattern) ? input.pattern : input.pattern.toString(),
+      pattern: input.pattern
+        .toString()
+        .substring(1, input.pattern.toString().length)
+        .replace('/i', ''),
       root: input.root,
-      result: input.result,
+      result: input.result.map((item) =>
+        item.toString().substring(1, item.length).replace('/i', ''),
+      ),
       message: input.message,
     };
   }

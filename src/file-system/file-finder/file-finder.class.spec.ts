@@ -18,7 +18,7 @@ describe('FileFinder', () => {
     await lastValueFrom(fileFinder.findFile('test.json', 'D:\\', fileSystem));
 
     const call = jest.mocked(fileSystem.findFile).mock.calls[0];
-    expect(call[0]).toBe('test.json');
+    expect(call[0]).toStrictEqual(new RegExp('test.json', 'i'));
     expect(call[1]).toBe('D:\\');
   });
 

@@ -65,13 +65,12 @@ export class FileSystemMock extends FileSystem {
     callback: (files: string[]) => void,
   ): AsyncFindStream {
     if (
-      typeof pattern === 'string' &&
-      (this.isCorrectTextFile(pattern) ||
-        this.isCorrectEncryptedFile(pattern) ||
-        this.isCorrectJsonFile(pattern) ||
-        this.isCorrectConfigFile(pattern))
+      this.isCorrectTextFile(pattern.toString()) ||
+      this.isCorrectEncryptedFile(pattern.toString()) ||
+      this.isCorrectJsonFile(pattern.toString()) ||
+      this.isCorrectConfigFile(pattern.toString())
     ) {
-      callback([pattern as string]);
+      callback([pattern.toString()]);
     } else {
       throw 'Error';
     }
@@ -83,7 +82,15 @@ export class FileSystemMock extends FileSystem {
     _path: PathLike,
     callback: (err: NodeJS.ErrnoException | null, files: string[]) => void,
   ): void {
-    callback(null, ['test.txt', 'test2.txt', 'test3.txt', 'test.json', 'test2.json', 'test3.json']);
+    callback(null, [
+      'test.txt',
+      'test2.txt',
+      'test3.txt',
+      'test.json',
+      '/test.json/i',
+      'test2.json',
+      'test3.json',
+    ]);
   }
 
   private isCorrectTextFile(path: string): boolean {
@@ -97,7 +104,7 @@ export class FileSystemMock extends FileSystem {
   }
 
   private isCorrectJsonFile(path: string): boolean {
-    return ['test.json', 'test2.json', 'test3.json', 'no-extension'].includes(path);
+    return ['test.json', '/test.json/i', 'test2.json', 'test3.json', 'no-extension'].includes(path);
   }
 
   private isCorrectConfigFile(path: string): boolean {
