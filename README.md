@@ -1,23 +1,24 @@
-# Teacup Backup (v0.4.1)
+# Teacup Backup (v0.5.0)
 
 ![Teacup backup logo](logo.png?raw=true)
 
-# What & why?
+# Introduction
 
 I needed a simple utility script to search for files and then make copies of those files.
 
-Teacup Backup works in two modes: "backup" and "restore". In the case of backup mode, the script searches for files with given name, then encrypts found files and saves them to the selected directory. In restore mode, the script decrypts all previously saved files.
+Teacup Backup works in two modes: "backup" and "restore". In the case of backup mode the script searches for files with given name and then encrypts found files and saves them to selected directory. In restore mode the script decrypts all previously saved files.
 
 Teacup Backup also has the functionality of uploading files to an FTP server.
 
-To run Teacup Backup you need the programs listed in section *Used technologies*. Then just modify the configuration file as needed (`src/config.json`) and run the command
+To run Teacup Backup you need software listed in section *Technologies*. Then you can modify the configuration file as needed (`src/config.json`) and run the command:
+
 ```bash
 /teacup-backup$ npm run start
 ```
 
 More details below.
 
-# Set the config.json file
+# Configuration file
 
 Before running the application fill the values in the `src/config.json` configuration file according to your needs (this file will be then also copied into `dist/config.json`).
 
@@ -69,7 +70,7 @@ If you would like to send the backup to an FTP server, you can provide credentia
     - `user` - username
     - `password` - password
 
-# Executing backup
+# Creating backup
 
 Once you have filled the `config.json`, you can install the required dependencies and then run the script.
 
@@ -92,7 +93,7 @@ Run the script:
 /teacup-backup$ npm run start
 ```
 
-# Used technologies
+# Technologies
 
 Developing and running the script requires following technologies:
 
@@ -102,4 +103,3 @@ Developing and running the script requires following technologies:
 # License
 
 Project is [MIT licensed](LICENSE).
-Project logo is [CC BY-SA 4.0 licensed to Krzysztof Pająk (Chris Araneo)](https://creativecommons.org/licenses/by-sa/4.0/).

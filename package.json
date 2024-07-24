@@ -1,6 +1,6 @@
 {
   "name": "teacup-backup",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Teacup Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
   "main": "index.js",
   "scripts": {
