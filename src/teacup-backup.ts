@@ -17,6 +17,8 @@ import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
 import { Logger } from './utils/logger.class';
 
+// Stryker disable all
+
 const prompt = Prompt({
   sigint: false,
 });
@@ -46,10 +48,10 @@ export class TeacupBackup {
     this.secretKey = prompt({ echo: '*' });
   }
 
-  runBackupFlow(config: Config): void {
+  async runBackupFlow(config: Config): Promise<void> {
     const backupDirectory = this.getNormalizedBackupDirectory(config.backupDirectory);
 
-    this.directoryCreator.createIfDoesntExist(backupDirectory);
+    await this.directoryCreator.createIfDoesntExist(backupDirectory);
 
     const logFoundFiles = tap((foundFiles: string[]) =>
       this.logger.info('Found files:', foundFiles),

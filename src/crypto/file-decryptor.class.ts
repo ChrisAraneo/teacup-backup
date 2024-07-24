@@ -9,18 +9,10 @@ export class FileDecryptor {
   }
 
   static decryptBase64File(file: EncryptedFile, secretKey: string): Base64File {
-    let decrypted = '';
-
-    try {
-      decrypted = CryptoAES.decrypt(file.getContent(), secretKey).toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-      throw error;
-    }
-
-    if (decrypted) {
-      return new Base64File(file.getPath(), decrypted, file.getModifiedDate());
-    } else {
-      throw Error('Decrypted content is empty!');
-    }
+    return new Base64File(
+      file.getPath(),
+      CryptoAES.decrypt(file.getContent(), secretKey).toString(CryptoJS.enc.Utf8),
+      file.getModifiedDate(),
+    );
   }
 }

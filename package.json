@@ -1,6 +1,6 @@
 {
   "name": "teacup-backup",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Teacup Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/ChrisAraneo/teacup-backup#readme",
   "devDependencies": {
+    "@stryker-mutator/jest-runner": "^8.2.6",
+    "@stryker-mutator/typescript-checker": "^8.2.6",
     "@types/crypto-js": "^4.1.2",
     "@types/find": "^0.2.2",
     "@types/jest": "^29.5.6",

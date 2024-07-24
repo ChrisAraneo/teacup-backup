@@ -7,20 +7,20 @@ import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
 
 export class EncryptedFile extends TextFile {
+  protected textFileWriter: TextFileWriter;
   protected textFileReader: TextFileReader;
 
   private constructor(
     protected path: string,
     protected content: string,
     protected modifiedDate: Date,
-    protected secretKey?: string,
+    protected secretKey: string,
     protected fileSystem: FileSystem = new FileSystem(),
   ) {
     super(path, content, modifiedDate);
 
-    if (!this.textFileReader) {
-      this.textFileReader = new TextFileReader(fileSystem);
-    }
+    this.textFileWriter = new TextFileWriter(fileSystem);
+    this.textFileReader = new TextFileReader(fileSystem);
 
     if (secretKey) {
       const result = FileEncryptor.encryptBase64File(
@@ -46,16 +46,18 @@ export class EncryptedFile extends TextFile {
       .pipe(
         map(
           (result) =>
-            new EncryptedFile(result.getPath(), result.getContent(), result.getModifiedDate()),
+            new EncryptedFile(
+              result.getPath(),
+              result.getContent(),
+              result.getModifiedDate(),
+              '',
+              fileSystem,
+            ),
         ),
       );
   }
 
-  writeToFile(fileSystem: FileSystem = new FileSystem()): Observable<void> {
-    if (!this.textFileWriter) {
-      this.textFileWriter = new TextFileWriter(fileSystem);
-    }
-
+  writeToFile(): Observable<void> {
     return this.textFileWriter.writeFile(this);
   }
 }

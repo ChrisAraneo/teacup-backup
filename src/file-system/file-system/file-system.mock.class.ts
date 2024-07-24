@@ -2,6 +2,8 @@ import { AsyncFindStream } from 'find';
 import { MakeDirectoryOptions, PathLike } from 'fs';
 import { FileSystem } from './file-system.class';
 
+// Stryker disable all : It's mock
+
 export class FileSystemMock extends FileSystem {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   writeFile(_path, _data, _options, _callback): Promise<void> {
@@ -63,13 +65,12 @@ export class FileSystemMock extends FileSystem {
     callback: (files: string[]) => void,
   ): AsyncFindStream {
     if (
-      typeof pattern === 'string' &&
-      (this.isCorrectTextFile(pattern) ||
-        this.isCorrectEncryptedFile(pattern) ||
-        this.isCorrectJsonFile(pattern) ||
-        this.isCorrectConfigFile(pattern))
+      this.isCorrectTextFile(pattern.toString()) ||
+      this.isCorrectEncryptedFile(pattern.toString()) ||
+      this.isCorrectJsonFile(pattern.toString()) ||
+      this.isCorrectConfigFile(pattern.toString())
     ) {
-      callback([pattern as string]);
+      callback([pattern.toString()]);
     } else {
       throw 'Error';
     }
@@ -81,19 +82,29 @@ export class FileSystemMock extends FileSystem {
     _path: PathLike,
     callback: (err: NodeJS.ErrnoException | null, files: string[]) => void,
   ): void {
-    callback(null, ['test.txt', 'test2.txt', 'test3.txt', 'test.json', 'test2.json', 'test3.json']);
+    callback(null, [
+      'test.txt',
+      'test2.txt',
+      'test3.txt',
+      'test.json',
+      '/test.json/i',
+      'test2.json',
+      'test3.json',
+    ]);
   }
 
   private isCorrectTextFile(path: string): boolean {
-    return ['test.txt', 'test2.txt', 'test3.txt'].includes(path);
+    return ['test.txt', 'test2.txt', 'test3.txt', 'no-extension'].includes(path);
   }
 
   private isCorrectEncryptedFile(path: string): boolean {
-    return ['test.mbe', 'directory/test.mbe'].includes(path);
+    return ['test.mbe', 'directory/test.mbe', 'no-extension', 'directory/no-extension'].includes(
+      path,
+    );
   }
 
   private isCorrectJsonFile(path: string): boolean {
-    return ['test.json', 'test2.json', 'test3.json'].includes(path);
+    return ['test.json', '/test.json/i', 'test2.json', 'test3.json', 'no-extension'].includes(path);
   }
 
   private isCorrectConfigFile(path: string): boolean {

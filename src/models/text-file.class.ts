@@ -6,11 +6,17 @@ import { File } from './file.class';
 export class TextFile extends File<string> {
   protected textFileWriter: TextFileWriter;
 
-  writeToFile(fileSystem: FileSystem = new FileSystem()): Observable<void> {
-    if (!this.textFileWriter) {
-      this.textFileWriter = new TextFileWriter(fileSystem);
-    }
+  constructor(
+    protected path: string,
+    protected content: string,
+    protected modifiedDate: Date,
+    protected fileSystem: FileSystem = new FileSystem(),
+  ) {
+    super(path, content, modifiedDate);
+    this.textFileWriter = new TextFileWriter(fileSystem);
+  }
 
+  writeToFile(): Observable<void> {
     return this.textFileWriter.writeFile(this);
   }
 }

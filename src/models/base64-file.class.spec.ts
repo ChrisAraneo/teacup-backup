@@ -23,6 +23,13 @@ describe('Base64File', () => {
     expect(path).toBe('directory/test.txt');
   });
 
+  it('#getPath should return correct path after change', async () => {
+    const file = new Base64File('directory/test.txt', 'SGVsbG8gV29ybGQh', new Date('2023-11-10'));
+    file.setPath('directory/changed.txt');
+
+    expect(file.getPath()).toBe('directory/changed.txt');
+  });
+
   it('#getFilename should return correct filename', async () => {
     const file = new Base64File(
       'directory/test.name.txt',
@@ -48,6 +55,17 @@ describe('Base64File', () => {
     expect(updated).toBe('test.name2');
   });
 
+  it('#setFilename should change filename without extension', async () => {
+    const file = new Base64File(
+      'directory/test.name.txt',
+      'SGVsbG8gV29ybGQh',
+      new Date('2023-11-13'),
+    );
+    file.setFilename('test', null);
+
+    expect(file.getFilename()).toBe('test');
+  });
+
   it('#getExtension should return correct extension', async () => {
     const file = new Base64File(
       'directory/this.is.test.name.txt',
@@ -57,6 +75,17 @@ describe('Base64File', () => {
     const extension = file.getExtension();
 
     expect(extension).toBe('txt');
+  });
+
+  it('#getExtension should return null', async () => {
+    const file = new Base64File(
+      'directory/no-extension',
+      'SGVsbG8gV29ybGQh',
+      new Date('2023-11-10'),
+    );
+    const extension = file.getExtension();
+
+    expect(extension).toBe(null);
   });
 
   it('#getContent should return correct file content', async () => {
