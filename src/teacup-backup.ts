@@ -35,7 +35,7 @@ export class TeacupBackup {
 
   constructor(private logger: Logger) {
     this.fileSystem = new FileSystem();
-    this.fileFinder = new FileFinder();
+    this.fileFinder = new FileFinder(this.fileSystem, this.logger);
     this.currentDirectory = new CurrentDirectory();
     this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
     this.base64FileReader = new Base64FileReader(this.fileSystem);

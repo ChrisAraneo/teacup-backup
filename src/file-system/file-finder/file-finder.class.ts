@@ -1,10 +1,14 @@
 import { isString } from 'lodash';
 import { Observable, catchError, forkJoin, of } from 'rxjs';
+import { Logger } from '../../utils/logger.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FindFileResult } from './find-file-result.type';
 
 export class FileFinder {
-  constructor(private fileSystem: FileSystem = new FileSystem()) {}
+  constructor(
+    private fileSystem: FileSystem = new FileSystem(),
+    private logger?: Logger,
+  ) {}
 
   findFile(
     pattern: string | RegExp,
@@ -29,18 +33,26 @@ export class FileFinder {
         return;
       }
 
-      fileSystem.findFile(_pattern, root, (result: string[]) => {
-        subscriber.next(
-          this.createFindFileResult({
-            success: true,
-            pattern: _pattern,
-            root,
-            result: result,
-            message: null,
-          }),
-        );
-        subscriber.complete();
-      });
+      fileSystem
+        .findFile(_pattern, root, (result: string[]) => {
+          subscriber.next(
+            this.createFindFileResult({
+              success: true,
+              pattern: _pattern,
+              root,
+              result: result,
+              message: null,
+            }),
+          );
+          subscriber.complete();
+        })
+        // Stryker disable all : Ignore file system errors like "Error: EBUSY: resource busy or locked"
+        .error((error: unknown) => {
+          if (this.logger) {
+            this.logger.debug(`${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+          }
+        });
+      // Stryker restore all
     }).pipe(
       catchError((error: unknown) => {
         return of(
