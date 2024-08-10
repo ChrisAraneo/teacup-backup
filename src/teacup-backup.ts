@@ -1,15 +1,25 @@
 import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import Prompt from 'prompt-sync';
-import { Observable, catchError, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  Subscription,
+  catchError,
+  forkJoin,
+  map,
+  mergeMap,
+  of,
+  tap,
+} from 'rxjs';
 import { FileDecryptor } from './crypto/file-decryptor.class';
-import { Base64FileReader } from './file-system/file-reader/base64-file-reader.class';
-import { Base64FileWriter } from './file-system/file-writer/base64-file-writer.class';
 import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';
 import { DirectoryInfo } from './file-system/directory-info/directory-info.class';
 import { FileFinder } from './file-system/file-finder/file-finder.class';
+import { Base64FileReader } from './file-system/file-reader/base64-file-reader.class';
 import { FileSystem } from './file-system/file-system/file-system.class';
+import { Base64FileWriter } from './file-system/file-writer/base64-file-writer.class';
 import { FtpClient } from './ftp/ftp-client.class';
 import { Base64File } from './models/base64-file.class';
 import { Config } from './models/config.type';
@@ -32,6 +42,7 @@ export class TeacupBackup {
   private base64FileWriter: Base64FileWriter;
   private ftpClient: FtpClient;
   private secretKey: string = '';
+  private subscription: Subscription;
 
   constructor(private logger: Logger) {
     this.fileSystem = new FileSystem();
@@ -41,6 +52,7 @@ export class TeacupBackup {
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
     this.ftpClient = new FtpClient(new BasicFtp.Client());
+    this.subscription = new Subscription();
   }
 
   promptUserSecretKey(): void {
@@ -98,20 +110,27 @@ export class TeacupBackup {
     config.files.forEach((file: string) => {
       this.logger.info('Searching file:', file);
 
-      this.findFiles(file, config.roots)
-        .pipe(
-          logFoundFiles,
-          mergeMap((foundFiles) =>
-            this.readFilesToBase64(foundFiles).pipe(
-              encryptFiles,
-              writeFiles,
-              logCreatedBackup,
-              uploadFiles,
-              logUploadedBackup,
+      this.subscription.add(
+        this.findFiles(file, config.roots)
+          .pipe(
+            logFoundFiles,
+            mergeMap((foundFiles) =>
+              this.readFilesToBase64(foundFiles).pipe(
+                encryptFiles,
+                writeFiles,
+                logCreatedBackup,
+                uploadFiles,
+                logUploadedBackup,
+              ),
             ),
-          ),
-        )
-        .subscribe();
+            catchError((error: unknown) => {
+              this.logger.info(error?.toString());
+
+              return EMPTY;
+            }),
+          )
+          .subscribe(),
+      );
     });
   }
 
@@ -134,16 +153,23 @@ export class TeacupBackup {
       this.logger.info('Restored:', writtenRestoredFiles),
     );
 
-    DirectoryInfo.getContents(backupDirectory, this.fileSystem)
-      .pipe(
-        filterFilesByExtension,
-        logFilesToDecrypt,
-        mergeMap((encryptedFiles: string[]) =>
-          this.readEncryptedFiles(encryptedFiles, config).pipe(writeRestoredFiles),
-        ),
-        logRestoredFiles,
-      )
-      .subscribe();
+    this.subscription.add(
+      DirectoryInfo.getContents(backupDirectory, this.fileSystem)
+        .pipe(
+          filterFilesByExtension,
+          logFilesToDecrypt,
+          mergeMap((encryptedFiles: string[]) =>
+            this.readEncryptedFiles(encryptedFiles, config).pipe(writeRestoredFiles),
+          ),
+          logRestoredFiles,
+          catchError((error: unknown) => {
+            this.logger.error(error?.toString());
+
+            return EMPTY;
+          }),
+        )
+        .subscribe(),
+    );
   }
 
   private getNormalizedBackupDirectory(directory: string): string {
