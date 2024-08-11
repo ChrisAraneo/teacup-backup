@@ -14,7 +14,7 @@ export class Base64FileReader extends FileReader<Base64File | null> {
       map(
         (result: ReadFileResult) => new Base64File(result.path, result.data, result.modifiedDate),
       ),
-      catchError(() => of(null)),
+      catchError(() => of(null)), // TODO Handle errors in different way
     );
   }
 }
