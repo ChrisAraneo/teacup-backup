@@ -95,7 +95,10 @@ export class FileFinder {
         .replace('/i', ''),
       root: input.root,
       result: input.result.map((item) =>
-        item.toString().substring(1, item.length).replace('/i', ''),
+        item
+          .toString()
+          .substring(item.indexOf('/') === 0 ? 1 : 0, item.length)
+          .replace('/i', ''),
       ),
       message: input.message,
     };
