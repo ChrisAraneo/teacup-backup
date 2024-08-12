@@ -1,5 +1,6 @@
 import { isString } from 'lodash';
-import { Observable, catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
+
 import { Logger } from '../../utils/logger.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FindFileResult } from './find-file-result.type';

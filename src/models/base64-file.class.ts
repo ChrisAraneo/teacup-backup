@@ -1,4 +1,5 @@
-import { Observable, map } from 'rxjs';
+import { map, Observable } from 'rxjs';
+
 import { Base64FileReader } from '../file-system/file-reader/base64-file-reader.class';
 import { FileSystem } from '../file-system/file-system/file-system.class';
 import { Base64FileWriter } from '../file-system/file-writer/base64-file-writer.class';

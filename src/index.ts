@@ -1,9 +1,10 @@
-import { Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
+
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { FileSystem } from './file-system/file-system/file-system.class';
-import { TeacupBackup } from './teacup-backup';
 import { Config } from './models/config.type';
+import { TeacupBackup } from './teacup-backup';
 import { Logger } from './utils/logger.class';
 
 // Stryker disable all

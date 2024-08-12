@@ -1,5 +1,5 @@
 import * as BasicFtp from 'basic-ftp';
-import { Observable, from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 
 export class FtpClient {
   constructor(private client: BasicFtp.Client) {}

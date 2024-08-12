@@ -1,5 +1,6 @@
 import { AsyncFindStream } from 'find';
 import { MakeDirectoryOptions, PathLike } from 'fs';
+
 import { FileSystem } from './file-system.class';
 
 // Stryker disable all : It's mock

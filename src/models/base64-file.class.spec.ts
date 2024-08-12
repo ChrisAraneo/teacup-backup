@@ -1,7 +1,8 @@
 import { lastValueFrom } from 'rxjs';
-import { Base64File } from './base64-file.class';
-import { FileSystemMock } from '../file-system/file-system/file-system.mock.class';
+
 import { FileSystem } from '../file-system/file-system/file-system.class';
+import { FileSystemMock } from '../file-system/file-system/file-system.mock.class';
+import { Base64File } from './base64-file.class';
 
 let fileSystem: FileSystem;
 

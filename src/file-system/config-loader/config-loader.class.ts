@@ -1,6 +1,7 @@
 import { includes, isArray, isBoolean, isNull, isNumber, isString } from 'lodash';
 import Path from 'path';
-import { Observable, map } from 'rxjs';
+import { map, Observable } from 'rxjs';
+
 import { Config, FtpConfig } from '../../models/config.type';
 import { JsonFile } from '../../models/json-file.class';
 import { CurrentDirectory } from '../current-directory/current-directory.class';

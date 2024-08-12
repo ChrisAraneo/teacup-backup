@@ -1,3 +1,6 @@
+import { Abortable } from 'node:events';
+
+import find, { AsyncFindStream } from 'find';
 import fs, {
   MakeDirectoryOptions,
   NoParamCallback,
@@ -6,8 +9,6 @@ import fs, {
   Stats,
   WriteFileOptions,
 } from 'fs';
-import find, { AsyncFindStream } from 'find';
-import { Abortable } from 'node:events';
 
 // Stryker disable all
 

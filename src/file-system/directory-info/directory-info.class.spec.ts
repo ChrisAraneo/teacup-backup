@@ -1,8 +1,10 @@
+import { PathLike } from 'node:fs';
+
 import { firstValueFrom, lastValueFrom } from 'rxjs';
-import { DirectoryInfo } from './directory-info.class';
+
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
-import { PathLike } from 'node:fs';
+import { DirectoryInfo } from './directory-info.class';
 
 let fileSystem: FileSystem;
 

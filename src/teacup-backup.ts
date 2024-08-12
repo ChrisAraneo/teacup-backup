@@ -2,16 +2,17 @@ import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import Prompt from 'prompt-sync';
 import {
-  EMPTY,
-  Observable,
-  Subscription,
   catchError,
+  EMPTY,
   forkJoin,
   map,
   mergeMap,
+  Observable,
   of,
+  Subscription,
   tap,
 } from 'rxjs';
+
 import { FileDecryptor } from './crypto/file-decryptor.class';
 import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';

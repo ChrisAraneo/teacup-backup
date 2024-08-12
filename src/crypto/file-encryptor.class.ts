@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import CryptoAES from 'crypto-js/aes';
+
 import { Base64File } from '../models/base64-file.class';
 import { EncryptionResult } from './encryption-result.type';
 
