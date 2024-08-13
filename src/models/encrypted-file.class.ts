@@ -1,4 +1,4 @@
-import { map, Observable } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 
 import { FileEncryptor } from '../crypto/file-encryptor.class';
 import { TextFileReader } from '../file-system/file-reader/text-file-reader.class';
@@ -42,20 +42,19 @@ export class EncryptedFile extends TextFile {
     path: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<EncryptedFile> {
-    return new TextFileReader(fileSystem)
-      .readFile(path)
-      .pipe(
-        map(
-          (result) =>
-            new EncryptedFile(
-              result.getPath(),
-              result.getContent(),
-              result.getModifiedDate(),
-              '',
-              fileSystem,
-            ),
-        ),
-      );
+    return new TextFileReader(fileSystem).readFile(path).pipe(
+      filter((result) => result instanceof TextFile),
+      map(
+        (result) =>
+          new EncryptedFile(
+            result.getPath(),
+            result.getContent(),
+            result.getModifiedDate(),
+            '',
+            fileSystem,
+          ),
+      ),
+    );
   }
 
   writeToFile(): Observable<void> {

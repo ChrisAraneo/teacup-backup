@@ -1,4 +1,4 @@
-import { includes, isArray, isBoolean, isNull, isNumber, isString } from 'lodash';
+import { includes, isArray, isBoolean, isNumber, isString } from 'lodash';
 import Path from 'path';
 import { map, Observable } from 'rxjs';
 
@@ -25,16 +25,16 @@ export class ConfigLoader {
 
     return this.jsonFileReader.readFile(path).pipe(
       map((result: unknown) => {
-        if (isNull(result)) {
-          throw Error(CONFIG_READING_ERROR_MESSAGE);
-        }
+        if (result instanceof JsonFile) {
+          const content: unknown = (result as JsonFile).getContent();
 
-        const content: unknown = (result as JsonFile).getContent();
-
-        if (this.isConfig(content)) {
-          return content;
+          if (this.isConfig(content)) {
+            return content;
+          } else {
+            throw Error(INVALID_CONFIG_ERROR_MESSAGE);
+          }
         } else {
-          throw Error(INVALID_CONFIG_ERROR_MESSAGE);
+          throw Error(CONFIG_READING_ERROR_MESSAGE);
         }
       }),
     );

@@ -198,7 +198,7 @@ export class TeacupBackup {
   private readFilesToBase64(files: string[]): Observable<Base64File[]> {
     return this.base64FileReader
       .readFiles(files)
-      .pipe(map((files) => files.filter((file) => file !== null)));
+      .pipe(map((files) => files.filter((file) => file instanceof Base64File)));
   }
 
   private encryptBase64Files(files: Base64File[]): Observable<EncryptedFile[]> {
