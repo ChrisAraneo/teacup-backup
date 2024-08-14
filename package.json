@@ -9,7 +9,8 @@
     "start": "npm run build && npm run copy-config && node dist/teacup-backup.js --no-warnings",
     "test": "jest",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/teacup-backup.js",
-    "copy-config": "node dev-scripts/copy-config-file.js"
+    "copy-config": "node dev-scripts/copy-config-file.js",
+    "stryker": "npx stryker run"
   },
   "repository": {
     "type": "git",
