@@ -33,22 +33,28 @@ describe('TextFileReader', () => {
     expect(calls.length).toBe(3);
   });
 
-  it('#readFile should return null when file system throw error on file read', async () => {
+  it('#readFile should return error object when file system throw error on file read', async () => {
     fileSystem = new ReadFileErrorMock();
     reader = new TextFileReader(fileSystem);
 
     const result = await lastValueFrom(reader.readFile('test.txt'));
 
-    expect(result).toBe(null);
+    expect(result).toStrictEqual({
+      message: 'Error while reading file content (test.txt): "error"',
+      status: 'error',
+    });
   });
 
-  it('#readFile should return null when file system throw error on meta-data check', async () => {
+  it('#readFile should return error object when file system throw error on meta-data check', async () => {
     fileSystem = new StatErrorMock();
     reader = new TextFileReader(fileSystem);
 
     const result = await lastValueFrom(reader.readFile('test.txt'));
 
-    expect(result).toBe(null);
+    expect(result).toStrictEqual({
+      message: 'Error while reading file metadata (test.txt): "error"',
+      status: 'error',
+    });
   });
 });
 
