@@ -45,7 +45,7 @@ export class EncryptedFile extends TextFile {
     return new TextFileReader(fileSystem).readFile(path).pipe(
       filter((result) => result instanceof TextFile),
       map(
-        (result) =>
+        (result: TextFile) =>
           new EncryptedFile(
             result.getPath(),
             result.getContent(),

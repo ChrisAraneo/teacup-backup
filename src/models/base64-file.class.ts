@@ -14,7 +14,8 @@ export class Base64File extends TextFile {
     return this.base64FileReader.readFile(path).pipe(
       filter((result) => result instanceof Base64File),
       map(
-        (result) => new Base64File(result.getPath(), result.getContent(), result.getModifiedDate()),
+        (result: Base64File) =>
+          new Base64File(result.getPath(), result.getContent(), result.getModifiedDate()),
       ),
     );
   }
