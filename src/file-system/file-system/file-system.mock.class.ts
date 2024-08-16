@@ -114,6 +114,7 @@ export class FileSystemMock extends FileSystem {
       '/\\/test.json/i',
       'te/st.json',
       '/te\\/st.json/i',
+      '/te\\/ist.json/i',
     ].includes(path);
   }
 
