@@ -105,7 +105,16 @@ export class FileSystemMock extends FileSystem {
   }
 
   private isCorrectJsonFile(path: string): boolean {
-    return ['test.json', '/test.json/i', 'test2.json', 'test3.json', 'no-extension'].includes(path);
+    return [
+      'test.json',
+      '/test.json/i',
+      'test2.json',
+      'test3.json',
+      'no-extension',
+      '/\\/test.json/i',
+      'te/st.json',
+      '/te\\/st.json/i',
+    ].includes(path);
   }
 
   private isCorrectConfigFile(path: string): boolean {
