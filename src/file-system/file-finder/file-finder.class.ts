@@ -16,7 +16,9 @@ export class FileFinder {
     root: string,
     fileSystem: FileSystem = new FileSystem(),
   ): Observable<FindFileResult> {
-    const _pattern: RegExp = isString(pattern) ? new RegExp(pattern, 'i') : pattern;
+    const _pattern: RegExp = isString(pattern)
+      ? new RegExp(pattern.replace('/i', '\\/i'), 'i')
+      : pattern;
 
     return new Observable<FindFileResult>((subscriber) => {
       if (!this.fileSystem.existsSync(root)) {
@@ -83,23 +85,27 @@ export class FileFinder {
 
   private createFindFileResult(input: {
     success: boolean;
-    pattern: string | RegExp;
+    pattern: RegExp;
     root: string;
     result: string[];
     message: string | null;
   }): FindFileResult {
+    const _pattern = input.pattern.toString();
+
     return {
       success: input.success,
       pattern: input.pattern
         .toString()
-        .substring(1, input.pattern.toString().length)
-        .replace('/i', ''),
+        .substring(_pattern.indexOf('/i') === _pattern.length - 2 ? 1 : 0, _pattern.length)
+        .replace(new RegExp('/i$'), '')
+        .replace('\\', ''),
       root: input.root,
       result: input.result.map((item) =>
         item
           .toString()
-          .substring(item.indexOf('/') === 0 ? 1 : 0, item.length)
-          .replace('/i', ''),
+          .substring(item.indexOf('/i') === item.length - 2 ? 1 : 0, item.length)
+          .replace(new RegExp('/i$'), '')
+          .replace('\\', ''),
       ),
       message: input.message,
     };
