@@ -5,6 +5,7 @@ import { CurrentDirectory } from './file-system/current-directory/current-direct
 import { FileSystem } from './file-system/file-system/file-system.class';
 import { Config } from './models/config.type';
 import { TeacupBackup } from './teacup-backup';
+import { IntervalFormatter } from './utils/interval-formatter.class';
 import { Logger } from './utils/logger.class';
 
 // Stryker disable all
@@ -16,6 +17,7 @@ class App {
     new CurrentDirectory(),
     new FileSystem(),
   );
+  private static intervalFormatter: IntervalFormatter = new IntervalFormatter();
 
   static async main(): Promise<void> {
     const config: Config | undefined = (await firstValueFrom(App.readConfigFile()).catch(
@@ -35,17 +37,19 @@ class App {
 
     this.teacupBackup.promptUserSecretKey();
 
-    const interval = +config.interval;
+    const intervalInSeconds = +config.interval;
 
     if (config.mode === 'backup') {
-      if (interval > 0) {
+      if (intervalInSeconds > 0) {
         this.logger.info(
-          `The application will check files and perform backups on the specified files every ${interval} seconds.`,
+          `Application will check specified files and perform backups on them every ${App.intervalFormatter.format(
+            intervalInSeconds * 1000,
+          )}`,
         );
 
         setInterval(() => {
           this.teacupBackup.runBackupFlow(config);
-        }, interval * 1000);
+        }, intervalInSeconds * 1000);
       }
 
       this.teacupBackup.runBackupFlow(config);
