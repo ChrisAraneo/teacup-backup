@@ -33,7 +33,7 @@ class App {
     App.logger = new Logger(config['log-level']);
     App.teacupBackup = new TeacupBackup(App.logger);
 
-    this.printTitleAndAscii('0.5.0');
+    this.printTitleAndAscii('0.5.1');
 
     this.teacupBackup.promptUserSecretKey();
 
