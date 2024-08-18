@@ -1,4 +1,5 @@
-import { Observable, forkJoin, map } from 'rxjs';
+import { forkJoin, map, Observable } from 'rxjs';
+
 import { File } from '../../models/file.class';
 import { FileSystem } from '../file-system/file-system.class';
 

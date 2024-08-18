@@ -1,5 +1,6 @@
 import { AsyncFindStream } from 'find';
 import { MakeDirectoryOptions, PathLike } from 'fs';
+
 import { FileSystem } from './file-system.class';
 
 // Stryker disable all : It's mock
@@ -104,7 +105,17 @@ export class FileSystemMock extends FileSystem {
   }
 
   private isCorrectJsonFile(path: string): boolean {
-    return ['test.json', '/test.json/i', 'test2.json', 'test3.json', 'no-extension'].includes(path);
+    return [
+      'test.json',
+      '/test.json/i',
+      'test2.json',
+      'test3.json',
+      'no-extension',
+      '/\\/test.json/i',
+      'te/st.json',
+      '/te\\/st.json/i',
+      '/te\\/ist.json/i',
+    ].includes(path);
   }
 
   private isCorrectConfigFile(path: string): boolean {

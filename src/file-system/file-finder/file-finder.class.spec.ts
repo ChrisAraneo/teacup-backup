@@ -1,7 +1,8 @@
 import { lastValueFrom } from 'rxjs';
-import { FileFinder } from './file-finder.class';
+
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
+import { FileFinder } from './file-finder.class';
 
 let fileSystem: FileSystem;
 let fileFinder: FileFinder;
@@ -32,6 +33,40 @@ describe('FileFinder', () => {
     expect(result.root).toBe('D:\\');
     expect(result.message).toBe(null);
     expect(result.result).toStrictEqual(['test.json']);
+  });
+
+  it('#findFile should return successful result when files have filename with slashes found', async () => {
+    jest.spyOn(fileSystem, 'findFile');
+
+    const result = [
+      await lastValueFrom(fileFinder.findFile('/test.json', 'D:\\', fileSystem)),
+      await lastValueFrom(fileFinder.findFile('te/st.json', 'D:\\', fileSystem)),
+      await lastValueFrom(fileFinder.findFile('te/ist.json', 'D:\\', fileSystem)),
+    ];
+
+    expect(result).toStrictEqual([
+      {
+        message: null,
+        pattern: '/test.json',
+        result: ['/test.json'],
+        root: 'D:\\',
+        success: true,
+      },
+      {
+        message: null,
+        pattern: 'te/st.json',
+        result: ['te/st.json'],
+        root: 'D:\\',
+        success: true,
+      },
+      {
+        message: null,
+        pattern: '/te/ist.json',
+        result: ['/te/ist.json'],
+        root: 'D:\\',
+        success: true,
+      },
+    ]);
   });
 
   it("#findFile should return unsuccessful result when root directory doesn't exist", async () => {

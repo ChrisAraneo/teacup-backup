@@ -1,6 +1,7 @@
 import { includes, isArray, isBoolean, isNumber, isString } from 'lodash';
 import Path from 'path';
-import { Observable, catchError, map } from 'rxjs';
+import { map, Observable } from 'rxjs';
+
 import { Config, FtpConfig } from '../../models/config.type';
 import { JsonFile } from '../../models/json-file.class';
 import { CurrentDirectory } from '../current-directory/current-directory.class';
@@ -23,16 +24,17 @@ export class ConfigLoader {
     const path = Path.normalize(`${currentDirectory}/config.json`);
 
     return this.jsonFileReader.readFile(path).pipe(
-      catchError(() => {
-        throw Error(CONFIG_READING_ERROR_MESSAGE);
-      }),
       map((result: unknown) => {
-        const content: unknown = (result as JsonFile).getContent();
+        if (result instanceof JsonFile) {
+          const content: unknown = (result as JsonFile).getContent();
 
-        if (this.isConfig(content)) {
-          return content;
+          if (this.isConfig(content)) {
+            return content;
+          } else {
+            throw Error(INVALID_CONFIG_ERROR_MESSAGE);
+          }
         } else {
-          throw Error(INVALID_CONFIG_ERROR_MESSAGE);
+          throw Error(CONFIG_READING_ERROR_MESSAGE);
         }
       }),
     );

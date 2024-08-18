@@ -1,10 +1,7 @@
 import { lastValueFrom } from 'rxjs';
+
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
-import {
-  FILE_CONTENT_READING_ERROR_MESSAGE,
-  FILE_METADATA_READING_ERROR_MESSAGE,
-} from './file-reader.consts';
 import { TextFileReader } from './text-file-reader.class';
 
 let fileSystem: FileSystem;
@@ -36,32 +33,28 @@ describe('TextFileReader', () => {
     expect(calls.length).toBe(3);
   });
 
-  it('#readFile should throw error when file system throw error on file read', async () => {
-    let error: unknown;
+  it('#readFile should return error object when file system throw error on file read', async () => {
     fileSystem = new ReadFileErrorMock();
     reader = new TextFileReader(fileSystem);
 
-    try {
-      await lastValueFrom(reader.readFile('test.txt'));
-    } catch (e: unknown) {
-      error = e;
-    }
+    const result = await lastValueFrom(reader.readFile('test.txt'));
 
-    expect(error).toContain(FILE_CONTENT_READING_ERROR_MESSAGE);
+    expect(result).toStrictEqual({
+      message: 'Error while reading file content (test.txt): "error"',
+      status: 'error',
+    });
   });
 
-  it('#readFile should throw error when file system throw error on meta-data check', async () => {
-    let error: unknown;
+  it('#readFile should return error object when file system throw error on meta-data check', async () => {
     fileSystem = new StatErrorMock();
     reader = new TextFileReader(fileSystem);
 
-    try {
-      await lastValueFrom(reader.readFile('test.txt'));
-    } catch (e: unknown) {
-      error = e;
-    }
+    const result = await lastValueFrom(reader.readFile('test.txt'));
 
-    expect(error).toContain(FILE_METADATA_READING_ERROR_MESSAGE);
+    expect(result).toStrictEqual({
+      message: 'Error while reading file metadata (test.txt): "error"',
+      status: 'error',
+    });
   });
 });
 

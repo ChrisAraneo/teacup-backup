@@ -1,4 +1,4 @@
-# Teacup Backup (v0.5.0)
+# Teacup Backup (v0.5.1)
 
 ![Teacup backup logo](logo.png?raw=true)
 
@@ -95,10 +95,15 @@ Run the script:
 
 # Technologies
 
-Developing and running the script requires following technologies:
+You need following to run the script:
 
 - [Node.js](https://nodejs.org/en) (recommended v18.16.0) - used for running & building the project
-- [TypeScript](https://www.typescriptlang.org/) - used as a development tool, it is not required to download any compilers besides project dependencies.
+
+Technologies & dependencies used in development:
+
+- [TypeScript](https://www.typescriptlang.org/) - used as a development tool, it is not required to download any compilers besides project dependencies
+- [RxJS](https://rxjs.dev/) - because reactive code is awesome
+- ... and more: [basic-ftp](https://www.npmjs.com/package/basic-ftp), [crypto-js](https://www.npmjs.com/package/crypto-js), [file-base64](https://www.npmjs.com/package/file-base64), [find](https://www.npmjs.com/package/find), [lodash](https://lodash.com/), [prompt-sync](https://www.npmjs.com/package/prompt-sync), [winston](https://www.npmjs.com/package/winston)
 
 # License
 

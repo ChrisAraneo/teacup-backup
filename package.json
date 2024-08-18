@@ -1,7 +1,7 @@
 {
   "name": "teacup-backup",
-  "version": "0.5.0",
-  "description": "Teacup Backup is a simple Node.js script that finds, encrypts and backs up selected files.",
+  "version": "0.5.1",
+  "description": "Teacup Backup is a simple Node.js script that finds, encrypts and creates backup of selected files.",
   "main": "index.js",
   "scripts": {
     "lint": "eslint \"src/**/*.{ts,json}\" --fix",
@@ -9,7 +9,8 @@
     "start": "npm run build && npm run copy-config && node dist/teacup-backup.js --no-warnings",
     "test": "jest",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/teacup-backup.js",
-    "copy-config": "node dev-scripts/copy-config-file.js"
+    "copy-config": "node dev-scripts/copy-config-file.js",
+    "stryker": "npx stryker run"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jsonc": "^2.10.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
     "ts-jest": "^29.1.1",
