@@ -1,0 +1,15 @@
+{
+  "backupDirectory": "./backups",
+  "files": ["spiders-password-db2.kdbx"],
+  "ftp": {
+    "directory": "teacup-backup",
+    "enabled": true,
+    "host": "192.168.50.1",
+    "password": "Qwerty123/",
+    "user": "user"
+  },
+  "interval": 3600,
+  "log-level": "debug",
+  "mode": "backup",
+  "roots": ["C:\\", "D:\\"]
+}
