@@ -1,6 +1,4 @@
-# Teacup Backup (v0.5.3)
-
-![Teacup backup logo](logo.png?raw=true)
+<h1 style="font-size: 64px; line-height: 64px; text-align: center;">🍵<span style="line-height: 64px; font-size: 48px; margin-left: 8px;">Teacup Backup</span></h1>
 
 # Introduction
 
