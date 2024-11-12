@@ -1,4 +1,4 @@
-# Teacup Backup (v0.5.1)
+# Teacup Backup (v0.5.3)
 
 ![Teacup backup logo](logo.png?raw=true)
 
