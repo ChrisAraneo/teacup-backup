@@ -1,0 +1,53 @@
+{
+  "name": "teacup-backup-cli",
+  "version": "0.5.2",
+  "description": "Teacup Backup is a simple Node.js script that finds, encrypts and creates backup of selected files.",
+  "license": "MIT",
+  "bin": "dist/cli.js",
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "start": "npm run build && node dist/cli",
+    "lint": "eslint \"src/**/*.{ts,tsx,json}\" \"eslint.config.mjs\" \"tsconfig.json\" --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json}\"",
+    "chores": "npm run lint && npm run format",
+    "test": "ava",
+    "build": "tsc"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "ink": "^4.1.0",
+    "meow": "^11.0.0",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "ava": "^6.2.0",
+    "chalk": "^5.3.0",
+    "eslint": "^9.14.0",
+    "eslint-config-xo-react": "^0.27.0",
+    "eslint-plugin-jsonc": "^2.18.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "ink-testing-library": "^4.0.0",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsimp": "^2.0.12",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
+  },
+  "ava": {
+    "extensions": {
+      "ts": "module",
+      "tsx": "module"
+    },
+    "nodeArguments": [
+      "--import=tsimp"
+    ]
+  }
+}
