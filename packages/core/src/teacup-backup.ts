@@ -30,6 +30,8 @@ import { Logger } from './utils/logger.class';
 
 // Stryker disable all
 
+// TODO Refactor
+
 const prompt = Prompt({
   sigint: false,
 });
