@@ -1,5 +1,3 @@
-import { Abortable } from 'node:events';
-
 import find, { AsyncFindStream } from 'find';
 import fs, {
   MakeDirectoryOptions,
@@ -33,7 +31,7 @@ export class FileSystem {
       | ({
           encoding: BufferEncoding;
           flag?: string | undefined;
-        } & Abortable)
+        } & unknown)
       | BufferEncoding,
     callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {

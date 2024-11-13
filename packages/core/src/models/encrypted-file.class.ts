@@ -8,7 +8,6 @@ import { Base64File } from './base64-file.class';
 import { TextFile } from './text-file.class';
 
 export class EncryptedFile extends TextFile {
-  protected textFileWriter: TextFileWriter;
   protected textFileReader: TextFileReader;
 
   private constructor(
