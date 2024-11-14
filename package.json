@@ -9,8 +9,6 @@
   "dependencies": {},
   "devDependencies": {
     "@nx/js": "20.1.0",
-    "@stryker-mutator/jest-runner": "^8.6.0",
-    "@stryker-mutator/typescript-checker": "^8.6.0",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
