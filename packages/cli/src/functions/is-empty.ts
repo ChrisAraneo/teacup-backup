@@ -1,5 +1,7 @@
 import lodash from 'lodash';
 
-export function isEmpty(x: unknown): boolean {
-  return lodash.isEmpty(x);
+type NonEmptyArray<T> = [T, ...T[]];
+
+export function isEmpty<T>(x: unknown): x is NonEmptyArray<T> {
+  return lodash.isArray<T>(x) && x.length > 0;
 }
