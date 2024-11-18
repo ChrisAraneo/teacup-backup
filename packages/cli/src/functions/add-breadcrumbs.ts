@@ -1,5 +1,5 @@
 import { MenuItem } from '../interfaces/menu-item.js';
-import { isEmpty } from './is-empty.js';
+import { isNotEmpty } from './is-not-empty.js';
 
 export function addBreadcrumbs(menus: MenuItem[]): void {
   addBreadcrumbsRecursively(menus, []);
@@ -10,7 +10,7 @@ function addBreadcrumbsRecursively(
   parentPath: string[],
 ): void {
   menus.forEach((menu) => {
-    if (isEmpty(menu.children)) {
+    if (isNotEmpty(menu.children)) {
       addBreadcrumbsRecursively(menu.children, [
         ...(parentPath || []),
         menu.name,
