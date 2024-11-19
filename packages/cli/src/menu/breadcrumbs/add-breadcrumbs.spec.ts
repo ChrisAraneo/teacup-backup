@@ -1,9 +1,9 @@
 import test from 'ava';
 
-import { MenuItem } from '../interfaces/menu-item.js';
+import { MenuItem } from '../../interfaces/menu-item.js';
 import { addBreadcrumbs } from './add-breadcrumbs.js';
 
-test('should add breadcrumbs to a nested menu structure', (context) => {
+test('should add breadcrumbs to a nested menu structure', (t) => {
   const menus = [
     {
       name: 'Home',
@@ -29,7 +29,7 @@ test('should add breadcrumbs to a nested menu structure', (context) => {
 
   addBreadcrumbs(menus);
 
-  context.deepEqual(menus, [
+  t.deepEqual(menus, [
     {
       name: 'Home',
       breadcrumbs: [],
@@ -63,27 +63,27 @@ test('should add breadcrumbs to a nested menu structure', (context) => {
   ]);
 });
 
-test('should handle an empty menu array', (context) => {
+test('should handle an empty menu array', (t) => {
   const menus: MenuItem[] = [];
 
   addBreadcrumbs(menus);
 
-  context.deepEqual(menus, []);
+  t.deepEqual(menus, []);
 });
 
-test('should add empty breadcrumbs to a flat menu structure', (context) => {
+test('should add empty breadcrumbs to a flat menu structure', (t) => {
   const menus = [{ name: 'Home' }, { name: 'About' }, { name: 'Contact' }];
 
   addBreadcrumbs(menus);
 
-  context.deepEqual(menus, [
+  t.deepEqual(menus, [
     { name: 'Home', breadcrumbs: [] },
     { name: 'About', breadcrumbs: [] },
     { name: 'Contact', breadcrumbs: [] },
   ]);
 });
 
-test('should handle menus with empty children', (context) => {
+test('should handle menus with empty children', (t) => {
   const menus = [
     { name: 'Home', children: [] },
     { name: 'About', children: [] },
@@ -91,13 +91,13 @@ test('should handle menus with empty children', (context) => {
 
   addBreadcrumbs(menus);
 
-  context.deepEqual(menus, [
+  t.deepEqual(menus, [
     { name: 'Home', breadcrumbs: [], children: [] },
     { name: 'About', breadcrumbs: [], children: [] },
   ]);
 });
 
-test('should overwrite existing breadcrumbs with correct values', (context) => {
+test('should overwrite existing breadcrumbs with correct values', (t) => {
   const menus = [
     {
       name: 'Home',
@@ -113,7 +113,7 @@ test('should overwrite existing breadcrumbs with correct values', (context) => {
 
   addBreadcrumbs(menus);
 
-  context.deepEqual(menus, [
+  t.deepEqual(menus, [
     {
       name: 'Home',
       breadcrumbs: [],

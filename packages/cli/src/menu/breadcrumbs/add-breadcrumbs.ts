@@ -1,8 +1,14 @@
-import { MenuItem } from '../interfaces/menu-item.js';
-import { isNotEmpty } from './is-not-empty.js';
+import { cloneDeep } from 'lodash';
 
-export function addBreadcrumbs(menus: MenuItem[]): void {
-  addBreadcrumbsRecursively(menus, []);
+import { isNotEmpty } from '../../functions/is-not-empty.js';
+import { MenuItem } from '../../interfaces/menu-item.js';
+
+export function addBreadcrumbs(menus: MenuItem[]): MenuItem[] {
+  const menusClone = cloneDeep(menus);
+
+  addBreadcrumbsRecursively(menusClone, []);
+
+  return menusClone;
 }
 
 function addBreadcrumbsRecursively(
