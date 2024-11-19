@@ -1,14 +1,13 @@
-import { cloneDeep } from 'lodash';
-
+import { cloneDeep } from '../../functions/clone-deep.js';
 import { isNotEmpty } from '../../functions/is-not-empty.js';
 import { MenuItem } from '../../interfaces/menu-item.js';
 
-export function addBreadcrumbs(menus: MenuItem[]): MenuItem[] {
-  const menusClone = cloneDeep(menus);
+export function addBreadcrumbs(items: MenuItem[]): MenuItem[] {
+  const clone = cloneDeep(items);
 
-  addBreadcrumbsRecursively(menusClone, []);
+  addBreadcrumbsRecursively(clone, []);
 
-  return menusClone;
+  return clone;
 }
 
 function addBreadcrumbsRecursively(
