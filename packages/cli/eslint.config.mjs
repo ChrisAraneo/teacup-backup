@@ -2,7 +2,6 @@ import eslint from '@eslint/js';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import eslintPluginReact from 'eslint-plugin-react';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default [
@@ -21,9 +20,6 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-      },
-      globals: {
-        ...globals.browser,
       },
     },
     rules: {
@@ -44,9 +40,6 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-      },
-      globals: {
-        ...globals.browser,
       },
     },
     rules: {
