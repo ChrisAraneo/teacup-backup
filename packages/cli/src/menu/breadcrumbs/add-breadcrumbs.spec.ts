@@ -27,9 +27,9 @@ test('should add breadcrumbs to a nested menu structure', (t) => {
     { name: 'About' },
   ];
 
-  addBreadcrumbs(menus);
+  const result = addBreadcrumbs(menus);
 
-  t.deepEqual(menus, [
+  t.deepEqual(result, [
     {
       name: 'Home',
       breadcrumbs: [],
@@ -66,17 +66,17 @@ test('should add breadcrumbs to a nested menu structure', (t) => {
 test('should handle an empty menu array', (t) => {
   const menus: MenuItem[] = [];
 
-  addBreadcrumbs(menus);
+  const result = addBreadcrumbs(menus);
 
-  t.deepEqual(menus, []);
+  t.deepEqual(result, []);
 });
 
 test('should add empty breadcrumbs to a flat menu structure', (t) => {
   const menus = [{ name: 'Home' }, { name: 'About' }, { name: 'Contact' }];
 
-  addBreadcrumbs(menus);
+  const result = addBreadcrumbs(menus);
 
-  t.deepEqual(menus, [
+  t.deepEqual(result, [
     { name: 'Home', breadcrumbs: [] },
     { name: 'About', breadcrumbs: [] },
     { name: 'Contact', breadcrumbs: [] },
@@ -89,9 +89,9 @@ test('should handle menus with empty children', (t) => {
     { name: 'About', children: [] },
   ];
 
-  addBreadcrumbs(menus);
+  const result = addBreadcrumbs(menus);
 
-  t.deepEqual(menus, [
+  t.deepEqual(result, [
     { name: 'Home', breadcrumbs: [], children: [] },
     { name: 'About', breadcrumbs: [], children: [] },
   ]);
@@ -111,9 +111,9 @@ test('should overwrite existing breadcrumbs with correct values', (t) => {
     },
   ];
 
-  addBreadcrumbs(menus);
+  const result = addBreadcrumbs(menus);
 
-  t.deepEqual(menus, [
+  t.deepEqual(result, [
     {
       name: 'Home',
       breadcrumbs: [],
@@ -124,5 +124,55 @@ test('should overwrite existing breadcrumbs with correct values', (t) => {
         },
       ],
     },
+  ]);
+});
+
+test('should not mutate input array', (t) => {
+  const menus = [
+    {
+      name: 'Home',
+      children: [
+        { name: 'Dashboard' },
+        {
+          name: 'Settings',
+          children: [
+            {
+              name: 'Profile',
+              children: [
+                { name: 'Edit', children: [] },
+                { name: 'Delete profile' },
+              ],
+            },
+            { name: 'Account' },
+          ],
+        },
+      ],
+    },
+    { name: 'About' },
+  ];
+
+  addBreadcrumbs(menus);
+
+  t.deepEqual(menus, [
+    {
+      name: 'Home',
+      children: [
+        { name: 'Dashboard' },
+        {
+          name: 'Settings',
+          children: [
+            {
+              name: 'Profile',
+              children: [
+                { name: 'Edit', children: [] },
+                { name: 'Delete profile' },
+              ],
+            },
+            { name: 'Account' },
+          ],
+        },
+      ],
+    },
+    { name: 'About' },
   ]);
 });
