@@ -93,7 +93,7 @@ test('should find item with children when searching for a matching nested struct
 
   const result = findMenuItem(menuItems, searched);
 
-  t.is(result, {
+  t.deepEqual(result, {
     name: 'Watermelons',
     children: [
       {
