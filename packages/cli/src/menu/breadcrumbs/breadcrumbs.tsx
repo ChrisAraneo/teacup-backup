@@ -1,33 +1,26 @@
 import { Text } from 'ink';
 import React from 'react';
 
+import { findMenuItem } from '../../functions/find-menu-item.js';
 import { MenuItem } from '../../interfaces/menu-item.js';
 import { addBreadcrumbs } from './add-breadcrumbs.js';
 
 interface Props {
+  active: MenuItem;
   items: MenuItem[];
-  selected: number;
 }
 
-export default function Breadcrumbs({ items, selected }: Props) {
-  const selectedItem = addBreadcrumbs(items)[selected];
-
-  if (!selectedItem) {
-    return <></>;
-  }
-
-  const breadcrumbs = selectedItem?.breadcrumbs || [];
+export default function Breadcrumbs({ active, items }: Props) {
+  const activeItemWithBreadcrumbs = findMenuItem(addBreadcrumbs(items), active);
 
   return (
     <Text>
-      {breadcrumbs.map((breadcrumb: string, index: number, array: string[]) => (
-        <Text
-          key={breadcrumb}
-          color={index < array.length - 1 ? 'gray' : 'white'}>
-          {breadcrumb}
-          {index < array.length - 1 ? ' » ' : ''}
+      {(activeItemWithBreadcrumbs?.breadcrumbs || []).map((breadcrumb: string) => (
+        <Text key={breadcrumb} color='gray'>
+          {breadcrumb + ' » '}
         </Text>
       ))}
+      <Text color='white'>{active.name}</Text>
     </Text>
   );
 }
