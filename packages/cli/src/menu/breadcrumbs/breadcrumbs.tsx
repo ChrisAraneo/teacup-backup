@@ -1,7 +1,8 @@
 import { Text } from 'ink';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { findMenuItem } from '../../functions/find-menu-item.js';
+import { BreadcrumbsMenuItem } from '../../interfaces/breadcrumbs-menu-item.js';
 import { MenuItem } from '../../interfaces/menu-item.js';
 import { addBreadcrumbs } from './add-breadcrumbs.js';
 
@@ -11,16 +12,29 @@ interface Props {
 }
 
 export default function Breadcrumbs({ active, items }: Props) {
-  const activeItemWithBreadcrumbs = findMenuItem(addBreadcrumbs(items), active);
+  const [breadcrumbs, setBreadcrumbs] = useState<string[]>([]);
+  const [name, setName] = useState<string>('');
+
+  useEffect(() => {
+    const breadcrumbItems = addBreadcrumbs(items);
+    const found = findMenuItem(breadcrumbItems, active) as
+      | BreadcrumbsMenuItem
+      | undefined;
+
+    if (found) {
+      setBreadcrumbs(found.breadcrumbs);
+      setName(found.name);
+    }
+  }, [items, active]);
 
   return (
     <Text>
-      {(activeItemWithBreadcrumbs?.breadcrumbs || []).map((breadcrumb: string) => (
+      {breadcrumbs.map((breadcrumb: string) => (
         <Text key={breadcrumb} color='gray'>
           {breadcrumb + ' » '}
         </Text>
       ))}
-      <Text color='white'>{active.name}</Text>
+      <Text color='white'>{name}</Text>
     </Text>
   );
 }
