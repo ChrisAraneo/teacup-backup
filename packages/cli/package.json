@@ -21,6 +21,7 @@
     "dist"
   ],
   "dependencies": {
+    "@reduxjs/toolkit": "^2.3.0",
     "@teacup-backup/core": "*",
     "ink": "^4.1.0",
     "meow": "^11.0.0",
