@@ -1,30 +1,36 @@
-import { Dispatch, SetStateAction } from 'react';
-
 import { MenuItem } from '../interfaces/menu-item.js';
+import { cloneDeep } from './clone-deep.js';
 import { isNotEmpty } from './is-not-empty.js';
 import { isNull } from './is-null.js';
 
 export function addBack(
-  menus: MenuItem[],
-  setItems: Dispatch<SetStateAction<MenuItem[]>>,
-): void {
-  addBackRecursively(menus, null, null, setItems);
+  items: MenuItem[],
+  activate: (item: MenuItem) => void,
+  exit: () => never = () => {
+    process.exit(0);
+  },
+): MenuItem[] {
+  const clone = cloneDeep(items);
+
+  addBackRecursively(clone, null, null, activate, exit);
+
+  return clone;
 }
 
 function addBackRecursively(
   menus: MenuItem[],
   parent: MenuItem | null,
   grandParent: MenuItem | null,
-  setItems: Dispatch<SetStateAction<MenuItem[]>>,
+  activate: (item: MenuItem) => void,
+  exit: () => never,
+  isLast = false,
 ): void {
   const back: MenuItem = {
     name: isNull(grandParent) ? 'Exit' : 'Back',
     onSelect: isNull(grandParent)
-      ? () => {
-          process.exit(0);
-        }
+      ? () => exit()
       : () => {
-          setItems(grandParent?.children || []);
+          activate(grandParent);
         },
   };
 
@@ -32,7 +38,10 @@ function addBackRecursively(
 
   menus.forEach((menu) => {
     if (isNotEmpty(menu.children)) {
-      addBackRecursively(menu.children, menu, parent, setItems);
+      addBackRecursively(menu.children, menu, parent, activate, exit);
+    } else if (!isLast) {
+      menu.children = [];
+      addBackRecursively(menu.children, menu, parent, activate, exit, true);
     }
   });
 }
