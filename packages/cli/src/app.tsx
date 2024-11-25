@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { addBack } from './functions/add-back.js';
 import { isNotEmpty } from './functions/is-not-empty.js';
 import { MenuItem } from './interfaces/menu-item.js';
+import Breadcrumbs from './menu/breadcrumbs/breadcrumbs.js';
+import Hint from './menu/hint/hint.js';
 import Menu from './menu/menu.js';
 
 interface Props {
@@ -25,15 +27,24 @@ export default function App({ root }: Props) {
   }, [items]);
 
   return (
-    <Box flexDirection='column'>
+    <Box
+      borderStyle={'single'}
+      borderColor={'gray'}
+      padding={1}
+      flexDirection='column'
+      rowGap={1}
+      width={80}
+      minHeight={30}>
       <Text>
         🍵 Teacup Backup <Text color='gray'>(v0.5.3)</Text>
       </Text>
+      <Hint></Hint>
       {active && (
-        <Menu
-          active={active}
-          items={transformedItems}
-          activate={(item) => setActive(item)}></Menu>
+        <Breadcrumbs items={transformedItems} active={active}></Breadcrumbs>
+      )}
+      {active && <Text>{active.description}</Text>}
+      {active && (
+        <Menu active={active} activate={(item) => setActive(item)}></Menu>
       )}
     </Box>
   );

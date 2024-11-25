@@ -2,16 +2,13 @@ import { Box, Text, useInput } from 'ink';
 import React, { useState } from 'react';
 
 import { MenuItem } from '../interfaces/menu-item.js';
-import Breadcrumbs from './breadcrumbs/breadcrumbs.js';
-import Hint from './hint/hint.js';
 
 interface Props {
   active: MenuItem;
-  items: MenuItem[];
   activate: (item: MenuItem) => void;
 }
 
-export default function Menu({ items, active, activate }: Props) {
+export default function Menu({ active, activate }: Props) {
   const [selected, setSelected] = useState(0);
 
   useInput((_, key) => {
@@ -38,8 +35,6 @@ export default function Menu({ items, active, activate }: Props) {
 
   return (
     <Box flexDirection='column'>
-      <Hint></Hint>
-      <Breadcrumbs items={items} active={active}></Breadcrumbs>
       {(active?.children || []).map((item, index) => (
         <Text key={item.name} color={index === selected ? 'green' : 'white'}>
           {index === selected ? '• ' : '  '}
