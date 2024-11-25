@@ -4,6 +4,7 @@ import meow from 'meow';
 import React from 'react';
 
 import App from './app.js';
+import { MenuItem } from './interfaces/menu-item.js';
 
 const cli = meow(
   `
@@ -27,4 +28,30 @@ const cli = meow(
   },
 );
 
-render(<App name={cli.flags.name} />);
+const root: MenuItem = {
+  name: 'Main menu',
+  children: [
+    {
+      name: 'Backup files',
+      children: [
+        {
+          name: 'Test1',
+          onSelect: () => {
+            console.log('Test 1');
+          },
+        },
+        {
+          name: 'Test2',
+        },
+      ],
+    },
+    {
+      name: 'Restore files',
+    },
+  ],
+} as const;
+
+render(<App root={root} />);
+
+// TODO Test
+console.log(cli.flags.name);
