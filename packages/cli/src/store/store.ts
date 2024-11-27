@@ -1,7 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-export const store = configureStore({
-  reducer: {},
+import cursorReducer from './cursor.slice.js';
+
+const store = configureStore({
+  reducer: {
+    cursor: cursorReducer,
+  },
 });
 
 export default store;
