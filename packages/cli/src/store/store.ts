@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import cursorReducer from './cursor.slice.js';
+import pageReducer from './page.slice.js';
 
 const store = configureStore({
   reducer: {
+    page: pageReducer,
     cursor: cursorReducer,
   },
 });

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const cursorSlice = createSlice({
   name: 'cursor',
@@ -21,12 +21,12 @@ export const cursorSlice = createSlice({
         state.value = 0;
       }
     },
-    setMax: (state, action) => {
+    setLast: (state, action: PayloadAction<number>) => {
       state.last = action.payload;
     },
   },
 });
 
-export const { moveUp, moveDown, setMax } = cursorSlice.actions;
+export const { moveUp, moveDown, setLast } = cursorSlice.actions;
 
 export default cursorSlice.reducer;

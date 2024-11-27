@@ -1,11 +1,12 @@
-import { Box, Text, useInput } from 'ink';
+import { Box, useInput } from 'ink';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import Action from '../shared/action.js';
-import Breadcrumbs from '../shared/breadcrumbs.js';
-import Hint from '../shared/hint.js';
-import { moveDown, moveUp, setMax } from '../store/cursor.slice.js';
+import Action from '../shared/components/action.js';
+import Breadcrumbs from '../shared/components/breadcrumbs.js';
+import Hint from '../shared/components/hint.js';
+import Title from '../shared/components/title.js';
+import { moveDown, moveUp, setLast } from '../store/cursor.slice.js';
 
 export default function MainMenu() {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ export default function MainMenu() {
   });
 
   useEffect(() => {
-    dispatch(setMax(3));
+    dispatch(setLast(2));
   });
 
   return (
@@ -31,16 +32,13 @@ export default function MainMenu() {
       rowGap={1}
       width={80}
       minHeight={30}>
-      <Text>
-        🍵 Teacup Backup <Text color='gray'>(v0.5.3)</Text>
-      </Text>
+      <Title></Title>
       <Hint></Hint>
       <Breadcrumbs items={['Main menu']}></Breadcrumbs>
       <Box flexDirection='column'>
-        <Action index={0}>Test 0</Action>
-        <Action index={1}>Test 1</Action>
-        <Action index={2}>Test 2</Action>
-        <Action index={3}>Test 3</Action>
+        <Action index={0}>Backup files</Action>
+        <Action index={1}>Restore files</Action>
+        <Action index={2}>Exit</Action>
       </Box>
     </Box>
   );

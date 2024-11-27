@@ -2,7 +2,7 @@ import { Text } from 'ink';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { RootState } from '../store/store.js';
+import { RootState } from '../../store/store.js';
 
 interface Props {
   index: number;
