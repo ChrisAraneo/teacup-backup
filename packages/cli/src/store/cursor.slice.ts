@@ -23,10 +23,17 @@ export const cursorSlice = createSlice({
     },
     setLast: (state, action: PayloadAction<number>) => {
       state.last = action.payload;
+
+      if (state.value > action.payload) {
+        state.value = action.payload;
+      }
+    },
+    reset: (state) => {
+      state.value = 0;
     },
   },
 });
 
-export const { moveUp, moveDown, setLast } = cursorSlice.actions;
+export const { moveUp, moveDown, setLast, reset } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
