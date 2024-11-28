@@ -7,6 +7,7 @@ import Breadcrumbs from '../shared/components/breadcrumbs.js';
 import Hint from '../shared/components/hint.js';
 import Title from '../shared/components/title.js';
 import { moveDown, moveUp, setLast } from '../store/cursor.slice.js';
+import { setPage } from '../store/page.slice.js';
 
 export default function MainMenu() {
   const dispatch = useDispatch();
@@ -36,9 +37,27 @@ export default function MainMenu() {
       <Hint></Hint>
       <Breadcrumbs items={['Main menu']}></Breadcrumbs>
       <Box flexDirection='column'>
-        <Action index={0}>Backup files</Action>
-        <Action index={1}>Restore files</Action>
-        <Action index={2}>Exit</Action>
+        <Action
+          index={0}
+          onSelect={() => {
+            dispatch(setPage('backup'));
+          }}>
+          Backup files
+        </Action>
+        <Action
+          index={1}
+          onSelect={() => {
+            console.log('TODO');
+          }}>
+          Restore files
+        </Action>
+        <Action
+          index={2}
+          onSelect={() => {
+            process.exit(0);
+          }}>
+          Exit
+        </Action>
       </Box>
     </Box>
   );
