@@ -6,7 +6,7 @@ import Action from '../shared/components/action.js';
 import Breadcrumbs from '../shared/components/breadcrumbs.js';
 import Hint from '../shared/components/hint.js';
 import Title from '../shared/components/title.js';
-import { moveDown, moveUp, setLast } from '../store/cursor.slice.js';
+import { moveDown, moveUp, reset, setLast } from '../store/cursor.slice.js';
 import { setPage } from '../store/page.slice.js';
 
 export default function MainMenu() {
@@ -22,6 +22,7 @@ export default function MainMenu() {
 
   useEffect(() => {
     dispatch(setLast(2));
+    dispatch(reset());
   });
 
   return (
@@ -34,8 +35,8 @@ export default function MainMenu() {
       width={80}
       minHeight={30}>
       <Title></Title>
-      <Hint></Hint>
       <Breadcrumbs items={['Main menu']}></Breadcrumbs>
+      <Hint></Hint>
       <Box flexDirection='column'>
         <Action
           index={0}
