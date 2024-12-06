@@ -1,6 +1,4 @@
 export class IntervalFormatter {
-  constructor() {}
-
   format(intervalInMs: number): string {
     const millis = intervalInMs % 1000;
     const secs = Math.floor((intervalInMs / 1000) % 60);

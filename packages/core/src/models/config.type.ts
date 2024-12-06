@@ -1,10 +1,12 @@
+import { LogLevel } from './log-level.type';
+
 export interface Config {
   roots: string[];
   files: string[];
   mode: 'backup' | 'restore';
   backupDirectory: string;
   interval: number;
-  'log-level': string;
+  'log-level': LogLevel;
   ftp?: FtpConfig;
 }
 

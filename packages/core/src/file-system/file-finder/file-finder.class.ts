@@ -28,7 +28,7 @@ export class FileFinder {
             pattern: _pattern,
             root,
             result: [],
-            message: `Root doesn\'t exist: ${root}`,
+            message: `Root doesn't exist: ${root}`,
           }),
         );
         subscriber.complete();

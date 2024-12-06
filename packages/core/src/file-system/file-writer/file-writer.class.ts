@@ -3,7 +3,7 @@ import { forkJoin, map, Observable } from 'rxjs';
 import { File } from '../../models/file.class';
 import { FileSystem } from '../file-system/file-system.class';
 
-export abstract class FileWriter<T extends File<any>> {
+export abstract class FileWriter<T extends File<string>> {
   constructor(
     protected fileSystem: FileSystem,
     protected encoding: BufferEncoding,
@@ -29,7 +29,9 @@ export abstract class FileWriter<T extends File<any>> {
 
   writeFiles(files: T[]): Observable<void> {
     return forkJoin(files.map((file) => this.writeFile(file))).pipe(
-      map(() => {}),
+      map(() => {
+        return;
+      }),
     );
   }
 }

@@ -1,3 +1,4 @@
+import { PathOrFileDescriptor } from 'fs';
 import { firstValueFrom } from 'rxjs';
 
 import { CurrentDirectory } from '../current-directory/current-directory.class';
@@ -122,11 +123,16 @@ describe('ConfigLoader', () => {
 
 class RestoreModeFileSystemMock extends FileSystemMock {
   readFile(
-    _path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
-    super.readFile(_path, _options, (error: unknown, data: any) => {
+    super.readFile(path, options, (error: unknown, data: string) => {
       callback(
         null,
         JSON.stringify({
@@ -146,9 +152,14 @@ class CurrentDirectoryMock extends CurrentDirectory {
 
 class InvalidConfigFileSystemMock extends FileSystemMock {
   readFile(
-    _path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
     callback(null, `{"interval": null}`);
   }
@@ -156,22 +167,32 @@ class InvalidConfigFileSystemMock extends FileSystemMock {
 
 class InvalidModeFileSystemMock extends FileSystemMock {
   readFile(
-    _path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
     callback(
       null,
-      `{"backupDirectory":".\/backups","files":["index.ts"],"ftp":{"directory":"teacup-backup\/","enabled":true,"host":"192.168.50.1","password":"Qwerty123\/","user":"user"},"interval":3600,"log-level":"debug","mode":"invalid","roots":["root"]}`,
+      `{"backupDirectory":"./backups","files":["index.ts"],"ftp":{"directory":"teacup-backup/","enabled":true,"host":"192.168.50.1","password":"Qwerty123/","user":"user"},"interval":3600,"log-level":"debug","mode":"invalid","roots":["root"]}`,
     );
   }
 }
 
 class InvalidJsonFileSystemMock extends FileSystemMock {
   readFile(
-    _path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
     callback(null, `Hello World!`);
   }
@@ -179,9 +200,14 @@ class InvalidJsonFileSystemMock extends FileSystemMock {
 
 class EmptyConfigFileSystemMock extends FileSystemMock {
   readFile(
-    _path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
     callback(null, undefined);
   }

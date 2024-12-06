@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { lastValueFrom } from 'rxjs';
 
 import { FileSystem } from '../file-system/file-system.class';

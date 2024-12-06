@@ -1,5 +1,11 @@
 import { AsyncFindStream } from 'find';
-import { MakeDirectoryOptions, PathLike } from 'fs';
+import {
+  MakeDirectoryOptions,
+  PathLike,
+  PathOrFileDescriptor,
+  Stats,
+} from 'fs';
+import { isString } from 'lodash';
 
 import { FileSystem } from './file-system.class';
 
@@ -16,7 +22,10 @@ export class FileSystemMock extends FileSystem {
     return !path.toString().includes('notExistingDir');
   }
 
-  stat(path: string, callback: (error: any, data?: any) => any): void {
+  stat(
+    path: string,
+    callback: (err: NodeJS.ErrnoException | null, stats: Stats) => void,
+  ): void {
     if (
       this.isCorrectTextFile(path) ||
       this.isCorrectEncryptedFile(path) ||
@@ -24,10 +33,10 @@ export class FileSystemMock extends FileSystem {
       this.isCorrectConfigFile(path)
     ) {
       callback(null, {
-        mtime: '2023-10-27T21:33:39.661Z',
-      });
+        mtime: new Date('2023-10-27T21:33:39.661Z'),
+      } as unknown as Stats);
     } else {
-      callback('Error');
+      callback('Error' as unknown as NodeJS.ErrnoException, {} as Stats);
     }
   }
 
@@ -42,9 +51,14 @@ export class FileSystemMock extends FileSystem {
   }
 
   readFile(
-    path: string,
-    _options,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
     if (this.isCorrectTextFile(path)) {
       callback(null, 'Hello World!');
@@ -56,12 +70,12 @@ export class FileSystemMock extends FileSystem {
     } else if (this.isCorrectConfigFile(path)) {
       callback(
         null,
-        `{"backupDirectory":".\/backups","files":["index.ts"],"ftp":{"directory":"teacup-backup\/","enabled":true,"host":"192.168.50.1","password":"Qwerty123\/","user":"user"},"interval":3600,"log-level":"debug","mode":"backup","roots":["root"]}`,
+        `{"backupDirectory":"./backups","files":["index.ts"],"ftp":{"directory":"teacup-backup/","enabled":true,"host":"192.168.50.1","password":"Qwerty123/","user":"user"},"interval":3600,"log-level":"debug","mode":"backup","roots":["root"]}`,
       );
     } else if (this.isCorrectJsonFile(path)) {
       callback(null, '{"name":"Joel"}');
     } else {
-      callback('Error');
+      callback('Error' as unknown as NodeJS.ErrnoException, '');
     }
   }
 
@@ -99,13 +113,21 @@ export class FileSystemMock extends FileSystem {
     ]);
   }
 
-  private isCorrectTextFile(path: string): boolean {
+  private isCorrectTextFile(path: PathOrFileDescriptor): boolean {
+    if (!isString(path)) {
+      return false;
+    }
+
     return ['test.txt', 'test2.txt', 'test3.txt', 'no-extension'].includes(
       path,
     );
   }
 
-  private isCorrectEncryptedFile(path: string): boolean {
+  private isCorrectEncryptedFile(path: PathOrFileDescriptor): boolean {
+    if (!isString(path)) {
+      return false;
+    }
+
     return [
       'test.mbe',
       'directory/test.mbe',
@@ -114,7 +136,11 @@ export class FileSystemMock extends FileSystem {
     ].includes(path);
   }
 
-  private isCorrectJsonFile(path: string): boolean {
+  private isCorrectJsonFile(path: PathOrFileDescriptor): boolean {
+    if (!isString(path)) {
+      return false;
+    }
+
     return [
       'test.json',
       '/test.json/i',
@@ -128,7 +154,11 @@ export class FileSystemMock extends FileSystem {
     ].includes(path);
   }
 
-  private isCorrectConfigFile(path: string): boolean {
+  private isCorrectConfigFile(path: PathOrFileDescriptor): boolean {
+    if (!isString(path)) {
+      return false;
+    }
+
     return path.includes('config.json');
   }
 }

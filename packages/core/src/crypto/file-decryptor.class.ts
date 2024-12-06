@@ -4,6 +4,7 @@ import CryptoAES from 'crypto-js/aes';
 import { Base64File } from '../models/base64-file.class';
 import { EncryptedFile } from '../models/encrypted-file.class';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class FileDecryptor {
   static decryptBase64Files(
     files: EncryptedFile[],

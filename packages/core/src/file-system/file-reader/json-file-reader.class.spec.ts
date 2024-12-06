@@ -1,3 +1,4 @@
+import { PathOrFileDescriptor, Stats } from 'fs';
 import { lastValueFrom } from 'rxjs';
 
 import { FileSystem } from '../file-system/file-system.class';
@@ -62,16 +63,27 @@ describe('JsonFileReader', () => {
 
 class ReadFileErrorMock extends FileSystemMock {
   readFile(
-    path: string,
-    _options: any,
-    callback: (error: any, data?: any) => any,
+    path: PathOrFileDescriptor,
+    options:
+      | ({
+          encoding: BufferEncoding;
+          flag?: string | undefined;
+        } & unknown)
+      | BufferEncoding,
+    callback: (err: NodeJS.ErrnoException | null, data: string) => void,
   ): void {
-    callback('error');
+    callback('error' as unknown as NodeJS.ErrnoException, '');
   }
 }
 
 class StatErrorMock extends FileSystemMock {
-  stat(path: string, callback: (error: any, data?: any) => any): void {
-    callback('error');
+  stat(
+    path: string,
+    callback: (err: NodeJS.ErrnoException | null, stats: Stats) => void,
+  ): void {
+    callback(
+      'error' as unknown as NodeJS.ErrnoException,
+      {} as unknown as Stats,
+    );
   }
 }

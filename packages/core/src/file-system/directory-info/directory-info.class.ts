@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 import { Observable } from 'rxjs';
 
 import { FileSystem } from '../file-system/file-system.class';

@@ -4,39 +4,45 @@ import {
   Logger as WinstonLogger,
   transports,
 } from 'winston';
+
+import { LogLevel } from '../models/log-level.type';
 const { combine, timestamp, printf, colorize, prettyPrint, simple } = format;
 
 // Stryker disable all
+
+type Meta = object | string | unknown;
 
 export class Logger {
   private logger: WinstonLogger;
 
   constructor(
-    private logLevel = 'info',
+    private logLevel: LogLevel = 'info',
     private areWarningsIgnored = true,
   ) {
-    this.areWarningsIgnored && this.ignoreWarnings();
+    if (this.areWarningsIgnored) {
+      this.ignoreWarnings();
+    }
 
     this.initialize();
   }
 
-  debug(message: string, ...meta: any[]): void {
+  debug(message: string, ...meta: Meta[]): void {
     this.logger.debug(message, ...meta);
   }
 
-  info(message: string, ...meta: any[]): void {
+  info(message: string, ...meta: Meta[]): void {
     this.logger.info(message, ...meta);
   }
 
-  warn(message: string, ...meta: any[]): void {
+  warn(message: string, ...meta: Meta[]): void {
     this.logger.warn(message, ...meta);
   }
 
-  error(message: string, ...meta: any[]): void {
+  error(message: string, ...meta: Meta[]): void {
     this.logger.error(message, ...meta);
   }
 
-  setLogLevel(logLevel = 'info'): void {
+  setLogLevel(logLevel: LogLevel = 'info'): void {
     this.logLevel = logLevel;
     this.initialize();
   }
@@ -68,6 +74,8 @@ export class Logger {
   }
 
   private ignoreWarnings(): void {
-    console.warn = (): undefined => {};
+    console.warn = (): undefined => {
+      return;
+    };
   }
 }
