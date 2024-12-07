@@ -10,7 +10,9 @@ import { ReadFileError } from './read-file-error.type';
 import { ReadFileResult } from './read-file-result.type';
 import { ReadFileResultStatus } from './read-file-result-status.enum';
 
-export abstract class FileReader<T extends File<string> | ReadFileError> {
+export abstract class FileReader<
+  T extends File<string | object> | ReadFileError,
+> {
   constructor(protected fileSystem: FileSystem) {}
 
   readFiles(paths: string[]): Observable<T[]> {
