@@ -27,6 +27,7 @@ export * from './models/config.type';
 export * from './models/encrypted-file.class';
 export * from './models/file.class';
 export * from './models/json-file.class';
+export * from './models/log-level.type';
 export * from './models/text-file.class';
 export * from './teacup-backup';
 export * from './utils/interval-formatter.class';
