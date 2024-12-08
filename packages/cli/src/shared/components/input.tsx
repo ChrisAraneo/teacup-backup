@@ -12,25 +12,38 @@ interface Props {
 
 export default function Input({ index, value, onChange }: Props) {
   const [text, setText] = useState<string>(value);
+  const [inputCursor, setInputCursor] = useState<number>(0);
   const [active, setActive] = useState<boolean>(false);
+
   const cursor = useSelector<RootState>((state) => state.cursor.value);
 
   useInput((char, key) => {
-    if (cursor !== index && active) {
-      setActive(false);
+    if (key.return && cursor === index && !active) {
+      setActive(true);
       return;
-    } else if (cursor !== index) {
+    } else if (!active) {
       return;
     }
 
-    if (key.return) {
-      setActive(!active);
-    } else if (key.downArrow || key.upArrow || key.escape) {
+    if (key.return || key.upArrow || key.downArrow || key.escape) {
       setActive(false);
-    } else if (key.backspace) {
-      setText(text.slice(0, text.length - 2));
-    } else {
-      setText(text + char);
+      return;
+    }
+
+    if (key.rightArrow) {
+      setInputCursor(
+        inputCursor >= text.length ? text.length : inputCursor + 1,
+      );
+    } else if (key.leftArrow) {
+      setInputCursor(inputCursor > 0 ? inputCursor - 1 : 0);
+    } else if (key.backspace && active) {
+      setText(text.slice(0, inputCursor - 1) + text.slice(inputCursor));
+      setInputCursor(inputCursor > 0 ? inputCursor - 1 : 0);
+    } else if (key.delete && active) {
+      setText(text.slice(0, inputCursor) + text.slice(inputCursor + 1));
+    } else if (active) {
+      setText(text.slice(0, inputCursor) + char + text.slice(inputCursor));
+      setInputCursor(inputCursor + 1);
     }
   });
 
@@ -42,11 +55,25 @@ export default function Input({ index, value, onChange }: Props) {
     <Text
       color={active ? 'yellow' : cursor === index ? '' : 'white'}
       backgroundColor={cursor === index && !active ? 'white' : ''}>
-      {text.length > 0
-        ? text
-        : cursor === index && !active
-          ? 'Enter to write value'
-          : ''}
+      {text.split('').map((char, i) => {
+        if (i !== inputCursor) {
+          return <Text key={char + i}>{char}</Text>;
+        } else if (active) {
+          return (
+            <Text key={char + i} inverse>
+              {char}
+            </Text>
+          );
+        } else {
+          return <></>;
+        }
+      })}
+      {cursor === index && active && inputCursor >= text.length && (
+        <Text inverse> </Text>
+      )}
+      {text.length === 0 && cursor === index && !active
+        ? 'Enter to write value'
+        : ''}
     </Text>
   );
 }
