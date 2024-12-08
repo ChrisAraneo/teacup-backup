@@ -4,7 +4,6 @@
   "main": "dist/index.js",
   "description": "Teacup Backup is a simple Node.js script that finds, encrypts and creates backup of selected files.",
   "scripts": {
-    "start": "npm run build && node dist/index.js",
     "lint": "eslint \"src/**/*.{ts,json,js,mjs}\" \"*{.js,.mjs,.json,.ts}\" --fix",
     "format": "prettier --write \"**/*.{ts,json,js,mjs}\"",
     "chores": "npm run lint && npm run format",
