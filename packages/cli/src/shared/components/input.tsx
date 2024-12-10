@@ -51,29 +51,26 @@ export default function Input({ index, value, onChange }: Props) {
     onChange(text);
   }, [text]);
 
-  return (
-    <Text
-      color={active ? 'yellow' : cursor === index ? '' : 'white'}
-      backgroundColor={cursor === index && !active ? 'white' : ''}>
-      {text.split('').map((char, i) => {
-        if (i !== inputCursor) {
-          return <Text key={char + i}>{char}</Text>;
-        } else if (active) {
-          return (
-            <Text key={char + i} inverse>
-              {char}
-            </Text>
-          );
-        } else {
-          return <></>;
-        }
-      })}
-      {cursor === index && active && inputCursor >= text.length && (
-        <Text inverse> </Text>
-      )}
-      {text.length === 0 && cursor === index && !active
-        ? 'Enter to write value'
-        : ''}
-    </Text>
-  );
+  if (active) {
+    return (
+      <Text color={'yellow'}>
+        {text.split('').map((char, i) => (
+          <Text key={char + i} inverse={i === inputCursor}>
+            {char}
+          </Text>
+        ))}
+        {cursor === index && inputCursor >= text.length && (
+          <Text inverse> </Text>
+        )}
+      </Text>
+    );
+  } else {
+    return (
+      <Text
+        color={cursor === index ? '' : 'white'}
+        backgroundColor={cursor === index ? 'white' : ''}>
+        {text.length === 0 && cursor === index ? 'Enter to write value' : text}
+      </Text>
+    );
+  }
 }
