@@ -37,7 +37,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "@stryker-mutator/jest-runner": "^8.6.0",
-    "@stryker-mutator/typescript-checker": "^8.6.0"
+    "@stryker-mutator/jest-runner": "^8.7.1",
+    "@stryker-mutator/typescript-checker": "^8.7.1"
   }
 }
