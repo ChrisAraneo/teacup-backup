@@ -1,1 +1,1 @@
-export type Page = 'main-menu' | 'backup';
+export type Page = 'main-menu' | 'backup' | 'backup/edit-files';
