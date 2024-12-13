@@ -22,8 +22,21 @@ export const cursorSlice = createSlice({
     setBackupDirectory: (state, action: PayloadAction<string>) => {
       state.backupDirectory = action.payload;
     },
+    // TODO Remove setFiles
     setFiles: (state, action: PayloadAction<string[]>) => {
       state.files = action.payload;
+    },
+    addFile: (state, action: PayloadAction<string>) => {
+      state.files = [...state.files, action.payload];
+    },
+    updateFile: (
+      state,
+      action: PayloadAction<{ index: number; file: string }>,
+    ) => {
+      const files = [...state.files];
+      files[action.payload.index] = action.payload.file;
+
+      state.files = files;
     },
     setInterval: (state, action: PayloadAction<number>) => {
       state.interval = action.payload;
@@ -42,7 +55,9 @@ export const cursorSlice = createSlice({
 
 export const {
   setBackupDirectory,
-  setFiles,
+  setFiles, // TODO Remove
+  addFile,
+  updateFile,
   setInterval,
   setLogLevel,
   setRoots,
