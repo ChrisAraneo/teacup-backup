@@ -22,10 +22,6 @@ export const cursorSlice = createSlice({
     setBackupDirectory: (state, action: PayloadAction<string>) => {
       state.backupDirectory = action.payload;
     },
-    // TODO Remove setFiles
-    setFiles: (state, action: PayloadAction<string[]>) => {
-      state.files = action.payload;
-    },
     addFile: (state, action: PayloadAction<string>) => {
       state.files = [...state.files, action.payload];
     },
@@ -44,8 +40,17 @@ export const cursorSlice = createSlice({
     setLogLevel: (state, action: PayloadAction<LogLevel>) => {
       state['log-level'] = action.payload;
     },
-    setRoots: (state, action: PayloadAction<string[]>) => {
-      state.roots = action.payload;
+    addRoot: (state, action: PayloadAction<string>) => {
+      state.roots = [...state.roots, action.payload];
+    },
+    updateRoot: (
+      state,
+      action: PayloadAction<{ index: number; root: string }>,
+    ) => {
+      const roots = [...state.roots];
+      roots[action.payload.index] = action.payload.root;
+
+      state.files = roots;
     },
     setMode: (state, action: PayloadAction<'backup' | 'restore'>) => {
       state.mode = action.payload;
@@ -55,12 +60,12 @@ export const cursorSlice = createSlice({
 
 export const {
   setBackupDirectory,
-  setFiles, // TODO Remove
   addFile,
   updateFile,
   setInterval,
   setLogLevel,
-  setRoots,
+  addRoot,
+  updateRoot,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
