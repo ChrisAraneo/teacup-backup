@@ -22,7 +22,6 @@ export default function MainMenu() {
 
   useEffect(() => {
     dispatch(setLast(2));
-    dispatch(reset());
   });
 
   return (
@@ -42,6 +41,7 @@ export default function MainMenu() {
           index={0}
           onSelect={() => {
             dispatch(setPage('backup'));
+            dispatch(reset());
           }}>
           Backup files
         </Action>
