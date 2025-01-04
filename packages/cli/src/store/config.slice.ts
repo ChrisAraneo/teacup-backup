@@ -50,7 +50,7 @@ export const cursorSlice = createSlice({
       const roots = [...state.roots];
       roots[action.payload.index] = action.payload.root;
 
-      state.files = roots;
+      state.roots = roots;
     },
     setMode: (state, action: PayloadAction<'backup' | 'restore'>) => {
       state.mode = action.payload;
