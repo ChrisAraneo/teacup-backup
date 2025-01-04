@@ -1,4 +1,5 @@
-import { Logger } from '../../utils/logger.class';
+import { Logger } from '@chris.araneo/logger';
+
 import { FileSystem } from '../file-system/file-system.class';
 import { CREATE_DIRECTORY_ERROR_MESSAGE } from './directory-creator.consts';
 

@@ -1,3 +1,4 @@
+import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import Prompt from 'prompt-sync';
@@ -26,7 +27,6 @@ import { Base64File } from './models/base64-file.class';
 import { Config } from './models/config.type';
 import { EncryptedFile } from './models/encrypted-file.class';
 import { TextFile } from './models/text-file.class';
-import { Logger } from './utils/logger.class';
 
 // Stryker disable all
 

@@ -1,6 +1,6 @@
+import { Logger } from '@chris.araneo/logger';
 import { MakeDirectoryOptions, PathLike } from 'fs';
 
-import { Logger } from '../../utils/logger.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
 import { DirectoryCreator } from './directory-creator.class';

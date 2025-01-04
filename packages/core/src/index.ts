@@ -31,4 +31,3 @@ export * from './models/log-level.type';
 export * from './models/text-file.class';
 export * from './teacup-backup';
 export * from './utils/interval-formatter.class';
-export * from './utils/logger.class';
