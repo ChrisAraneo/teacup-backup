@@ -1,4 +1,16 @@
-import { CurrentDirectory } from '@chris.araneo/file-system';
+import { EncryptedFile, FileDecryptor } from '@chris.araneo/crypto';
+import {
+  Base64File,
+  Base64FileReader,
+  Base64FileWriter,
+  CurrentDirectory,
+  DirectoryCreator,
+  DirectoryInfo,
+  FileFinder,
+  FileSystem,
+  TextFile,
+} from '@chris.araneo/file-system';
+import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
@@ -15,18 +27,7 @@ import {
   tap,
 } from 'rxjs';
 
-import { FileDecryptor } from './crypto/file-decryptor.class';
-import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';
-import { DirectoryInfo } from './file-system/directory-info/directory-info.class';
-import { FileFinder } from './file-system/file-finder/file-finder.class';
-import { Base64FileReader } from './file-system/file-reader/base64-file-reader.class';
-import { FileSystem } from './file-system/file-system/file-system.class';
-import { Base64FileWriter } from './file-system/file-writer/base64-file-writer.class';
-import { FtpClient } from './ftp/ftp-client.class';
-import { Base64File } from './models/base64-file.class';
 import { Config } from './models/config.type';
-import { EncryptedFile } from './models/encrypted-file.class';
-import { TextFile } from './models/text-file.class';
 
 // Stryker disable all
 
