@@ -3,7 +3,6 @@ export * from './crypto/file-decryptor.class';
 export * from './crypto/file-encryptor.class';
 export * from './file-system/config-loader/config-loader.class';
 export * from './file-system/config-loader/config-loader.consts';
-export * from './file-system/current-directory/current-directory.class';
 export * from './file-system/directory-creator/directory-creator.class';
 export * from './file-system/directory-creator/directory-creator.consts';
 export * from './file-system/directory-info/directory-info.class';
