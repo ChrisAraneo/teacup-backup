@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/ChrisAraneo/teacup-backup#readme",
   "dependencies": {
+    "@chris.araneo/file-system": "^0.0.2",
     "@chris.araneo/logger": "^0.0.2",
     "basic-ftp": "^5.0.5",
     "crypto-js": "^4.2.0",

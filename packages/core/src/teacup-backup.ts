@@ -1,3 +1,4 @@
+import { CurrentDirectory } from '@chris.araneo/file-system';
 import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
@@ -15,7 +16,6 @@ import {
 } from 'rxjs';
 
 import { FileDecryptor } from './crypto/file-decryptor.class';
-import { CurrentDirectory } from './file-system/current-directory/current-directory.class';
 import { DirectoryCreator } from './file-system/directory-creator/directory-creator.class';
 import { DirectoryInfo } from './file-system/directory-info/directory-info.class';
 import { FileFinder } from './file-system/file-finder/file-finder.class';

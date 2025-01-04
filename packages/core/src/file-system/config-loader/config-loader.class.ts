@@ -1,10 +1,10 @@
+import { CurrentDirectory } from '@chris.araneo/file-system';
 import { includes, isArray, isBoolean, isNumber, isString } from 'lodash';
 import Path from 'path';
 import { map, Observable } from 'rxjs';
 
 import { Config, FtpConfig } from '../../models/config.type';
 import { JsonFile } from '../../models/json-file.class';
-import { CurrentDirectory } from '../current-directory/current-directory.class';
 import { JsonFileReader } from '../file-reader/json-file-reader.class';
 import { FileSystem } from '../file-system/file-system.class';
 import {

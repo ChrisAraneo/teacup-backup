@@ -1,7 +1,7 @@
+import { CurrentDirectory } from '@chris.araneo/file-system';
 import { PathOrFileDescriptor } from 'fs';
 import { firstValueFrom } from 'rxjs';
 
-import { CurrentDirectory } from '../current-directory/current-directory.class';
 import { FileSystem } from '../file-system/file-system.class';
 import { FileSystemMock } from '../file-system/file-system.mock.class';
 import { ConfigLoader } from './config-loader.class';
