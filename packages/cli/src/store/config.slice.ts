@@ -52,6 +52,19 @@ export const cursorSlice = createSlice({
 
       state.roots = roots;
     },
+    setFtpEnabled: (state, action: PayloadAction<boolean>) => {
+      if (state.ftp) {
+        state.ftp.enabled = action.payload;
+      } else if (action.payload) {
+        state.ftp = {
+          enabled: action.payload,
+          directory: '',
+          host: '',
+          password: '',
+          user: '',
+        };
+      }
+    },
     setMode: (state, action: PayloadAction<'backup' | 'restore'>) => {
       state.mode = action.payload;
     },
@@ -66,6 +79,7 @@ export const {
   setLogLevel,
   addRoot,
   updateRoot,
+  setFtpEnabled,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
