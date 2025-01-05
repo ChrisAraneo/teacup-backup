@@ -1,14 +1,34 @@
 import { Box, Text, useInput } from 'ink';
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Action from '../shared/components/action.js';
 import Breadcrumbs from '../shared/components/breadcrumbs.js';
+import CheckBox from '../shared/components/checkbox.js';
+import NumberInput from '../shared/components/number-input.js';
 import Title from '../shared/components/title.js';
+import { setInterval } from '../store/config.slice.js';
 import { moveDown, moveUp, reset, setLast } from '../store/cursor.slice.js';
 import { setPage } from '../store/page.slice.js';
+import { RootState } from '../store/store.js';
 
 export default function Backup() {
+  const cursor = useSelector<RootState>(
+    (state) => state.cursor.value,
+  ) as number;
+  const files = useSelector<RootState>(
+    (state) => state.config.files,
+  ) as string[];
+  const roots = useSelector<RootState>(
+    (state) => state.config.roots,
+  ) as string[];
+  const ftpEnabled = useSelector<RootState>(
+    (state) => state.config.ftp?.enabled,
+  ) as boolean;
+  const interval = useSelector<RootState>(
+    (state) => state.config.interval,
+  ) as number;
+
   const dispatch = useDispatch();
 
   useInput((_, key) => {
@@ -21,7 +41,6 @@ export default function Backup() {
 
   useEffect(() => {
     dispatch(setLast(8));
-    dispatch(reset());
   });
 
   return (
@@ -35,26 +54,35 @@ export default function Backup() {
       minHeight={30}>
       <Title></Title>
       <Breadcrumbs items={['Main menu', 'Backup']}></Breadcrumbs>
-      <Text color={'white'}>Configuration</Text>
       <Box flexDirection='column' rowGap={0}>
         <Text color={'grey'}>
-          Files to backup:{' '}
+          {'Files to backup: '}
           <Action
             index={0}
             onSelect={() => {
-              console.log('TODO');
+              dispatch(setPage('backup/edit-files'));
+              reset();
             }}>
-            Test 1
+            {files.length
+              ? files.join(', ')
+              : cursor === 0
+                ? 'Enter to add files'
+                : ''}
           </Action>
         </Text>
         <Text color={'grey'}>
-          Discs to search:{' '}
+          {'Discs to search: '}
           <Action
             index={1}
             onSelect={() => {
-              console.log('TODO');
+              dispatch(setPage('backup/edit-roots'));
+              reset();
             }}>
-            Test 1
+            {roots.length
+              ? roots.join(', ')
+              : cursor === 1
+                ? 'Enter to add discs'
+                : ''}
           </Action>
         </Text>
         <Text color={'grey'}>
@@ -69,23 +97,21 @@ export default function Backup() {
         </Text>
         <Text color={'grey'}>
           FTP upload:{' '}
-          <Action
+          <CheckBox
             index={3}
-            onSelect={() => {
-              console.log('TODO');
-            }}>
-            Test 1
-          </Action>
+            value={ftpEnabled}
+            onChange={(v) => {
+              console.log(v);
+            }}></CheckBox>
         </Text>
         <Text color={'grey'}>
           Interval:{' '}
-          <Action
+          <NumberInput
             index={4}
-            onSelect={() => {
-              console.log('TODO');
-            }}>
-            Test 1
-          </Action>
+            value={interval}
+            onChange={(value) => {
+              dispatch(setInterval(value));
+            }}></NumberInput>
         </Text>
         <Text color={'grey'}>
           Log level:{' '}
@@ -117,6 +143,7 @@ export default function Backup() {
           index={8}
           onSelect={() => {
             dispatch(setPage('main-menu'));
+            dispatch(reset());
           }}>
           Back
         </Action>

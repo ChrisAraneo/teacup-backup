@@ -1,0 +1,80 @@
+import { Box, Text, useInput } from 'ink';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import Action from '../../shared/components/action.js';
+import Breadcrumbs from '../../shared/components/breadcrumbs.js';
+import Input from '../../shared/components/input.js';
+import Title from '../../shared/components/title.js';
+import { addRoot, updateRoot } from '../../store/config.slice.js';
+import { moveDown, moveUp, reset, setLast } from '../../store/cursor.slice.js';
+import { setPage } from '../../store/page.slice.js';
+import { RootState } from '../../store/store.js';
+
+export default function EditRoots() {
+  const roots = useSelector<RootState>(
+    (state) => state.config.roots,
+  ) as string[];
+
+  const dispatch = useDispatch();
+
+  useInput((_, key) => {
+    if (key.upArrow) {
+      dispatch(moveUp());
+    } else if (key.downArrow) {
+      dispatch(moveDown());
+    }
+  });
+
+  return (
+    <Box
+      borderStyle={'single'}
+      borderColor={'gray'}
+      padding={1}
+      flexDirection='column'
+      rowGap={1}
+      width={80}
+      minHeight={30}>
+      <Title></Title>
+      <Breadcrumbs
+        items={['Main menu', 'Backup', 'Edit discs to search']}></Breadcrumbs>
+      {roots.length ? (
+        <Box flexDirection='column' rowGap={0}>
+          {roots.map((file: string, index: number) => {
+            return (
+              <Text key={index}>
+                <Text color={'gray'}>{'• '}</Text>
+                <Input
+                  index={index}
+                  value={file}
+                  onChange={(root) => {
+                    dispatch(updateRoot({ index, root }));
+                  }}></Input>
+              </Text>
+            );
+          })}
+        </Box>
+      ) : (
+        <></>
+      )}
+      <Box flexDirection='column'>
+        <Action
+          index={roots.length}
+          onSelect={() => {
+            dispatch(addRoot(''));
+            dispatch(setLast(roots.length + 2));
+          }}>
+          + Add disc
+        </Action>
+        <Action
+          index={roots.length + 1}
+          onSelect={() => {
+            dispatch(setPage('backup'));
+            dispatch(reset());
+          }}>
+          Back
+        </Action>
+      </Box>
+    </Box>
+  );
+}
