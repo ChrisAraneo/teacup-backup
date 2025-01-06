@@ -7,7 +7,7 @@ export interface Config {
   backupDirectory: string;
   interval: number;
   'log-level': LogLevel;
-  ftp?: FtpConfig;
+  ftp: FtpConfig;
 }
 
 export interface FtpConfig {
