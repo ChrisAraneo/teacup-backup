@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
+import Backup from './backup/backup.js';
 import EditFiles from './backup/edit-files/edit-files.js';
 import EditRoots from './backup/edit-roots/edit-roots.js';
 import SelectLogLevel from './backup/select-log-level/select-log-level.js';
@@ -15,7 +16,7 @@ export default function App() {
       return <MainMenu></MainMenu>;
     }
     case 'backup': {
-      return <MainMenu></MainMenu>;
+      return <Backup></Backup>;
     }
     case 'backup/edit-files': {
       return <EditFiles></EditFiles>;
