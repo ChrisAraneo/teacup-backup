@@ -1,4 +1,4 @@
-import { FtpConfig } from '@teacup-backup/core';
+import { FtpConfig, LogLevel } from '@teacup-backup/core';
 import { Box, Text, useInput } from 'ink';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import CheckBox from '../shared/components/checkbox.js';
 import Input from '../shared/components/input.js';
 import NumberInput from '../shared/components/number-input.js';
 import Title from '../shared/components/title.js';
+import { capitalize } from '../shared/functions/capitalize.js';
 import {
   setBackupDirectory,
   setFtpDirectory,
@@ -39,6 +40,9 @@ export default function Backup() {
   const interval = useSelector<RootState>(
     (state) => state.config.interval,
   ) as number;
+  const logLevel = useSelector<RootState>(
+    (state) => state.config['log-level'],
+  ) as LogLevel;
 
   const dispatch = useDispatch();
 
@@ -171,9 +175,10 @@ export default function Backup() {
           <Action
             index={ftp.enabled ? 9 : 5}
             onSelect={() => {
-              console.log('TODO');
+              dispatch(setPage('backup/select-log-level'));
+              dispatch(reset());
             }}>
-            Test 1
+            {capitalize(logLevel)}
           </Action>
         </Text>
       </Box>
