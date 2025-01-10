@@ -1,3 +1,4 @@
+import { FtpConfig } from '@teacup-backup/core';
 import { Box, Text, useInput } from 'ink';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -5,9 +6,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import Action from '../shared/components/action.js';
 import Breadcrumbs from '../shared/components/breadcrumbs.js';
 import CheckBox from '../shared/components/checkbox.js';
+import Input from '../shared/components/input.js';
 import NumberInput from '../shared/components/number-input.js';
 import Title from '../shared/components/title.js';
-import { setInterval } from '../store/config.slice.js';
+import {
+  setBackupDirectory,
+  setFtpDirectory,
+  setFtpEnabled,
+  setFtpHost,
+  setFtpPassword,
+  setFtpUser,
+  setInterval,
+} from '../store/config.slice.js';
 import { moveDown, moveUp, reset, setLast } from '../store/cursor.slice.js';
 import { setPage } from '../store/page.slice.js';
 import { RootState } from '../store/store.js';
@@ -22,9 +32,10 @@ export default function Backup() {
   const roots = useSelector<RootState>(
     (state) => state.config.roots,
   ) as string[];
-  const ftpEnabled = useSelector<RootState>(
-    (state) => state.config.ftp?.enabled,
-  ) as boolean;
+  const backupDirectory = useSelector<RootState>(
+    (state) => state.config.backupDirectory,
+  ) as string;
+  const ftp = useSelector<RootState>((state) => state.config.ftp) as FtpConfig;
   const interval = useSelector<RootState>(
     (state) => state.config.interval,
   ) as number;
@@ -40,7 +51,7 @@ export default function Backup() {
   });
 
   useEffect(() => {
-    dispatch(setLast(8));
+    dispatch(setLast(ftp.enabled ? 12 : 8));
   });
 
   return (
@@ -87,27 +98,69 @@ export default function Backup() {
         </Text>
         <Text color={'grey'}>
           Backup directory:{' '}
-          <Action
+          <Input
             index={2}
-            onSelect={() => {
-              console.log('TODO');
-            }}>
-            Test 1
-          </Action>
+            value={backupDirectory}
+            onChange={(value) => {
+              dispatch(setBackupDirectory(value));
+            }}></Input>
         </Text>
         <Text color={'grey'}>
           FTP upload:{' '}
           <CheckBox
             index={3}
-            value={ftpEnabled}
-            onChange={(v) => {
-              console.log(v);
+            value={ftp.enabled}
+            onChange={(enabled) => {
+              dispatch(setFtpEnabled(enabled));
+              dispatch(setLast(enabled ? 12 : 8));
             }}></CheckBox>
         </Text>
+        {ftp.enabled ? (
+          <>
+            <Text color={'grey'}>
+              {'  Address: '}
+              <Input
+                index={4}
+                value={ftp.host}
+                onChange={(value) => {
+                  dispatch(setFtpHost(value));
+                }}></Input>
+            </Text>
+            <Text color={'grey'}>
+              {'  Username: '}
+              <Input
+                index={5}
+                value={backupDirectory}
+                onChange={(value) => {
+                  dispatch(setFtpUser(value));
+                }}></Input>
+            </Text>
+            <Text color={'grey'}>
+              {'  Password: '}
+              <Input
+                index={6}
+                value={backupDirectory}
+                onChange={(value) => {
+                  dispatch(setFtpPassword(value));
+                }}></Input>
+            </Text>
+            <Text color={'grey'}>
+              {'  Directory on FTP: '}
+              <Input
+                index={7}
+                value={backupDirectory}
+                onChange={(value) => {
+                  dispatch(setFtpDirectory(value));
+                }}></Input>
+            </Text>
+          </>
+        ) : (
+          <></>
+        )}
         <Text color={'grey'}>
           Interval:{' '}
           <NumberInput
-            index={4}
+            index={ftp.enabled ? 8 : 4}
             value={interval}
             onChange={(value) => {
               dispatch(setInterval(value));
@@ -116,7 +169,7 @@ export default function Backup() {
         <Text color={'grey'}>
           Log level:{' '}
           <Action
-            index={5}
+            index={ftp.enabled ? 9 : 5}
             onSelect={() => {
               console.log('TODO');
             }}>
@@ -126,21 +179,21 @@ export default function Backup() {
       </Box>
       <Box flexDirection='column'>
         <Action
-          index={6}
+          index={ftp.enabled ? 10 : 6}
           onSelect={() => {
             console.log('TODO');
           }}>
           Test 1
         </Action>
         <Action
-          index={7}
+          index={ftp.enabled ? 11 : 7}
           onSelect={() => {
             console.log('TODO');
           }}>
           Test 2
         </Action>
         <Action
-          index={8}
+          index={ftp.enabled ? 12 : 8}
           onSelect={() => {
             dispatch(setPage('main-menu'));
             dispatch(reset());
