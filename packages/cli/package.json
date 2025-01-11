@@ -21,6 +21,7 @@
     "dist"
   ],
   "dependencies": {
+    "@chris.araneo/logger": "^0.0.2",
     "@reduxjs/toolkit": "^2.3.0",
     "@teacup-backup/core": "*",
     "ink": "^4.1.0",
