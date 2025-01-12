@@ -14,15 +14,17 @@ import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
-import Prompt from 'prompt-sync';
 import {
   catchError,
   EMPTY,
+  first,
   forkJoin,
+  from,
   map,
   mergeMap,
   Observable,
   of,
+  Subject,
   Subscription,
   tap,
 } from 'rxjs';
@@ -33,9 +35,11 @@ import { Config } from './models/config.type';
 
 // TODO Refactor
 
-const prompt = Prompt({
-  sigint: false,
-});
+interface Task {
+  task: string; // TODO Name
+  message: string;
+  status: 'success' | 'error';
+}
 
 export class TeacupBackup {
   private fileSystem: FileSystem;
@@ -45,10 +49,12 @@ export class TeacupBackup {
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
   private ftpClient: FtpClient;
-  private secretKey = '';
   private subscription: Subscription;
 
-  constructor(private logger: Logger) {
+  constructor(
+    private readonly logger: Logger,
+    private readonly secretKey: string,
+  ) {
     this.fileSystem = new FileSystem();
     this.fileFinder = new FileFinder(this.fileSystem, this.logger);
     this.currentDirectory = new CurrentDirectory();
@@ -59,40 +65,55 @@ export class TeacupBackup {
     this.subscription = new Subscription();
   }
 
-  promptUserSecretKey(): void {
-    this.logger.info('Secret key (password for encryption):');
-    this.secretKey = prompt({ echo: '*' });
-  }
+  runBackupFlow(config: Config): Observable<Task> {
+    const subject = new Subject<Task>();
 
-  async runBackupFlow(config: Config): Promise<void> {
     const backupDirectory = this.getNormalizedBackupDirectory(
       config.backupDirectory,
     );
 
-    await this.directoryCreator.createIfDoesntExist(backupDirectory);
-
-    const logFoundFiles = tap((foundFiles: string[]) =>
-      this.logger.info('Found files:', foundFiles),
-    );
     const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
-      this.encryptBase64Files(filesInBase64),
-    );
-    const writeFiles = mergeMap((encrypted: EncryptedFile[]) =>
-      this.writeEncryptedFiles(encrypted, backupDirectory),
-    );
-    const logCreatedBackup = tap((files: EncryptedFile[]) =>
-      this.logger.info(
-        'Created backup:',
-        files.map((file) => file.getPath()),
+      this.encryptBase64Files(filesInBase64).pipe(
+        tap((files) =>
+          subject.next({
+            task: 'ENCRYPT_FILES',
+            message: `Encrypted files: ${files.map((file) => file.getFilename())}`,
+            status: 'success',
+          }),
+        ),
+        catchError((error: unknown) => {
+          subject.error({
+            task: 'ENCRYPT_FILES',
+            message: error.toString(),
+            status: 'error',
+          });
+
+          return EMPTY;
+        }),
       ),
     );
-    const logUploadedBackup = tap((directory: string | null) => {
-      if (directory) {
-        this.logger.info(
-          `Uploaded directory to FTP server: ${JSON.stringify(directory)}`,
-        );
-      }
-    });
+
+    const writeFiles = mergeMap((encrypted: EncryptedFile[]) =>
+      this.writeEncryptedFiles(encrypted, backupDirectory).pipe(
+        tap((files) =>
+          subject.next({
+            task: 'WRITE_ENCRYPTED_FILES',
+            message: `Wrote files: ${files.map((file) => file.getFilename())}`,
+            status: 'success',
+          }),
+        ),
+        catchError((error: unknown) => {
+          subject.error({
+            task: 'WRITE_ENCRYPTED_FILES',
+            message: error.toString(),
+            status: 'error',
+          });
+
+          return EMPTY;
+        }),
+      ),
+    );
+
     const uploadFiles = mergeMap(() => {
       if (config.ftp?.enabled) {
         const { host, user, password, directory } = config.ftp;
@@ -104,13 +125,26 @@ export class TeacupBackup {
           .uploadDirectory(host, user, password, backupDirectory, directory)
           .pipe(
             map(() => backupDirectory),
+            tap((backupDirectory) => {
+              if (backupDirectory !== null) {
+                subject.next({
+                  task: 'FTP_UPLOAD',
+                  message:
+                    'Successfully uploaded directory: ' + backupDirectory,
+                  status: 'success',
+                });
+              }
+            }),
             catchError((error) => {
-              this.logger.error(
-                JSON.stringify(
+              subject.error({
+                task: 'FTP_UPLOAD',
+                message: JSON.stringify(
                   error,
                   Object.getOwnPropertyNames(error),
                 ).replace('\\\\', '\\'),
-              );
+                status: 'error',
+              });
+              subject.unsubscribe();
 
               return of(null);
             }),
@@ -120,31 +154,77 @@ export class TeacupBackup {
       }
     });
 
-    config.files.forEach((file: string) => {
-      this.logger.info('Searching file:', file);
+    const createBackupDirectory = from(
+      this.directoryCreator.createIfDoesntExist(backupDirectory),
+    ).pipe(
+      first(),
+      tap(() =>
+        subject.next({
+          task: 'CREATE_DIRECTORY',
+          message: 'Backup directory is ready: ' + backupDirectory,
+          status: 'success',
+        }),
+      ),
+      catchError((error: unknown) => {
+        subject.error({
+          task: 'CREATE_DIRECTORY',
+          message: error.toString(),
+          status: 'error',
+        });
 
-      this.subscription.add(
-        this.findFiles(file, config.roots)
-          .pipe(
-            logFoundFiles,
-            mergeMap((foundFiles) =>
-              this.readFilesToBase64(foundFiles).pipe(
-                encryptFiles,
-                writeFiles,
-                logCreatedBackup,
-                uploadFiles,
-                logUploadedBackup,
+        return EMPTY;
+      }),
+    );
+
+    const subscription = createBackupDirectory
+      .pipe(
+        mergeMap(() => {
+          const fileFlows = config.files.map((file: string) => {
+            return this.findFiles(file, config.roots).pipe(
+              tap((foundFiles) => {
+                subject.next({
+                  task: 'FIND_FILES',
+                  message: `Found files: ${foundFiles.join(', ')}`,
+                  status: 'success',
+                });
+              }),
+              mergeMap((foundFiles) =>
+                this.readFilesToBase64(foundFiles).pipe(
+                  encryptFiles,
+                  writeFiles,
+                  uploadFiles,
+                ),
               ),
-            ),
-            catchError((error: unknown) => {
-              this.logger.info(error?.toString());
+              catchError((error: unknown) => {
+                subject.error({
+                  task: 'UNKNOWN', // TODO Refactor
+                  message: error?.toString() || '',
+                  status: 'error',
+                });
+                subject.unsubscribe();
 
-              return EMPTY;
+                return EMPTY;
+              }),
+            );
+          });
+
+          return forkJoin(fileFlows).pipe(
+            tap(() => {
+              subject.next({
+                task: 'FINISH',
+                message: 'Finished all tasks for all files',
+                status: 'success',
+              });
+              subject.complete();
+              subject.unsubscribe();
+              subscription.unsubscribe();
             }),
-          )
-          .subscribe(),
-      );
-    });
+          );
+        }),
+      )
+      .subscribe();
+
+    return subject.asObservable();
   }
 
   runRestoreFlow(config: Config): void {
