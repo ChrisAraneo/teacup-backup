@@ -1,3 +1,4 @@
+import { FtpConfig } from './ftp-config.interface';
 import { LogLevel } from './log-level.type';
 
 export interface Config {
@@ -8,12 +9,4 @@ export interface Config {
   interval: number;
   'log-level': LogLevel;
   ftp: FtpConfig;
-}
-
-export interface FtpConfig {
-  enabled: boolean;
-  host: string;
-  user: string;
-  password: string;
-  directory: string;
 }
