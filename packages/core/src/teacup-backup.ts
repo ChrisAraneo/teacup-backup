@@ -29,17 +29,14 @@ import {
   tap,
 } from 'rxjs';
 
-import { Config } from './models/config.type';
+import { Config } from './models/config.interface';
+import { Task } from './models/task.interface';
+import { TaskId } from './models/task-id.enum';
+import { TaskStatus } from './models/task-status.enum';
 
 // Stryker disable all
 
 // TODO Refactor
-
-interface Task {
-  task: string; // TODO Name
-  message: string;
-  status: 'success' | 'error';
-}
 
 export class TeacupBackup {
   private fileSystem: FileSystem;
@@ -75,18 +72,20 @@ export class TeacupBackup {
     const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
       this.encryptBase64Files(filesInBase64).pipe(
         tap((files) =>
-          subject.next({
-            task: 'ENCRYPT_FILES',
-            message: `Encrypted files: ${files.map((file) => file.getFilename())}`,
-            status: 'success',
-          }),
+          this.emitTask(
+            subject,
+            TaskId.EncryptFiles,
+            TaskStatus.Success,
+            `Encrypted files: ${files.map((file) => file.getFilename())}`,
+          ),
         ),
         catchError((error: unknown) => {
-          subject.error({
-            task: 'ENCRYPT_FILES',
-            message: error.toString(),
-            status: 'error',
-          });
+          this.emitTask(
+            subject,
+            TaskId.EncryptFiles,
+            TaskStatus.Error,
+            error.toString(),
+          );
 
           return EMPTY;
         }),
@@ -96,18 +95,20 @@ export class TeacupBackup {
     const writeFiles = mergeMap((encrypted: EncryptedFile[]) =>
       this.writeEncryptedFiles(encrypted, backupDirectory).pipe(
         tap((files) =>
-          subject.next({
-            task: 'WRITE_ENCRYPTED_FILES',
-            message: `Wrote files: ${files.map((file) => file.getFilename())}`,
-            status: 'success',
-          }),
+          this.emitTask(
+            subject,
+            TaskId.WriteEncryptedFiles,
+            TaskStatus.Success,
+            `Wrote files: ${files.map((file) => file.getFilename())}`,
+          ),
         ),
         catchError((error: unknown) => {
-          subject.error({
-            task: 'WRITE_ENCRYPTED_FILES',
-            message: error.toString(),
-            status: 'error',
-          });
+          this.emitTask(
+            subject,
+            TaskId.WriteEncryptedFiles,
+            TaskStatus.Error,
+            error.toString(),
+          );
 
           return EMPTY;
         }),
@@ -127,24 +128,24 @@ export class TeacupBackup {
             map(() => backupDirectory),
             tap((backupDirectory) => {
               if (backupDirectory !== null) {
-                subject.next({
-                  task: 'FTP_UPLOAD',
-                  message:
-                    'Successfully uploaded directory: ' + backupDirectory,
-                  status: 'success',
-                });
+                this.emitTask(
+                  subject,
+                  TaskId.UploadFtp,
+                  TaskStatus.Success,
+                  'Successfully uploaded directory: ' + backupDirectory,
+                );
               }
             }),
             catchError((error) => {
-              subject.error({
-                task: 'FTP_UPLOAD',
-                message: JSON.stringify(
+              this.emitTask(
+                subject,
+                TaskId.UploadFtp,
+                TaskStatus.Error,
+                JSON.stringify(
                   error,
                   Object.getOwnPropertyNames(error),
                 ).replace('\\\\', '\\'),
-                status: 'error',
-              });
-              subject.unsubscribe();
+              );
 
               return of(null);
             }),
@@ -159,34 +160,37 @@ export class TeacupBackup {
     ).pipe(
       first(),
       tap(() =>
-        subject.next({
-          task: 'CREATE_DIRECTORY',
-          message: 'Backup directory is ready: ' + backupDirectory,
-          status: 'success',
-        }),
+        this.emitTask(
+          subject,
+          TaskId.CreateDirectory,
+          TaskStatus.Success,
+          'Backup directory is ready: ' + backupDirectory,
+        ),
       ),
       catchError((error: unknown) => {
-        subject.error({
-          task: 'CREATE_DIRECTORY',
-          message: error.toString(),
-          status: 'error',
-        });
+        this.emitTask(
+          subject,
+          TaskId.CreateDirectory,
+          TaskStatus.Error,
+          error.toString(),
+        );
 
         return EMPTY;
       }),
     );
 
-    const subscription = createBackupDirectory
+    createBackupDirectory
       .pipe(
         mergeMap(() => {
           const fileFlows = config.files.map((file: string) => {
             return this.findFiles(file, config.roots).pipe(
               tap((foundFiles) => {
-                subject.next({
-                  task: 'FIND_FILES',
-                  message: `Found files: ${foundFiles.join(', ')}`,
-                  status: 'success',
-                });
+                this.emitTask(
+                  subject,
+                  TaskId.FindFiles,
+                  TaskStatus.Success,
+                  `Found files: ${foundFiles.join(', ')}`,
+                );
               }),
               mergeMap((foundFiles) =>
                 this.readFilesToBase64(foundFiles).pipe(
@@ -197,11 +201,10 @@ export class TeacupBackup {
               ),
               catchError((error: unknown) => {
                 subject.error({
-                  task: 'UNKNOWN', // TODO Refactor
+                  task: 'UNKNOWN', // TODO
                   message: error?.toString() || '',
                   status: 'error',
                 });
-                subject.unsubscribe();
 
                 return EMPTY;
               }),
@@ -210,14 +213,12 @@ export class TeacupBackup {
 
           return forkJoin(fileFlows).pipe(
             tap(() => {
-              subject.next({
-                task: 'FINISH',
-                message: 'Finished all tasks for all files',
-                status: 'success',
-              });
-              subject.complete();
-              subject.unsubscribe();
-              subscription.unsubscribe();
+              this.emitTask(
+                subject,
+                TaskId.Finalize,
+                TaskStatus.Success,
+                'Finished all tasks for all files',
+              );
             }),
           );
         }),
@@ -428,5 +429,32 @@ export class TeacupBackup {
 
       file.setFilename(updatedFilename, currentExtension);
     });
+  }
+
+  private emitTask(
+    subject: Subject<Task>,
+    id: TaskId,
+    status: TaskStatus,
+    message: string,
+  ): void {
+    if (subject.closed) {
+      throw Error('Subject closed');
+    } else if (status === TaskStatus.Success) {
+      subject.next({
+        id: id,
+        status: status,
+        message: message,
+      });
+
+      if (id === TaskId.Finalize) {
+        subject.complete();
+      }
+    } else {
+      subject.error({
+        id: id,
+        status: status,
+        message: message,
+      });
+    }
   }
 }
