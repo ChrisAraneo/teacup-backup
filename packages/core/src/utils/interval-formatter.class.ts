@@ -1,3 +1,4 @@
+// TODO Use or refactor
 export class IntervalFormatter {
   format(intervalInMs: number): string {
     const millis = intervalInMs % 1000;
