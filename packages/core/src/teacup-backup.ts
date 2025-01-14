@@ -48,10 +48,7 @@ export class TeacupBackup {
   private ftpClient: FtpClient;
   private subscription: Subscription;
 
-  constructor(
-    private readonly logger: Logger,
-    private readonly secretKey: string,
-  ) {
+  constructor(private readonly logger: Logger) {
     this.fileSystem = new FileSystem();
     this.fileFinder = new FileFinder(this.fileSystem, this.logger);
     this.currentDirectory = new CurrentDirectory();
@@ -70,7 +67,7 @@ export class TeacupBackup {
     );
 
     const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
-      this.encryptBase64Files(filesInBase64).pipe(
+      this.encryptBase64Files(filesInBase64, config.secret).pipe(
         tap((files) =>
           this.emitTask(
             subject,
@@ -310,11 +307,12 @@ export class TeacupBackup {
       );
   }
 
-  private encryptBase64Files(files: Base64File[]): Observable<EncryptedFile[]> {
+  private encryptBase64Files(
+    files: Base64File[],
+    secret: string,
+  ): Observable<EncryptedFile[]> {
     return forkJoin(
-      files.map((item) =>
-        of(EncryptedFile.fromBase64File(item, this.secretKey)),
-      ),
+      files.map((item) => of(EncryptedFile.fromBase64File(item, secret))),
     );
   }
 
@@ -346,7 +344,7 @@ export class TeacupBackup {
       map((encryptedFiles) => {
         const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
           encryptedFiles,
-          this.secretKey,
+          config.secret,
         );
 
         this.updateFilePathsToDecrypted(decryptedFiles);
