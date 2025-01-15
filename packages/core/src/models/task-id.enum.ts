@@ -1,4 +1,5 @@
 export enum TaskId {
+  Start = 'START',
   CreateDirectory = 'CREATE_DIRECTORY',
   FindFiles = 'FIND_FILES',
   EncryptFiles = 'ENCRYPT_FILES',
