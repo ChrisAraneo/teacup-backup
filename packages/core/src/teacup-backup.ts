@@ -16,6 +16,7 @@ import * as BasicFtp from 'basic-ftp';
 import Path from 'path';
 import {
   catchError,
+  delay,
   EMPTY,
   first,
   forkJoin,
@@ -39,6 +40,9 @@ import { TaskStatus } from './models/task-status.enum';
 // TODO Refactor
 
 export class TeacupBackup {
+  private readonly START_TASK_DELAY_MS = 20;
+  private readonly CREATE_DIRECTORY_TASK_DELAY_MS = 20;
+
   private fileSystem: FileSystem;
   private fileFinder: FileFinder;
   private currentDirectory: CurrentDirectory;
@@ -176,49 +180,63 @@ export class TeacupBackup {
       }),
     );
 
-    createBackupDirectory
+    of([])
       .pipe(
-        mergeMap(() => {
-          const fileFlows = config.files.map((file: string) => {
-            return this.findFiles(file, config.roots).pipe(
-              tap((foundFiles) => {
-                this.emitTask(
-                  subject,
-                  TaskId.FindFiles,
-                  TaskStatus.Success,
-                  `Found files: ${foundFiles.join(', ')}`,
-                );
-              }),
-              mergeMap((foundFiles) =>
-                this.readFilesToBase64(foundFiles).pipe(
-                  encryptFiles,
-                  writeFiles,
-                  uploadFiles,
-                ),
-              ),
-              catchError((error: unknown) => {
-                subject.error({
-                  task: 'UNKNOWN', // TODO
-                  message: error?.toString() || '',
-                  status: 'error',
-                });
-
-                return EMPTY;
-              }),
-            );
-          });
-
-          return forkJoin(fileFlows).pipe(
-            tap(() => {
-              this.emitTask(
-                subject,
-                TaskId.Finalize,
-                TaskStatus.Success,
-                'Finished all tasks for all files',
-              );
-            }),
+        delay(this.START_TASK_DELAY_MS),
+        tap(() => {
+          this.emitTask(
+            subject,
+            TaskId.Start,
+            TaskStatus.Success,
+            'Starting backup',
           );
         }),
+        delay(this.CREATE_DIRECTORY_TASK_DELAY_MS),
+        mergeMap(() =>
+          createBackupDirectory.pipe(
+            mergeMap(() => {
+              const fileFlows = config.files.map((file: string) => {
+                return this.findFiles(file, config.roots).pipe(
+                  tap((foundFiles) => {
+                    this.emitTask(
+                      subject,
+                      TaskId.FindFiles,
+                      TaskStatus.Success,
+                      `Found files: ${foundFiles.join(', ')}`,
+                    );
+                  }),
+                  mergeMap((foundFiles) =>
+                    this.readFilesToBase64(foundFiles).pipe(
+                      encryptFiles,
+                      writeFiles,
+                      uploadFiles,
+                    ),
+                  ),
+                  catchError((error: unknown) => {
+                    subject.error({
+                      task: 'UNKNOWN', // TODO
+                      message: error?.toString() || '',
+                      status: 'error',
+                    });
+
+                    return EMPTY;
+                  }),
+                );
+              });
+
+              return forkJoin(fileFlows).pipe(
+                tap(() => {
+                  this.emitTask(
+                    subject,
+                    TaskId.Finalize,
+                    TaskStatus.Success,
+                    'Finished all tasks for all files',
+                  );
+                }),
+              );
+            }),
+          ),
+        ),
       )
       .subscribe();
 
