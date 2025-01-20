@@ -4,8 +4,8 @@ import { Config, LogLevel } from '@teacup-backup/core';
 export const cursorSlice = createSlice({
   name: 'config',
   initialState: {
-    backupDirectory: '',
-    files: [] as string[],
+    backupDirectory: './backup',
+    files: ['index.ts'] as string[],
     interval: 3600,
     'log-level': 'info' as LogLevel,
     roots: ['C:\\', 'D:\\'],
@@ -16,6 +16,7 @@ export const cursorSlice = createSlice({
       password: '',
       user: '',
     },
+    secret: '',
     mode: 'backup',
   } as Config,
   reducers: {
@@ -85,6 +86,9 @@ export const cursorSlice = createSlice({
     setMode: (state, action: PayloadAction<'backup' | 'restore'>) => {
       state.mode = action.payload;
     },
+    setSecret: (state, action: PayloadAction<string>) => {
+      state.secret = action.payload;
+    },
   },
 });
 
@@ -101,6 +105,7 @@ export const {
   setFtpUser,
   setFtpPassword,
   setFtpHost,
+  setSecret,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
