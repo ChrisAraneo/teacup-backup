@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import events from 'node:events';
 
 import { render } from 'ink';
