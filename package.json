@@ -1,6 +1,6 @@
 {
   "name": "teacup-backup",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write \".vscode\" \".prettierrc\" \"*.json\""

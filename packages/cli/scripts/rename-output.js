@@ -3,8 +3,8 @@
 import { rename } from 'fs';
 import { normalize } from 'path';
 
-const oldName = normalize('./dist/prod/cli.js');
-const newName = normalize('./dist/prod/teacup.js');
+const oldName = normalize('./dist/cli.js');
+const newName = normalize('./dist/cli.prod.js');
 
 rename(oldName, newName, (error) => {
   if (error) {

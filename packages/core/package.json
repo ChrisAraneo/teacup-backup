@@ -1,6 +1,6 @@
 {
   "name": "@teacup-backup/core",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "main": "dist/index.js",
   "description": "Teacup Backup is a simple Node.js script that finds, encrypts and creates backup of selected files.",
   "scripts": {
@@ -8,9 +8,8 @@
     "format": "prettier --write \"**/*.{ts,json,js,mjs}\"",
     "chores": "npm run lint && npm run format",
     "test": "jest",
-    "build": "tsup src/**/*.ts && npm run copy-config",
-    "stryker": "npx stryker run",
-    "copy-config": "node copy-config-file"
+    "build": "tsup src/**/*.ts",
+    "stryker": "npx stryker run"
   },
   "repository": {
     "type": "git",
