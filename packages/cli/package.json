@@ -16,7 +16,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json}\"",
     "chores": "npm run lint && npm run format",
     "test": "ava",
-    "build:dev": "tsc --build --clean",
+    "build:dev": "tsc",
     "build:prod": "npm run build:dev && tsup dist/cli.js --format=esm --target=node16 --minify --out-dir=dist && node scripts/rename-output"
   },
   "files": [
