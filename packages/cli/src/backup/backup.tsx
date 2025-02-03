@@ -10,6 +10,7 @@ import Input from '../shared/components/input.js';
 import NumberInput from '../shared/components/number-input.js';
 import Title from '../shared/components/title.js';
 import { capitalize } from '../shared/functions/capitalize.js';
+import { createBackup } from '../store/backup.slice.js';
 import {
   setBackupDirectory,
   setFtpDirectory,
@@ -186,9 +187,10 @@ export default function Backup() {
         <Action
           index={ftp.enabled ? 10 : 6}
           onSelect={() => {
-            console.log('TODO');
+            dispatch(createBackup());
+            dispatch(setPage('backup/progress'));
           }}>
-          Test 1
+          Start
         </Action>
         <Action
           index={ftp.enabled ? 11 : 7}
