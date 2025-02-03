@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import Backup from './backup/backup.js';
+import BackupProgress from './backup/backup-progress/backup-progress.js';
 import EditFiles from './backup/edit-files/edit-files.js';
 import EditRoots from './backup/edit-roots/edit-roots.js';
 import SelectLogLevel from './backup/select-log-level/select-log-level.js';
@@ -26,6 +27,9 @@ export default function App() {
     }
     case 'backup/select-log-level': {
       return <SelectLogLevel></SelectLogLevel>;
+    }
+    case 'backup/progress': {
+      return <BackupProgress></BackupProgress>;
     }
     default: {
       return <></>;
