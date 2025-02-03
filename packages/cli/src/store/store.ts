@@ -1,18 +1,34 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineSlices, configureStore } from '@reduxjs/toolkit';
+import { combineEpics, createEpicMiddleware, Epic } from 'redux-observable';
 
+import { backupEpic } from './backup.epic.js';
+import backupReducer from './backup.slice.js';
 import configReducer from './config.slice.js';
 import cursorReducer from './cursor.slice.js';
 import pageReducer from './page.slice.js';
 
-const store = configureStore({
-  reducer: {
-    page: pageReducer,
-    cursor: cursorReducer,
-    config: configReducer,
-  },
+const reducer = combineSlices({
+  page: pageReducer,
+  cursor: cursorReducer,
+  config: configReducer,
+  backup: backupReducer,
 });
 
-export default store;
+export type RootState = ReturnType<typeof reducer>;
+export type AppEpic = Epic<unknown, unknown, RootState>;
 
-export type RootState = ReturnType<typeof store.getState>;
+const epicMiddleware = createEpicMiddleware<unknown, unknown, RootState>();
+
+const rootEpic = combineEpics(backupEpic);
+
+const store = configureStore({
+  reducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(epicMiddleware),
+});
+
+epicMiddleware.run(rootEpic);
+
 export type AppDispatch = typeof store.dispatch;
+
+export default store;
