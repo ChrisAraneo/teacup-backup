@@ -3,4 +3,5 @@ export type Page =
   | 'backup'
   | 'backup/edit-files'
   | 'backup/edit-roots'
-  | 'backup/select-log-level';
+  | 'backup/select-log-level'
+  | 'backup/progress';
