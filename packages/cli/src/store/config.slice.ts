@@ -89,6 +89,9 @@ export const cursorSlice = createSlice({
     setSecret: (state, action: PayloadAction<string>) => {
       state.secret = action.payload;
     },
+    readConfig: () => {
+      return;
+    },
   },
 });
 
@@ -106,6 +109,7 @@ export const {
   setFtpPassword,
   setFtpHost,
   setSecret,
+  readConfig,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
