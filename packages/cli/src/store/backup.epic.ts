@@ -1,11 +1,8 @@
-import { Logger } from '@chris.araneo/logger';
-import { TeacupBackup } from '@teacup-backup/core';
 import { filter, from, map, mergeMap, take } from 'rxjs';
 
+import { instance } from '../instance.js';
 import { addBackupTask, createBackup } from './backup.slice.js';
 import { AppEpic } from './store.js';
-
-const instance = new TeacupBackup(new Logger());
 
 export const backupEpic: AppEpic = (action, state) =>
   action.pipe(
