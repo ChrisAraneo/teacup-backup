@@ -23,6 +23,7 @@
     "dist"
   ],
   "dependencies": {
+    "@chris.araneo/file-system": "^0.0.32",
     "@chris.araneo/logger": "^0.0.2",
     "@reduxjs/toolkit": "^2.3.0",
     "@teacup-backup/core": "*",
