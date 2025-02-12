@@ -92,6 +92,15 @@ export const cursorSlice = createSlice({
     readConfig: () => {
       return;
     },
+    setConfig: (state, action: PayloadAction<Config>) => {
+      state.backupDirectory = action.payload.backupDirectory;
+      state.files = action.payload.files;
+      state.ftp = action.payload.ftp;
+      state.interval = action.payload.interval;
+      state['log-level'] = action.payload['log-level'];
+      state.mode = action.payload.mode;
+      state.roots = action.payload.roots;
+    },
   },
 });
 
@@ -110,6 +119,7 @@ export const {
   setFtpHost,
   setSecret,
   readConfig,
+  setConfig,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
