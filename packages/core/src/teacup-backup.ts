@@ -8,8 +8,12 @@ import {
   DirectoryInfo,
   FileFinder,
   FileSystem,
+  JsonFile,
+  JsonFileReader,
   TextFile,
+  TextFileWriter,
 } from '@chris.araneo/file-system';
+import { ReadFileError } from '@chris.araneo/file-system/dist/src/file-reader/read-file-error.type';
 import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
@@ -27,10 +31,12 @@ import {
   of,
   Subject,
   Subscription,
+  take,
   tap,
 } from 'rxjs';
 
 import { Config } from './models/config.interface';
+import { DEFAULT_CONFIG } from './models/default-config.const';
 import { Task } from './models/task.interface';
 import { TaskId } from './models/task-id.enum';
 import { TaskStatus } from './models/task-status.enum';
@@ -49,6 +55,8 @@ export class TeacupBackup {
   private directoryCreator: DirectoryCreator;
   private base64FileReader: Base64FileReader;
   private base64FileWriter: Base64FileWriter;
+  private jsonFileReader: JsonFileReader;
+  private textFileWriter: TextFileWriter; // TODO Refactor to JsonFileWriter
   private ftpClient: FtpClient;
   private subscription: Subscription;
 
@@ -59,8 +67,42 @@ export class TeacupBackup {
     this.directoryCreator = new DirectoryCreator(this.fileSystem, this.logger);
     this.base64FileReader = new Base64FileReader(this.fileSystem);
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
+    this.textFileWriter = new TextFileWriter(this.fileSystem);
+    this.jsonFileReader = new JsonFileReader(this.fileSystem);
     this.ftpClient = new FtpClient(new BasicFtp.Client());
     this.subscription = new Subscription();
+    this.currentDirectory = new CurrentDirectory();
+  }
+
+  writeDefaultConfigWhenDoesntExist(): Observable<void> {
+    const directory =
+      this.currentDirectory.getExtendedInfo()['root'] ||
+      this.currentDirectory.getCurrentDirectory();
+
+    return DirectoryInfo.getContents(directory, this.fileSystem).pipe(
+      take(1),
+      mergeMap((contents) => {
+        if (!contents.find((item) => item === 'config.json')) {
+          return this.textFileWriter.writeFile(
+            new TextFile(
+              `${directory}/config.json`,
+              DEFAULT_CONFIG,
+              new Date(),
+            ),
+          );
+        }
+
+        return of(undefined);
+      }),
+    );
+  }
+
+  readConfig(): Observable<JsonFile | ReadFileError> {
+    const directory =
+      this.currentDirectory.getExtendedInfo()['root'] ||
+      this.currentDirectory.getCurrentDirectory();
+
+    return this.jsonFileReader.readFile(`${directory}/config.json`);
   }
 
   runBackupFlow(config: Config): Observable<Task> {
