@@ -1,12 +1,6 @@
 import { JsonFile } from '@chris.araneo/file-system';
 import { Config } from '@teacup-backup/core';
-import {
-  delay,
-  filter,
-  first,
-  map,
-  mergeMap,
-} from 'rxjs';
+import { delay, filter, first, map, mergeMap } from 'rxjs';
 
 import { instance } from '../instance.js';
 import { readConfig, setConfig } from './config.slice.js';
