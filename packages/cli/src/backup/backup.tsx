@@ -8,6 +8,7 @@ import Breadcrumbs from '../shared/components/breadcrumbs.js';
 import CheckBox from '../shared/components/checkbox.js';
 import Input from '../shared/components/input.js';
 import NumberInput from '../shared/components/number-input.js';
+import PasswordInput from '../shared/components/password-input.js';
 import Title from '../shared/components/title.js';
 import { capitalize } from '../shared/functions/capitalize.js';
 import { createBackup } from '../store/backup.slice.js';
@@ -19,6 +20,7 @@ import {
   setFtpPassword,
   setFtpUser,
   setInterval,
+  setSecret,
 } from '../store/config.slice.js';
 import { moveDown, moveUp, reset, setLast } from '../store/cursor.slice.js';
 import { setPage } from '../store/page.slice.js';
@@ -44,6 +46,9 @@ export default function Backup() {
   const logLevel = useSelector<RootState>(
     (state) => state.config['log-level'],
   ) as LogLevel;
+  const secret = useSelector<RootState>(
+    (state) => state.config.secret,
+  ) as string;
 
   const dispatch = useDispatch();
 
@@ -182,22 +187,24 @@ export default function Backup() {
             {capitalize(logLevel)}
           </Action>
         </Text>
+        <Text color={'grey'}>
+          Password:{' '}
+          <PasswordInput
+            index={ftp.enabled ? 10 : 6}
+            value={secret}
+            onChange={(value) => {
+              dispatch(setSecret(value));
+            }}></PasswordInput>
+        </Text>
       </Box>
       <Box flexDirection='column'>
         <Action
-          index={ftp.enabled ? 10 : 6}
+          index={ftp.enabled ? 11 : 7}
           onSelect={() => {
             dispatch(createBackup());
             dispatch(setPage('backup/progress'));
           }}>
           Start
-        </Action>
-        <Action
-          index={ftp.enabled ? 11 : 7}
-          onSelect={() => {
-            console.log('TODO');
-          }}>
-          Test 2
         </Action>
         <Action
           index={ftp.enabled ? 12 : 8}
