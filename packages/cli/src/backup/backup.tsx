@@ -31,23 +31,25 @@ export default function Backup() {
     (state) => state.cursor.value,
   ) as number;
   const files = useSelector<RootState>(
-    (state) => state.config.files,
+    (state) => state.config.data.files,
   ) as string[];
   const roots = useSelector<RootState>(
-    (state) => state.config.roots,
+    (state) => state.config.data.roots,
   ) as string[];
   const backupDirectory = useSelector<RootState>(
-    (state) => state.config.backupDirectory,
+    (state) => state.config.data.backupDirectory,
   ) as string;
-  const ftp = useSelector<RootState>((state) => state.config.ftp) as FtpConfig;
+  const ftp = useSelector<RootState>(
+    (state) => state.config.data.ftp,
+  ) as FtpConfig;
   const interval = useSelector<RootState>(
-    (state) => state.config.interval,
+    (state) => state.config.data.interval,
   ) as number;
   const logLevel = useSelector<RootState>(
-    (state) => state.config['log-level'],
+    (state) => state.config.data['log-level'],
   ) as LogLevel;
   const secret = useSelector<RootState>(
-    (state) => state.config.secret,
+    (state) => state.config.data.secret,
   ) as string;
 
   const dispatch = useDispatch();

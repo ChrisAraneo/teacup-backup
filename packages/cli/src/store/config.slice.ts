@@ -4,102 +4,106 @@ import { Config, LogLevel } from '@teacup-backup/core';
 export const cursorSlice = createSlice({
   name: 'config',
   initialState: {
-    backupDirectory: './backup',
-    files: ['index.ts'] as string[],
-    interval: 3600,
-    'log-level': 'info' as LogLevel,
-    roots: ['C:\\', 'D:\\'],
-    ftp: {
-      enabled: false,
-      directory: '',
-      host: '',
-      password: '',
-      user: '',
-    },
-    secret: '',
-    mode: 'backup',
-  } as Config,
+    loaded: false,
+    data: {
+      backupDirectory: './backup',
+      files: ['index.ts'] as string[],
+      interval: 3600,
+      'log-level': 'info' as LogLevel,
+      roots: ['C:\\', 'D:\\'],
+      ftp: {
+        enabled: false,
+        directory: '',
+        host: '',
+        password: '',
+        user: '',
+      },
+      secret: '',
+      mode: 'backup',
+    } as Config,
+  },
   reducers: {
     setBackupDirectory: (state, action: PayloadAction<string>) => {
-      state.backupDirectory = action.payload;
+      state.data.backupDirectory = action.payload;
     },
     addFile: (state, action: PayloadAction<string>) => {
-      state.files = [...state.files, action.payload];
+      state.data.files = [...state.data.files, action.payload];
     },
     updateFile: (
       state,
       action: PayloadAction<{ index: number; file: string }>,
     ) => {
-      const files = [...state.files];
+      const files = [...state.data.files];
       files[action.payload.index] = action.payload.file;
 
-      state.files = files;
+      state.data.files = files;
     },
     setInterval: (state, action: PayloadAction<number>) => {
-      state.interval = action.payload;
+      state.data.interval = action.payload;
     },
     setLogLevel: (state, action: PayloadAction<LogLevel>) => {
-      state['log-level'] = action.payload;
+      state.data['log-level'] = action.payload;
     },
     addRoot: (state, action: PayloadAction<string>) => {
-      state.roots = [...state.roots, action.payload];
+      state.data.roots = [...state.data.roots, action.payload];
     },
     updateRoot: (
       state,
       action: PayloadAction<{ index: number; root: string }>,
     ) => {
-      const roots = [...state.roots];
+      const roots = [...state.data.roots];
       roots[action.payload.index] = action.payload.root;
 
-      state.roots = roots;
+      state.data.roots = roots;
     },
     setFtpEnabled: (state, action: PayloadAction<boolean>) => {
-      state.ftp = {
-        ...state.ftp,
+      state.data.ftp = {
+        ...state.data.ftp,
         enabled: !!action.payload,
       };
     },
     setFtpDirectory: (state, action: PayloadAction<string>) => {
-      state.ftp = {
-        ...state.ftp,
+      state.data.ftp = {
+        ...state.data.ftp,
         directory: action.payload,
       };
     },
     setFtpHost: (state, action: PayloadAction<string>) => {
-      state.ftp = {
-        ...state.ftp,
+      state.data.ftp = {
+        ...state.data.ftp,
         host: action.payload,
       };
     },
     setFtpPassword: (state, action: PayloadAction<string>) => {
-      state.ftp = {
-        ...state.ftp,
+      state.data.ftp = {
+        ...state.data.ftp,
         password: action.payload,
       };
     },
     setFtpUser: (state, action: PayloadAction<string>) => {
-      state.ftp = {
-        ...state.ftp,
+      state.data.ftp = {
+        ...state.data.ftp,
         user: action.payload,
       };
     },
     setMode: (state, action: PayloadAction<'backup' | 'restore'>) => {
-      state.mode = action.payload;
+      state.data.mode = action.payload;
     },
     setSecret: (state, action: PayloadAction<string>) => {
-      state.secret = action.payload;
+      state.data.secret = action.payload;
     },
     readConfig: () => {
       return;
     },
-    setConfig: (state, action: PayloadAction<Config>) => {
-      state.backupDirectory = action.payload.backupDirectory;
-      state.files = action.payload.files;
-      state.ftp = action.payload.ftp;
-      state.interval = action.payload.interval;
-      state['log-level'] = action.payload['log-level'];
-      state.mode = action.payload.mode;
-      state.roots = action.payload.roots;
+    loadConfig: (state, action: PayloadAction<Config>) => {
+      state.data.backupDirectory = action.payload.backupDirectory;
+      state.data.files = action.payload.files;
+      state.data.ftp = action.payload.ftp;
+      state.data.interval = action.payload.interval;
+      state.data['log-level'] = action.payload['log-level'];
+      state.data.mode = action.payload.mode;
+      state.data.roots = action.payload.roots;
+      state.loaded = true;
     },
   },
 });
@@ -119,7 +123,7 @@ export const {
   setFtpHost,
   setSecret,
   readConfig,
-  setConfig,
+  loadConfig,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;

@@ -3,7 +3,7 @@ import { Config } from '@teacup-backup/core';
 import { delay, filter, first, map, mergeMap } from 'rxjs';
 
 import { instance } from '../instance.js';
-import { readConfig, setConfig } from './config.slice.js';
+import { loadConfig, readConfig } from './config.slice.js';
 import { AppEpic } from './store.js';
 
 export const configEpic: AppEpic = (action, state) =>
@@ -11,6 +11,7 @@ export const configEpic: AppEpic = (action, state) =>
     filter(readConfig.match),
     mergeMap(() =>
       state.pipe(
+        filter((state) => !state.config.loaded),
         first(),
         mergeMap(() =>
           instance
@@ -21,7 +22,7 @@ export const configEpic: AppEpic = (action, state) =>
           instance.readConfig().pipe(
             map((result) => {
               if (result instanceof JsonFile) {
-                return setConfig(result.getContent() as Config);
+                return loadConfig(result.getContent() as Config);
               } else {
                 throw Error(result.message);
               }

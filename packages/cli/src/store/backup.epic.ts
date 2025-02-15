@@ -12,7 +12,7 @@ export const backupEpic: AppEpic = (action, state) =>
         take(1),
         filter((state) => !state.backup.running),
         mergeMap((state) => {
-          return from(instance.runBackupFlow(state.config)).pipe(
+          return from(instance.runBackupFlow(state.config.data)).pipe(
             map((task) => {
               return addBackupTask(task);
             }),

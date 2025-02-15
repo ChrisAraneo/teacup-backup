@@ -15,7 +15,7 @@ import { RootState } from '../../store/store.js';
 
 export default function SelectLogLevel() {
   const logLevel = useSelector<RootState>(
-    (state) => state.config['log-level'],
+    (state) => state.config.data['log-level'],
   ) as LogLevel;
 
   const dispatch = useDispatch();

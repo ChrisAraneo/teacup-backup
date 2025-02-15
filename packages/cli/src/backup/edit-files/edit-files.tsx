@@ -13,7 +13,7 @@ import { RootState } from '../../store/store.js';
 
 export default function EditFiles() {
   const files = useSelector<RootState>(
-    (state) => state.config.files,
+    (state) => state.config.data.files,
   ) as string[];
 
   const dispatch = useDispatch();

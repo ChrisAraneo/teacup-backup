@@ -13,7 +13,7 @@ import { RootState } from '../../store/store.js';
 
 export default function EditRoots() {
   const roots = useSelector<RootState>(
-    (state) => state.config.roots,
+    (state) => state.config.data.roots,
   ) as string[];
 
   const dispatch = useDispatch();
