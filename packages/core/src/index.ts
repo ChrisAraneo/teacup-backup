@@ -1,4 +1,5 @@
 export * from './models/config.interface';
+export * from './models/default-config.const';
 export * from './models/ftp-config.interface';
 export * from './models/log-level.type';
 export * from './models/task.interface';
