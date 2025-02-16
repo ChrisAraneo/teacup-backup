@@ -17,6 +17,7 @@ import { ReadFileError } from '@chris.araneo/file-system/dist/src/file-reader/re
 import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
 import * as BasicFtp from 'basic-ftp';
+import { isString } from 'lodash';
 import Path from 'path';
 import {
   catchError,
@@ -31,7 +32,6 @@ import {
   of,
   Subject,
   Subscription,
-  take,
   tap,
 } from 'rxjs';
 
@@ -75,20 +75,16 @@ export class TeacupBackup {
   }
 
   writeDefaultConfigWhenDoesntExist(): Observable<void> {
-    const directory =
-      this.currentDirectory.getExtendedInfo()['root'] ||
-      this.currentDirectory.getCurrentDirectory();
-
-    return DirectoryInfo.getContents(directory, this.fileSystem).pipe(
-      take(1),
+    return DirectoryInfo.getContents(
+      this.getConfigDirectory(),
+      this.fileSystem,
+    ).pipe(
+      first(),
       mergeMap((contents) => {
         if (!contents.find((item) => item === 'config.json')) {
+          return this.writeConfig(DEFAULT_CONFIG);
           return this.textFileWriter.writeFile(
-            new TextFile(
-              `${directory}/config.json`,
-              DEFAULT_CONFIG,
-              new Date(),
-            ),
+            new TextFile(this.getConfigPath(), DEFAULT_CONFIG, new Date()),
           );
         }
 
@@ -98,11 +94,17 @@ export class TeacupBackup {
   }
 
   readConfig(): Observable<JsonFile | ReadFileError> {
-    const directory =
-      this.currentDirectory.getExtendedInfo()['root'] ||
-      this.currentDirectory.getCurrentDirectory();
+    return this.jsonFileReader.readFile(this.getConfigPath());
+  }
 
-    return this.jsonFileReader.readFile(`${directory}/config.json`);
+  writeConfig(config: Config | string): Observable<void> {
+    return this.textFileWriter.writeFile(
+      new TextFile(
+        this.getConfigPath(),
+        isString(config) ? config : JSON.stringify(config),
+        new Date(),
+      ),
+    );
   }
 
   runBackupFlow(config: Config): Observable<Task> {
@@ -514,5 +516,16 @@ export class TeacupBackup {
         message: message,
       });
     }
+  }
+
+  private getConfigDirectory(): string {
+    return (
+      this.currentDirectory.getExtendedInfo()['root'] ||
+      this.currentDirectory.getCurrentDirectory()
+    );
+  }
+
+  private getConfigPath(): string {
+    return `${this.getConfigDirectory()}/config.json`;
   }
 }
