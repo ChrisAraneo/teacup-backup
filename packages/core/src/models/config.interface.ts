@@ -9,5 +9,5 @@ export interface Config {
   interval: number;
   'log-level': LogLevel;
   ftp: FtpConfig;
-  secret: string;
+  secret?: string;
 }

@@ -14,7 +14,6 @@ const defaultConfig: Config = {
     password: '',
     directory: 'backup',
   },
-  secret: '',
 };
 
 export const DEFAULT_CONFIG = JSON.stringify(defaultConfig);
