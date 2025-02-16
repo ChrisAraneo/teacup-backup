@@ -1,25 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Config, LogLevel } from '@teacup-backup/core';
+import { Config, DEFAULT_CONFIG, LogLevel } from '@teacup-backup/core';
 
 export const cursorSlice = createSlice({
   name: 'config',
   initialState: {
     loaded: false,
     data: {
-      backupDirectory: './backup',
-      files: ['index.ts'] as string[],
-      interval: 3600,
-      'log-level': 'info' as LogLevel,
-      roots: ['C:\\', 'D:\\'],
-      ftp: {
-        enabled: false,
-        directory: '',
-        host: '',
-        password: '',
-        user: '',
-      },
+      ...JSON.parse(DEFAULT_CONFIG),
       secret: '',
-      mode: 'backup',
     } as Config,
   },
   reducers: {
@@ -105,6 +93,9 @@ export const cursorSlice = createSlice({
       state.data.roots = action.payload.roots;
       state.loaded = true;
     },
+    noop: () => {
+      return;
+    },
   },
 });
 
@@ -124,6 +115,7 @@ export const {
   setSecret,
   readConfig,
   loadConfig,
+  noop,
 } = cursorSlice.actions;
 
 export default cursorSlice.reducer;
