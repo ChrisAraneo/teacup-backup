@@ -1,4 +1,4 @@
-import { filter, from, map, mergeMap, take } from 'rxjs';
+import { filter, first, from, map, mergeMap } from 'rxjs';
 
 import { instance } from '../instance.js';
 import { addBackupTask, createBackup } from './backup.slice.js';
@@ -9,7 +9,7 @@ export const backupEpic: AppEpic = (action, state) =>
     filter(createBackup.match),
     mergeMap(() =>
       state.pipe(
-        take(1),
+        first(),
         filter((state) => !state.backup.running),
         mergeMap((state) => {
           return from(instance.runBackupFlow(state.config.data)).pipe(
