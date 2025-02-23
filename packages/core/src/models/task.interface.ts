@@ -5,4 +5,5 @@ export interface Task {
   id: TaskId;
   status: TaskStatus;
   message: string;
+  dependsOn?: TaskId;
 }
