@@ -114,6 +114,45 @@ export class TeacupBackup {
       config.backupDirectory,
     );
 
+    const createBackupDirectory = from(
+      this.directoryCreator.createIfDoesntExist(backupDirectory),
+    ).pipe(
+      first(),
+      tap(() =>
+        this.emitTask(
+          subject,
+          TaskId.CreateDirectory,
+          TaskStatus.Success,
+          'Backup directory is ready: ' + backupDirectory,
+          TaskId.Start,
+        ),
+      ),
+      catchError((error: unknown) => {
+        this.emitTask(
+          subject,
+          TaskId.CreateDirectory,
+          TaskStatus.Error,
+          error.toString(),
+          TaskId.Start,
+        );
+
+        return EMPTY;
+      }),
+    );
+
+    const findFiles = (pattern: string) =>
+      this.findFiles(pattern, config.roots).pipe(
+        tap((foundFiles) => {
+          this.emitTask(
+            subject,
+            TaskId.FindFiles,
+            TaskStatus.Success,
+            `Found files: ${foundFiles.join(', ')}`,
+            TaskId.CreateDirectory,
+          );
+        }),
+      );
+
     const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
       this.encryptBase64Files(filesInBase64, config.secret).pipe(
         tap((files) =>
@@ -122,6 +161,7 @@ export class TeacupBackup {
             TaskId.EncryptFiles,
             TaskStatus.Success,
             `Encrypted files: ${files.map((file) => file.getFilename())}`,
+            TaskId.FindFiles,
           ),
         ),
         catchError((error: unknown) => {
@@ -130,6 +170,7 @@ export class TeacupBackup {
             TaskId.EncryptFiles,
             TaskStatus.Error,
             error.toString(),
+            TaskId.FindFiles,
           );
 
           return EMPTY;
@@ -145,6 +186,7 @@ export class TeacupBackup {
             TaskId.WriteEncryptedFiles,
             TaskStatus.Success,
             `Wrote files: ${files.map((file) => file.getFilename())}`,
+            TaskId.EncryptFiles,
           ),
         ),
         catchError((error: unknown) => {
@@ -153,6 +195,7 @@ export class TeacupBackup {
             TaskId.WriteEncryptedFiles,
             TaskStatus.Error,
             error.toString(),
+            TaskId.EncryptFiles,
           );
 
           return EMPTY;
@@ -178,6 +221,7 @@ export class TeacupBackup {
                   TaskId.UploadFtp,
                   TaskStatus.Success,
                   'Successfully uploaded directory: ' + backupDirectory,
+                  TaskId.WriteEncryptedFiles,
                 );
               }
             }),
@@ -190,6 +234,7 @@ export class TeacupBackup {
                   error,
                   Object.getOwnPropertyNames(error),
                 ).replace('\\\\', '\\'),
+                TaskId.WriteEncryptedFiles,
               );
 
               return of(null);
@@ -199,30 +244,6 @@ export class TeacupBackup {
         return of(null);
       }
     });
-
-    const createBackupDirectory = from(
-      this.directoryCreator.createIfDoesntExist(backupDirectory),
-    ).pipe(
-      first(),
-      tap(() =>
-        this.emitTask(
-          subject,
-          TaskId.CreateDirectory,
-          TaskStatus.Success,
-          'Backup directory is ready: ' + backupDirectory,
-        ),
-      ),
-      catchError((error: unknown) => {
-        this.emitTask(
-          subject,
-          TaskId.CreateDirectory,
-          TaskStatus.Error,
-          error.toString(),
-        );
-
-        return EMPTY;
-      }),
-    );
 
     of([])
       .pipe(
@@ -239,16 +260,8 @@ export class TeacupBackup {
         mergeMap(() =>
           createBackupDirectory.pipe(
             mergeMap(() => {
-              const fileFlows = config.files.map((file: string) => {
-                return this.findFiles(file, config.roots).pipe(
-                  tap((foundFiles) => {
-                    this.emitTask(
-                      subject,
-                      TaskId.FindFiles,
-                      TaskStatus.Success,
-                      `Found files: ${foundFiles.join(', ')}`,
-                    );
-                  }),
+              const fileFlows = config.files.map((pattern: string) =>
+                findFiles(pattern).pipe(
                   mergeMap((foundFiles) =>
                     this.readFilesToBase64(foundFiles).pipe(
                       encryptFiles,
@@ -265,8 +278,8 @@ export class TeacupBackup {
 
                     return EMPTY;
                   }),
-                );
-              });
+                ),
+              );
 
               return forkJoin(fileFlows).pipe(
                 tap(() => {
@@ -496,6 +509,7 @@ export class TeacupBackup {
     id: TaskId,
     status: TaskStatus,
     message: string,
+    dependsOn?: TaskId,
   ): void {
     if (subject.closed) {
       throw Error('Subject closed');
@@ -504,6 +518,7 @@ export class TeacupBackup {
         id: id,
         status: status,
         message: message,
+        dependsOn: dependsOn,
       });
 
       if (id === TaskId.Finalize) {
