@@ -16,7 +16,7 @@ import {
 import { ReadFileError } from '@chris.araneo/file-system/dist/src/file-reader/read-file-error.type';
 import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
-import * as BasicFtp from 'basic-ftp';
+import { uploadDirectory } from '@chris.araneo/ftp';
 import { isString } from 'lodash';
 import Path from 'path';
 import {
@@ -69,7 +69,6 @@ export class TeacupBackup {
     this.base64FileWriter = new Base64FileWriter(this.fileSystem);
     this.textFileWriter = new TextFileWriter(this.fileSystem);
     this.jsonFileReader = new JsonFileReader(this.fileSystem);
-    this.ftpClient = new FtpClient(new BasicFtp.Client());
     this.subscription = new Subscription();
     this.currentDirectory = new CurrentDirectory();
   }
@@ -210,36 +209,40 @@ export class TeacupBackup {
           config.backupDirectory,
         );
 
-        return this.ftpClient
-          .uploadDirectory(host, user, password, backupDirectory, directory)
-          .pipe(
-            map(() => backupDirectory),
-            tap((backupDirectory) => {
-              if (backupDirectory !== null) {
-                this.emitTask(
-                  subject,
-                  TaskId.UploadFtp,
-                  TaskStatus.Success,
-                  'Successfully uploaded directory: ' + backupDirectory,
-                  TaskId.WriteEncryptedFiles,
-                );
-              }
-            }),
-            catchError((error) => {
+        return uploadDirectory()({
+          host,
+          user,
+          password,
+          localPath: backupDirectory,
+          remotePath: directory,
+        }).pipe(
+          map(() => backupDirectory),
+          tap((backupDirectory) => {
+            if (backupDirectory !== null) {
               this.emitTask(
                 subject,
                 TaskId.UploadFtp,
-                TaskStatus.Error,
-                JSON.stringify(
-                  error,
-                  Object.getOwnPropertyNames(error),
-                ).replace('\\\\', '\\'),
+                TaskStatus.Success,
+                'Successfully uploaded directory: ' + backupDirectory,
                 TaskId.WriteEncryptedFiles,
               );
+            }
+          }),
+          catchError((error) => {
+            this.emitTask(
+              subject,
+              TaskId.UploadFtp,
+              TaskStatus.Error,
+              JSON.stringify(error, Object.getOwnPropertyNames(error)).replace(
+                '\\\\',
+                '\\',
+              ),
+              TaskId.WriteEncryptedFiles,
+            );
 
-              return of(null);
-            }),
-          );
+            return of(null);
+          }),
+        );
       } else {
         return of(null);
       }
