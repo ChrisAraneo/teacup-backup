@@ -1,6 +1,6 @@
 dist
 tmp
-/out-tsc
+out-tsc
 node_modules
 /.idea
 .project
@@ -26,4 +26,4 @@ testem.log
 Thumbs.db
 .nx/cache
 .nx/workspace-data
-config.json
+test-output

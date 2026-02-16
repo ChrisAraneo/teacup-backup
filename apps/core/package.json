@@ -1,0 +1,85 @@
+{
+  "name": "@teacup-backup/core",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/core/dist",
+          "format": [
+            "cjs"
+          ],
+          "bundle": false,
+          "main": "apps/core/src/main.ts",
+          "tsConfig": "apps/core/tsconfig.app.json",
+          "assets": [
+            "apps/core/src/assets"
+          ],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@teacup-backup/core:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@teacup-backup/core:build:development"
+          },
+          "production": {
+            "buildTarget": "@teacup-backup/core:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@chris.araneo/crypto": "^0.0.2",
+    "@chris.araneo/file-system": "^0.0.32",
+    "@chris.araneo/ftp": "0.0.4",
+    "@chris.araneo/logger": "^0.0.2",
+    "basic-ftp": "^5.0.5",
+    "crypto-js": "^4.2.0",
+    "file-base64": "^1.0.0",
+    "find": "^0.3.0",
+    "lodash": "^4.17.21",
+    "prompt-sync": "^4.2.0",
+    "rxjs": "^7.8.1",
+    "winston": "^3.17.0"
+  }
+}

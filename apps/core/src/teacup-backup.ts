@@ -14,7 +14,6 @@ import {
   TextFileWriter,
 } from '@chris.araneo/file-system';
 import { ReadFileError } from '@chris.araneo/file-system/dist/src/file-reader/read-file-error.type';
-import { FtpClient } from '@chris.araneo/ftp';
 import { Logger } from '@chris.araneo/logger';
 import { uploadDirectory } from '@chris.araneo/ftp';
 import { isString } from 'lodash';
@@ -57,7 +56,6 @@ export class TeacupBackup {
   private base64FileWriter: Base64FileWriter;
   private jsonFileReader: JsonFileReader;
   private textFileWriter: TextFileWriter; // TODO Refactor to JsonFileWriter
-  private ftpClient: FtpClient;
   private subscription: Subscription;
 
   constructor(private readonly logger: Logger) {
@@ -131,7 +129,7 @@ export class TeacupBackup {
           subject,
           TaskId.CreateDirectory,
           TaskStatus.Error,
-          error.toString(),
+          (error ?? '').toString(),
           TaskId.Start,
         );
 
@@ -153,7 +151,7 @@ export class TeacupBackup {
       );
 
     const encryptFiles = mergeMap((filesInBase64: Base64File[]) =>
-      this.encryptBase64Files(filesInBase64, config.secret).pipe(
+      this.encryptBase64Files(filesInBase64, config?.secret ?? '').pipe(
         tap((files) =>
           this.emitTask(
             subject,
@@ -168,7 +166,7 @@ export class TeacupBackup {
             subject,
             TaskId.EncryptFiles,
             TaskStatus.Error,
-            error.toString(),
+            (error ?? '').toString(),
             TaskId.FindFiles,
           );
 
@@ -193,7 +191,7 @@ export class TeacupBackup {
             subject,
             TaskId.WriteEncryptedFiles,
             TaskStatus.Error,
-            error.toString(),
+            (error ?? '').toString(),
             TaskId.EncryptFiles,
           );
 
@@ -314,10 +312,6 @@ export class TeacupBackup {
       files.filter((file: string) => file.lastIndexOf('.mbe') >= 0),
     );
 
-    const logFilesToDecrypt = tap((files) =>
-      this.logger.info('Decrypting files:', files),
-    );
-
     const writeRestoredFiles = mergeMap((decrypted: Base64File[]) =>
       this.writeRestoredFiles(decrypted),
     );
@@ -330,7 +324,7 @@ export class TeacupBackup {
       DirectoryInfo.getContents(backupDirectory, this.fileSystem)
         .pipe(
           filterFilesByExtension,
-          logFilesToDecrypt,
+          tap((files) => this.logger.info('Decrypting files:', files)),
           mergeMap((encryptedFiles: string[]) =>
             this.readEncryptedFiles(encryptedFiles, config).pipe(
               writeRestoredFiles,
@@ -338,7 +332,7 @@ export class TeacupBackup {
           ),
           logRestoredFiles,
           catchError((error: unknown) => {
-            this.logger.error(error?.toString());
+            this.logger.error((error ?? '').toString());
 
             return EMPTY;
           }),
@@ -422,7 +416,7 @@ export class TeacupBackup {
       map((encryptedFiles) => {
         const decryptedFiles: Base64File[] = FileDecryptor.decryptBase64Files(
           encryptedFiles,
-          config.secret,
+          config.secret ?? '',
         );
 
         this.updateFilePathsToDecrypted(decryptedFiles);
@@ -538,7 +532,7 @@ export class TeacupBackup {
 
   private getConfigDirectory(): string {
     return (
-      this.currentDirectory.getExtendedInfo()['root'] ||
+      (this.currentDirectory.getExtendedInfo() as any)['root'] ?? // TODO Change any
       this.currentDirectory.getCurrentDirectory()
     );
   }
