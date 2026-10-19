@@ -1,9 +1,9 @@
-export * from './models/config.interface';
-export * from './models/default-config.const';
-export * from './models/ftp-config.interface';
-export * from './models/log-level.type';
-export * from './models/task.interface';
-export * from './models/task-id.enum';
-export * from './models/task-status.enum';
+export { DEFAULT_CONFIG } from './consts';
+export * from './interval/interval-formatter';
 export * from './teacup-backup';
-export * from './utils/interval-formatter.class';
+export * from './types/config';
+export * from './types/ftp-config';
+export * from './types/log-level';
+export * from './types/task';
+export * from './types/task-id';
+export * from './types/task-status';

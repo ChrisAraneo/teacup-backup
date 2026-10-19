@@ -1,5 +1,5 @@
-import { FtpConfig } from './ftp-config.interface';
-import { LogLevel } from './log-level.type';
+import type { FtpConfig } from './ftp-config';
+import type { LogLevel } from './log-level';
 
 export interface Config {
   roots: string[];

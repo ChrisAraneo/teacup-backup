@@ -1,5 +1,5 @@
-import { TaskId } from './task-id.enum';
-import { TaskStatus } from './task-status.enum';
+import type { TaskId } from './task-id';
+import type { TaskStatus } from './task-status';
 
 export interface Task {
   id: TaskId;
