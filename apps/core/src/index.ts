@@ -1,5 +1,5 @@
 export { DEFAULT_CONFIG } from './consts';
-export * from './interval/interval-formatter';
+export { formatInterval } from './interval/interval-formatter';
 export * from './teacup-backup';
 export * from './types/config';
 export * from './types/ftp-config';
